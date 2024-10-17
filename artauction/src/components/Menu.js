@@ -9,6 +9,9 @@ const Menu = ()=>{
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/member/join">회원가입</NavLink>
                         </li> 
+                        <li className="nav-item">
+                            <NavLink className="nav-link" to="/artist">작가</NavLink>
+                        </li> 
                     </ul>
                 </div>
             </div>
