@@ -21,6 +21,7 @@ const MemberLogin = () => {
         setInput({
             ...input,
             [e.target.name]: e.target.value
+            
         });
     }, [input]);
 
