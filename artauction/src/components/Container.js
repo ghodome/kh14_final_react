@@ -1,3 +1,5 @@
+import Artist from "./Artist/Artist";
+import ArtistRegist from "./Artist/ArtistRegist";
 import Home from "./Home";
 import Menu from "./Menu";
 import WorkRegist from "./work/WorkRegist";
@@ -11,6 +13,8 @@ const Container =()=>{
                     <Routes>
                         <Route path="/" element={<Home/>}/>
                         <Route path="/work" element={<WorkRegist/>}/>
+                        <Route path="/artist" element={<Artist/>}/>
+                        <Route path="/artist/regist" element={<ArtistRegist/>}/>
                     </Routes>
                 </div>
             </div>
