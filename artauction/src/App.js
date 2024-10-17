@@ -1,12 +1,14 @@
-import logo from './logo.svg';
-import './App.css';
+
+import { HashRouter } from 'react-router-dom';
+import Container from './components/Container';
+import Menu from './components/Menu';
 
 function App() {
   return (<>
-  <div>테스트</div>
-  <div>테스트</div>
-  <div>테스트</div>
-  <div>테스트</div>
+  <HashRouter>
+    <Menu/>
+    <Container/>
+  </HashRouter>
   </>
   );
 }
