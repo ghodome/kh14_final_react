@@ -10,7 +10,7 @@ const Menu = ()=>{
                             <NavLink className="nav-link" to="/member/join">회원가입</NavLink>
                         </li> 
                         <li className="nav-item">
-                            <NavLink className="nav-link" to="/artist/regist">작가등록</NavLink>
+                            <NavLink className="nav-link" to="/artist">작가</NavLink>
                         </li> 
                     </ul>
                 </div>
