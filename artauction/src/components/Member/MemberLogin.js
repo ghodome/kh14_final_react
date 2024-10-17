@@ -22,6 +22,7 @@ const MemberLogin = () => {
             ...input,
             [e.target.name]: e.target.value
             
+
         });
     }, [input]);
 
