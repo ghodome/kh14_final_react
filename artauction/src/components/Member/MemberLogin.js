@@ -1,7 +1,104 @@
+import axios from "axios";
+import { useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Jumbotron from "../Jumbotron";
+import { CgLogIn } from "react-icons/cg";
 
-const MemberLogin=()=>{
+const MemberLogin = () => {
+    const navigate = useNavigate();
+
+    const [input, setInput] = useState({
+        memberId: "", memberPw: ""
+    });
+    const [display, setDisplay] = useState(false);
+    const [stay, setStay] = useState(false);
+
+    const [memberId, setMemberId] = useState(false);
+    const [memberRank, setMemberRank] = useState(false);
+
+
+    const changeInput = useCallback(e => {
+        setInput({
+            ...input,
+            [e.target.name]: e.target.value
+            
+
+        });
+    }, [input]);
+
+    const sendLoginRequest = useCallback(async () => {
+        const resp = await axios.post("http://localhost:8080/member/login", input);
+
+        setMemberId(resp.data.memberId);
+        setMemberRank(resp.data.memberRank);
+
+        axios.defaults.headers.common["Authorization"]
+            = "Bearer" + resp.data.accessToken;
+
+        if (stay === true) {
+            window.localStorage.setItem("refreshToken", resp.data.refreshToken);
+        }
+        else {
+            window.sessionStorage.setItem("refreshToken", resp.data.refreshToken);
+        }
+
+        navigate("/");
+    }, [input, stay]);
+
     return (<>
-    
+        <div className="row">
+            <div className="col-md-6 offset-md-3">
+
+                <Jumbotron title="회원 로그인" />
+
+                <div className="row mt-4">
+                    <div className="col">
+                        <input type="text" name="memberId" className="form-control"
+                            placeholder="아이디 입력"
+                            value={input.memberId} onChange={changeInput} />
+                    </div>
+                </div>
+
+                <div className="row mt-4">
+                    <div className="col">
+                        <input type={display ? "text" : "password"} name="memberPw" className="form-control"
+                            placeholder="비밀번호 입력"
+                            value={input.memberPw} onChange={changeInput} />
+                    </div>
+                </div>
+
+                <div className="row mt-4">
+                    <div className="col">
+
+                        <label>
+                            <input type="checkbox" className="form-check-input"
+                                checked={display}
+                                onChange={e => setDisplay(e.target.checked)} />
+                            <span className="form-check-label ms-2">비밀번호 표시</span>
+                        </label>
+
+                        <label className="ms-5">
+                            <input type="checkbox" className="form-check-input"
+                                checked={stay}
+                                onChange={e => setStay(e.target.checked)} />
+                            <span className="form-check-label ms-2">로그인 유지</span>
+                        </label>
+
+                    </div>
+                </div>
+
+                <div className="row mt-4">
+                    <div className="col">
+                        <button className="btn btn-success w-100"
+                            onClick={sendLoginRequest}>
+                            <CgLogIn />
+                            <span className="ms-2">로그인</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </>)
 }
 

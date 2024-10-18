@@ -7,6 +7,7 @@ const Jumbotron =(props)=>{
                         <h2 className=" text-light">{props.title}</h2>
                         
                         <p className=" text-light">{props.content}</p>
+                        
                     </div>
                 </div>
             </div>
