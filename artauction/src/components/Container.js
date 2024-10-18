@@ -1,7 +1,6 @@
 import Artist from "./Artist/Artist";
 import ArtistRegist from "./Artist/ArtistRegist";
 import Home from "./Home";
-import Menu from "./Menu";
 import WorkRegist from "./work/WorkRegist";
 import {Routes, Route } from 'react-router-dom';
 

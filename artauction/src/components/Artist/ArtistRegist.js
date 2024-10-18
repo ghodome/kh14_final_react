@@ -3,6 +3,12 @@ import Jumbotron from "../Jumbotron";
 import axios from "axios";
 
 const ArtistRegist = ()=>{
+    function onChange(e) {
+        const text=document.querySelector(".note-editable").textContent;
+        console.log(text);
+       e.preventDefault(); 
+      };
+
     //state
     const [input, setInput]=useState({});
     const [artistList,setArtistList]=useState([]);
