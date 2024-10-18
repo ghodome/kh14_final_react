@@ -6,14 +6,18 @@ import { Modal } from "bootstrap";
 const Artist = () => {
   //state
   const [input, setInput] = useState({
+    });
+  const [artistList, setArtistList] = useState([]);
+  const [detailArtist,setDetailArtist] = useState({
     artistName: "",
     artistDescription: "",
     artistHistory: "",
     artistBirth: "",
     artistDeath: "",
   });
-  const [artistList, setArtistList] = useState([]);
 
+  const [updateInput,setUpdateInput]=useState({});
+  const [updateStatus,setUpdateStatus]=useState({});
   // 모달 관련
   const modal = useRef();
   const detailModal = useRef();
@@ -24,12 +28,17 @@ const Artist = () => {
       tag.show();
     }
   }, [modal]);
-  const openDetailModal = useCallback(() => {
+  const openDetailModal = useCallback((artist) => {
     if (detailModal.current) {
-      const tag = Modal.getOrCreateInstance(detailModal.current);
-      tag.show();
+        setUpdateInput({
+            ...updateInput,
+            artistNo:artist.artistNo
+        })
+        setDetailArtist({...artist});
+        const tag = Modal.getOrCreateInstance(detailModal.current);
+        tag.show();
     }
-  }, [detailModal]);
+  }, [detailModal,detailArtist,updateInput]);
 
   const closeModal = useCallback(() => {
     if (modal.current) {
@@ -44,9 +53,11 @@ const Artist = () => {
       const tag = Modal.getInstance(detailModal.current);
       if (tag) {
         tag.hide();
+        setUpdateStatus({});
+        setUpdateInput({});
       }
     }
-  }, [detailModal]);
+  }, [detailModal,updateStatus]);
 
   const changeInput = useCallback(
     (e) => {
@@ -64,7 +75,7 @@ const Artist = () => {
   }, []);
 
   const registInput = useCallback(async () => {
-    const resp = await axios.post("http://localhost:8080/artist/", input);
+    await axios.post("http://localhost:8080/artist/", input);
     window.alert("등록 되었습니다.")
     setInput({
       artistName: "",
@@ -75,8 +86,42 @@ const Artist = () => {
     });
     closeModal();
     loadArtistList();
+    
   }, [input]);
 
+  const deleteArtist=useCallback(async (artistNo)=>{
+    await axios.delete(`http://localhost:8080/artist/${artistNo}`);
+    window.alert("삭제가 완료되었습니다.");
+    loadArtistList();
+    closeDetailModal();
+  },[])
+  const changeStatus = useCallback((e) => {
+    setUpdateStatus({
+        ...updateStatus,
+        [e.target.name]:e.target.checked
+    })
+    if(!e.target.checked){
+        setUpdateInput({
+            ...updateInput,
+            [e.target.name]:null
+        })
+    }
+}, [updateStatus,updateInput]);
+  const changeUpdateInput=useCallback((e)=>{
+    setUpdateInput({
+        ...updateInput,
+        [e.target.name]:e.target.value
+    })
+  },[updateInput]);
+
+
+  const updateArtist=useCallback(async ()=>{
+    const resp=await axios.patch("http://localhost:8080/artist/",updateInput);
+    loadArtistList();
+    closeDetailModal();
+  },[updateInput])
+
+  //effect
   useEffect(() => {
     loadArtistList();
   }, [loadArtistList]);
@@ -118,7 +163,7 @@ const Artist = () => {
               </div>
               <div className="row">
                 <div className="col">
-                    <label>작가설명</label>
+                    <label>작가 설명</label>
                     <textarea type="text" 
                     value={input.artistDescription} 
                     name="artistDescription" 
@@ -130,7 +175,7 @@ const Artist = () => {
             </div>
             <div className="row">
                 <div className="col">
-                    <label>작기기록</label>
+                    <label>작가 기록</label>
                     <input type="text" 
                     name="artistHistory" 
                     className="form-control" 
@@ -204,7 +249,8 @@ const Artist = () => {
                     </div>
                     </div>
                     <div className="col-md-2 d-flex">
-                    <button type="button" className="btn btn-outline-secondary">
+                    <button type="button" className="btn btn-outline-secondary"
+                        onClick={e=>openDetailModal(artist)}>
                         상세
                     </button>
                     </div>
@@ -213,6 +259,147 @@ const Artist = () => {
             ))}
         </div>
     </div>
+    {/* 작가 상세 모달 */}
+    <div className="modal fade" tabIndex="-1" ref={detailModal}>
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title text-danger">작가 정보 상세</h5>
+              <button
+                type="button"
+                className="btn-close"
+                aria-label="Close"
+                onClick={closeDetailModal}></button>
+            </div>
+            <div className="modal-body">
+              <div className="row">
+                <div className="col">
+                  <label>작가명</label>
+                  <div className="row">
+                    <div className="col-10">
+                        {updateStatus.artistName==true?(<>
+                        <input type="text" name="artistName"
+                        value={updateInput.artistName} 
+                        className="form-control"
+                        onChange={e=>changeUpdateInput(e)}></input>
+                        </>):(<p>{detailArtist.artistName}</p>)}
+                    </div>
+                    <div className="col-2">
+                        <input type="checkbox" name="artistName"
+                        onChange={e=>changeStatus(e)}></input>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+              <div className="row"> 
+                <div className="col">
+                    <label>작가설명</label>
+                    <div className="row">
+                    <div className="col-10">
+                        {updateStatus.artistDescription==true?(<>
+                        <input type="text" name="artistDescription"
+                        value={updateInput.artistDescription} 
+                        className="form-control"
+                        onChange={e=>changeUpdateInput(e)}></input>
+                        </>):(<p>{detailArtist.artistDescription}</p>)}
+                    </div>
+                    <div className="col-2">
+                    <input type="checkbox" name="artistDescription"
+                    onChange={e=>changeStatus(e)}></input>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col">
+                    <label>작가기록</label>
+                    <div className="row">
+                    <div className="col-10">
+                        {updateStatus.artistHistory==true?(<>
+                        <input type="text" name="artistHistory"
+                        value={updateInput.artistHistory} 
+                        className="form-control"
+                        onChange={e=>changeUpdateInput(e)}></input>
+                        </>):(<p>{detailArtist.artistHistory}</p>)}
+                    </div>
+                    <div className="col-2">
+                    <input type="checkbox" name='artistHistory'
+                    onChange={e=>changeStatus(e)}></input>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col">
+                    <label>탄생</label>
+                    <div className="row">
+                    <div className="col-10">
+                        {updateStatus.artistBirth==true?(<>
+                        <input type="text" name="artistBirth"
+                        value={updateInput.artistBirth} 
+                        className="form-control"
+                        onChange={e=>changeUpdateInput(e)}></input>
+                        </>):(<p>{detailArtist.artistBirth}</p>)}
+                    </div>
+                    <div className="col-2">
+                    <input type="checkbox" name='artistBirth'
+                    onChange={e=>changeStatus(e)}></input>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col">
+                    <label>사망</label>
+                    <div className="row">
+                    <div className="col-10">
+                        {updateStatus.artistDeath==true?(<>
+                        <input type="text" name="artistDeath"
+                        value={updateInput.artistDeath} 
+                        className="form-control"
+                        onChange={e=>changeUpdateInput(e)}></input>
+                        </>):(<p>{detailArtist.artistDeath}</p>)}
+                    </div>
+                    <div className="col-2">
+                        <input type="checkbox" name='artistDeath'
+                        onChange={e=>changeStatus(e)}></input>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            </div>
+            <div className="modal-footer">
+                <div className="row">
+                    <div className="col-4">
+                        <button
+                            type="button"
+                            className="btn btn-lg btn-danger"
+                            onClick={e=>deleteArtist(detailArtist.artistNo)}>
+                            삭제
+                        </button>
+                    </div>
+                    <div className="col-4">
+                        <button
+                            type="button"
+                            className="btn btn-lg btn-success"
+                            onClick={updateArtist}>
+                            변경
+                        </button>
+                    </div>
+                    <div className="col-4">
+                        <button
+                            type="button"
+                            className="btn btn-lg btn-secondary"
+                            onClick={closeDetailModal}>
+                            확인
+                        </button>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };
