@@ -13,7 +13,7 @@ const Menu = ()=>{
                             <NavLink className="nav-link" to="/artist">작가</NavLink>
                         </li>
                         <li className="nav-item">
-                            <NavLink className="nav-link" to="/auctionlist">경매</NavLink>
+                            <NavLink className="nav-link" to="/auctionschedule">경매</NavLink>
                         </li> 
                     </ul>
                     <ul className="navbar-nav me-auto">

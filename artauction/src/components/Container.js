@@ -1,6 +1,6 @@
 import Artist from "./Artist/Artist";
 import ArtistRegist from "./Artist/ArtistRegist";
-import AuctionList from "./Auction/AuctionList";
+import AuctionSchedule from "./Auction/AuctionSchedule";
 import Home from "./Home";
 import ChangePw from "./Member/ChangePw";
 import FindPw from "./Member/FindPw";
@@ -26,7 +26,7 @@ const Container =()=>{
                         <Route path="/work" element={<WorkRegist/>}/>
                         <Route path="/artist" element={<Artist/>}/>
                         <Route path="/artist/regist" element={<ArtistRegist/>}/>
-                        <Route path="/auctionlist" element={<AuctionList/>}/>
+                        <Route path="/auctionschedule" element={<AuctionSchedule/>}/>
                         <Route path="/notice" element={<Notice/>}/>
                         <Route path="/notice/detail/:noticeNo" element={<NoticeDetail/>}/>
                     </Routes>
