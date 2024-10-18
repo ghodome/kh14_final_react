@@ -1,7 +1,7 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import Jumbotron from '../Jumbotron';
+import axios from 'axios';
 
 const MemberJoin = () => {
     const navigate = useNavigate();
@@ -19,27 +19,64 @@ const MemberJoin = () => {
 
     const [display, setDisplay] = useState(false);
 
+    useEffect(() => {
+        const script = document.createElement('script');
+        script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+        script.async = true;
+        document.body.appendChild(script);
+
+        return () => {
+            document.body.removeChild(script);
+        };
+    }, []);
+
     const changeInput = useCallback((e) => {
-        setInput({
-            ...input,
+        setInput(prevInput => ({
+            ...prevInput,
             [e.target.name]: e.target.value 
-        });
-    }, [input]);
+        }));
+    }, []);
 
     const joinRequest = useCallback(async () => {
-        
+        try {
             const resp = await axios.post("http://localhost:8080/member/join", input);
-            console.log( resp.data);
+            console.log(resp.data);
             navigate("/");
-         
+        } catch (error) {
+            console.error("회원 가입 요청 중 오류:", error);
+        }
     }, [input, navigate]);
+
+    const sample6_execDaumPostcode = () => {
+        if (!window.daum) {
+            console.error("Daum Postcode API가 로드되지 않았습니다.");
+            return;
+        }
+
+        new window.daum.Postcode({
+            oncomplete: function(data) {
+                const addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+                const extraAddr = data.userSelectedType === 'R' ? 
+                    (data.bname ? data.bname : '') + (data.buildingName ? `, ${data.buildingName}` : '') : 
+                    '';
+
+                setInput(prevInput => ({
+                    ...prevInput,
+                    memberPost: data.zonecode,
+                    memberAddress1: addr,
+                    memberAddress2: extraAddr
+                }));
+
+                document.getElementById("sample6_detailAddress").focus(); // 상세주소 입력 필드에 포커스 이동
+            }
+        }).open();
+    };
 
     return (
         <>
             <div className='row'>
                 <div className='col-md-6 offset-md-3'>
                     <Jumbotron title="회원가입" />
-
                     <div className='row mt-4'>
                         <div className='col'>
                             <input type='text' name='memberId'
@@ -90,26 +127,27 @@ const MemberJoin = () => {
                     </div>
                     <div className="row mt-4">
                         <div className="col">
-                            <input type='text' name='memberPost'
+                            <input type='text' id="sample6_postcode" name='memberPost'
                                 className='form-control' placeholder='우편번호'
                                 value={input.memberPost}
-                                onChange={changeInput}
+                                readOnly
                             />
+                            <input type="button" onClick={sample6_execDaumPostcode} value="우편번호 찾기" />
                         </div>
                     </div>
                     <div className="row mt-4">
                         <div className="col">
-                            <input type='text' name='memberAddress1'
-                                className='form-control' placeholder='주소 1'
+                            <input type='text' id="sample6_address" name='memberAddress1'
+                                className='form-control' placeholder='주소'
                                 value={input.memberAddress1}
-                                onChange={changeInput}
+                                readOnly
                             />
                         </div>
                     </div>
                     <div className="row mt-4">
                         <div className="col">
-                            <input type='text' name='memberAddress2'
-                                className='form-control' placeholder='주소 2'
+                            <input type='text' id="sample6_detailAddress" name='memberAddress2'
+                                className='form-control' placeholder='상세주소'
                                 value={input.memberAddress2}
                                 onChange={changeInput}
                             />
