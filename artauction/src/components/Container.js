@@ -1,6 +1,8 @@
 import Artist from "./Artist/Artist";
 import ArtistRegist from "./Artist/ArtistRegist";
 import Home from "./Home";
+import ChangePw from "./Member/ChangePw";
+import FindPw from "./Member/FindPw";
 import MemberJoin from "./Member/MemberJoin";
 import MemberLogin from "./Member/MemberLogin";
 import Menu from "./Menu";
@@ -17,6 +19,8 @@ const Container =()=>{
                         <Route path="/" element={<Home/>}/>
                         <Route path="/join" element={<MemberJoin/>}/>
                         <Route path="/login" element={<MemberLogin/>}/>
+                        <Route path="/findPw" element={<FindPw/>}/>
+                        <Route path="/changePw/:token" element={<ChangePw/>}/>
                         <Route path="/work" element={<WorkRegist/>}/>
                         <Route path="/artist" element={<Artist/>}/>
                         <Route path="/artist/regist" element={<ArtistRegist/>}/>
