@@ -4,6 +4,7 @@ import Home from "./Home";
 import MemberJoin from "./Member/MemberJoin";
 import MemberLogin from "./Member/MemberLogin";
 import Menu from "./Menu";
+import Notice from "./Notice/Notice";
 import WorkRegist from "./work/WorkRegist";
 import {Routes, Route } from 'react-router-dom';
 
@@ -19,6 +20,7 @@ const Container =()=>{
                         <Route path="/work" element={<WorkRegist/>}/>
                         <Route path="/artist" element={<Artist/>}/>
                         <Route path="/artist/regist" element={<ArtistRegist/>}/>
+                        <Route path="/notice" element={<Notice/>}/>
                     </Routes>
                 </div>
             </div>
