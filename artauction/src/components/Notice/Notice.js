@@ -7,6 +7,7 @@ const Notice = () => {
     const [keyword, setKeyword] = useState("");
 
     useEffect(() => {
+        
         loadNoticeList();
     }, []);
 
