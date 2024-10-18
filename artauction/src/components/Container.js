@@ -6,7 +6,6 @@ import ChangePw from "./Member/ChangePw";
 import FindPw from "./Member/FindPw";
 import MemberJoin from "./Member/MemberJoin";
 import MemberLogin from "./Member/MemberLogin";
-import Menu from "./Menu";
 import Notice from "./Notice/Notice";
 import NoticeDetail from "./Notice/NoticeDetail";
 import WorkRegist from "./work/WorkRegist";
