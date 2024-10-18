@@ -3,7 +3,6 @@ import axios from "axios";
 import { NavLink } from "react-router-dom";
 
 const Notice = () => {
-    //state
     const [noticeList, setNoticeList] = useState([]);
     const [keyword, setKeyword] = useState("");
 
@@ -11,13 +10,11 @@ const Notice = () => {
         loadNoticeList();
     }, []);
 
-  //callback
-     const loadNoticeList = useCallback(async ()=>{
 
+    const loadNoticeList = useCallback(async () => {
         const resp = await axios.get("http://localhost:8080/notice/list");
         setNoticeList(resp.data);
     }, []);
-
 
     const handleSearch = async () => {
         if (keyword.trim() === "") {
@@ -28,8 +25,7 @@ const Notice = () => {
         }
     };
 
-    //view
-    
+
     return (
         <>
             <div className="container mt-4">
@@ -77,5 +73,4 @@ const Notice = () => {
         </>
     );
 };
-
 export default Notice;
