@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Notice = () => {
+    //navigator
+    const navigate = useNavigate();
+
+
     //state
     const [noticeList, setNoticeList] = useState([]);
 
@@ -12,7 +17,7 @@ const Notice = () => {
 
     //callback
     const loadNoticeList = useCallback(async ()=>{
-        const resp = await axios.get("http://localhost:8080/notice/");
+        const resp = await axios.get("http://localhost:8080/notice/list");
         setNoticeList(resp.data);
     }, [noticeList])
 
@@ -33,24 +38,20 @@ const Notice = () => {
               </button>
             </div>
           </div>
-<hr/>
         </div>
       </div>
   <div className="container mt-4">
     <table className="table table-bordered">
       <thead className="table-white">
-        <tr>
-          <th className="text-center col-3">번호</th>
-          <th className="text-center col-6">제목</th>
-          <th className="text-center col-3">작성자</th>
-        </tr>
       </thead>
       <tbody className="table">
         {noticeList.map(notice=>(
             <tr key={notice.noticeNo}>
-                <td className="text-center">{notice.noticeNo}</td>
-                <td>{notice.noticeTitle}</td>
-                <td className="text-center">{notice.noticeMemberId}</td>
+                <td className="text-center">{notice.noticeType}</td>
+                <td>
+                    <NavLink to={"/notice/detail/"+notice.noticeNo}>{notice.noticeTitle}</NavLink>
+                    </td>
+                <td className="text-center">{notice.noticeWtime}</td>
             </tr>
             ))}
       </tbody>
