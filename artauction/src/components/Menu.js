@@ -7,7 +7,7 @@ const Menu = ()=>{
                 <div className="collapse navbar-collapse" id="top-menu">
                     <ul className="navbar-nav me-auto">
                         <li className="nav-item">
-                            <NavLink className="nav-link" to="/member/join">회원가입</NavLink>
+                            <NavLink className="nav-link" to="/join">회원가입</NavLink>
                         </li> 
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/artist">작가</NavLink>
