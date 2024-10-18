@@ -124,7 +124,7 @@ const Artist = () => {
                     name="artistDescription" 
                     className="form-control" 
                     onChange={e => changeInput(e)} 
-                    placeholder="작가에 대한 설명"
+                    placeholder="작가에 대한 소개"
                     autoComplete="off"/>
                 </div>
             </div>
@@ -136,13 +136,13 @@ const Artist = () => {
                     className="form-control" 
                     value={input.artistHistory} 
                     onChange={e => changeInput(e)} 
-                    placeholder="작품, 행보 등"
+                    placeholder="작품, 활동 등"
                     autoComplete="off"/>
                 </div>
             </div>
             <div className="row">
                 <div className="col">
-                    <label>태어난날</label>
+                    <label>출생</label>
                     <input type="text" 
                     name="artistBirth" 
                     className="form-control" 
@@ -154,7 +154,7 @@ const Artist = () => {
             </div>
             <div className="row">
                 <div className="col">
-                    <label>죽은날</label>
+                    <label>사망</label>
                     <input type="text" 
                     name="artistDeath" 
                     className="form-control" 
