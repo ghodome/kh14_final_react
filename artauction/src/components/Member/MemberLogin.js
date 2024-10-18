@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Jumbotron from "../Jumbotron";
 import { CgLogIn } from "react-icons/cg";
+import FindPw from "./FindPw";
 
 const MemberLogin = () => {
     const navigate = useNavigate();
@@ -12,6 +13,8 @@ const MemberLogin = () => {
     });
     const [display, setDisplay] = useState(false);
     const [stay, setStay] = useState(false);
+
+    const [forgotPw, setForgotPw] = useState(false);
 
     const [memberId, setMemberId] = useState(false);
     const [memberRank, setMemberRank] = useState(false);
@@ -44,6 +47,8 @@ const MemberLogin = () => {
 
         navigate("/");
     }, [input, stay]);
+
+   
 
     return (<>
         <div className="row">
@@ -97,6 +102,13 @@ const MemberLogin = () => {
                     </div>
                 </div>
 
+                <div className="row mt-4">
+                    <div className="col">
+                        <button className="btn btn-link" onClick={() => navigate("/findPw")}>
+                            비밀번호 찾기
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </>)

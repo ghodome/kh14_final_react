@@ -10,6 +10,7 @@ const Notice = () => {
         loadNoticeList();
     }, []);
 
+
     const loadNoticeList = useCallback(async () => {
         const resp = await axios.get("http://localhost:8080/notice/list");
         setNoticeList(resp.data);
@@ -71,5 +72,4 @@ const Notice = () => {
         </>
     );
 };
-
 export default Notice;
