@@ -1,6 +1,8 @@
 import Artist from "./Artist/Artist";
-import ArtistRegist from "./Artist/ArtistRegist";
+// import ArtistRegist from "./Artist/ArtistRegist";
 import AuctionSchedule from "./Auction/AuctionSchedule";
+import AuctionScheduleDetail from "./Auction/AuctionScheduleDetail";
+import PageNotFound from "./Error/PageNotFound";
 import Home from "./Home";
 import ChangePw from "./Member/ChangePw";
 import FindPw from "./Member/FindPw";
@@ -24,11 +26,14 @@ const Container =()=>{
                         <Route path="/changePw/:token" element={<ChangePw/>}/>
                         <Route path="/work" element={<WorkRegist/>}/>
                         <Route path="/artist" element={<Artist/>}/>
-                        <Route path="/artist/regist" element={<ArtistRegist/>}/>
+                        {/* <Route path="/artist/regist" element={<ArtistRegist/>}/> */}
                         <Route path="/auctionschedule" element={<AuctionSchedule/>}/>
+                        <Route path="/auctionschedule/detail/:auctionScheduleNo" element={<AuctionScheduleDetail/>}/>
                         <Route path="/notice" element={<Notice/>}/>
                         <Route path="/notice/detail/:noticeNo" element={<NoticeDetail/>}/>
+                        <Route path="*" element={<PageNotFound/>}/>
                     </Routes>
+
                 </div>
             </div>
         </div>
