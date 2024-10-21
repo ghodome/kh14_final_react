@@ -6,6 +6,7 @@ import FindPw from "./Member/FindPw";
 import MemberJoin from "./Member/MemberJoin";
 import MemberLogin from "./Member/MemberLogin";
 import Notice from "./Notice/Notice";
+import WorkList from "./work/WorkList";
 import NoticeDetail from "./Notice/NoticeDetail";
 import WorkRegist from "./work/WorkRegist";
 import {Routes, Route } from 'react-router-dom';
@@ -19,6 +20,8 @@ const Container =()=>{
                         <Route path="/" element={<Home/>}/>
                         <Route path="/join" element={<MemberJoin/>}/>
                         <Route path="/login" element={<MemberLogin/>}/>
+                        <Route path="/work/regist" element={<WorkRegist/>}/>
+                        <Route path="/work/list" element={<WorkList/>}/>
                         <Route path="/findPw" element={<FindPw/>}/>
                         <Route path="/changePw/:token" element={<ChangePw/>}/>
                         <Route path="/work" element={<WorkRegist/>}/>
