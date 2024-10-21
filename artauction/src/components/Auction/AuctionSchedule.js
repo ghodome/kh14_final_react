@@ -169,7 +169,7 @@ const AuctionSchedule = ()=>{
 
                             <div className="col-3 p-4">
                                 <p>이미지</p>
-                            </div>
+                            </div>ㅔㅕ
 
                         </div>
                     ))}
