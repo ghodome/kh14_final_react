@@ -15,6 +15,12 @@ const Menu = ()=>{
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/auctionschedule">경매</NavLink>
                         </li> 
+                        <li className="nav-item">
+                            <NavLink className="nav-link" to="/work/list">작품</NavLink>
+                        </li> 
+                        <li className="nav-item">
+                            <NavLink className="nav-link" to="/work/regist">작품등록</NavLink>
+                        </li> 
                     </ul>
                     <ul className="navbar-nav me-auto">
                         <li className="nav-item">
