@@ -1,5 +1,6 @@
 import Artist from "./Artist/Artist";
 import AuctionSchedule from "./Auction/AuctionSchedule";
+import Faq from "./faq/Faq";
 import Home from "./Home";
 import ChangePw from "./Member/ChangePw";
 import FindPw from "./Member/FindPw";
@@ -26,6 +27,7 @@ const Container =()=>{
                         <Route path="/auctionschedule" element={<AuctionSchedule/>}/>
                         <Route path="/notice" element={<Notice/>}/>
                         <Route path="/notice/detail/:noticeNo" element={<NoticeDetail/>}/>
+                        <Route path="/faq" element={<Faq/>}/>
                     </Routes>
                 </div>
             </div>
