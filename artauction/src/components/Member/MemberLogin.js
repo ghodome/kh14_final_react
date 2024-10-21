@@ -30,22 +30,27 @@ const MemberLogin = () => {
     }, [input]);
 
     const sendLoginRequest = useCallback(async () => {
-        const resp = await axios.post("http://localhost:8080/member/login", input);
+       try{
+           const resp = await axios.post("http://localhost:8080/member/login", input);
+   
+           setMemberId(resp.data.memberId);
+           setMemberRank(resp.data.memberRank);
+   
+           axios.defaults.headers.common["Authorization"]
+               = "Bearer " + resp.data.accessToken;
+   
+           if (stay === true) {
+               window.localStorage.setItem("refreshToken", resp.data.refreshToken);
+           }
+           else {
+               window.sessionStorage.setItem("refreshToken", resp.data.refreshToken);
+           }
+           navigate("/");
+       }
+       catch(e){
+        console.log("아이디 없거나 비밀번호 틀림");
+       }
 
-        setMemberId(resp.data.memberId);
-        setMemberRank(resp.data.memberRank);
-
-        axios.defaults.headers.common["Authorization"]
-            = "Bearer" + resp.data.accessToken;
-
-        if (stay === true) {
-            window.localStorage.setItem("refreshToken", resp.data.refreshToken);
-        }
-        else {
-            window.sessionStorage.setItem("refreshToken", resp.data.refreshToken);
-        }
-
-        navigate("/");
     }, [input, stay]);
 
    

@@ -83,6 +83,12 @@ const Menu = ()=>{
                         </li> 
                         <li className="nav-item">
                             <NavLink className="nav-link" to="#">{timeToShow&&(<p>{timeToShow}</p>)}</NavLink>
+                        </li>
+                        <li className="nav-item">
+                            <NavLink className="nav-link" to="/faq">FAQ</NavLink>
+                        </li> 
+                        <li className="nav-item">
+                            <NavLink className="nav-link" to="/websocket">websocket</NavLink>
                         </li> 
                     </ul>
                 </div>
