@@ -26,6 +26,12 @@ const Menu = ()=>{
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/notice">공지사항</NavLink>
                         </li> 
+                        <li className="nav-item">
+                            <NavLink className="nav-link" to="/faq">FAQ</NavLink>
+                        </li> 
+                        <li className="nav-item">
+                            <NavLink className="nav-link" to="/websocket">websocket</NavLink>
+                        </li> 
                     </ul>
                 </div>
             </div>
