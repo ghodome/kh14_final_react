@@ -4,7 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 const Faq = () => {
     // state
     const [faqList, setFaqList] = useState([]);
-    const [selectedType, setSelectedType] = useState(null);
+    const [filteredFaqs, setFilteredFaqs] = useState([]);
+    const [selectedType, setSelectedType] = useState("회원");
+    const [searchTerm, setSearchTerm] = useState("");
 
     // effect
     useEffect(() => {
@@ -14,37 +16,56 @@ const Faq = () => {
     // callback
     const loadFaqList = useCallback(async () => {
         const resp = await axios.get("http://localhost:8080/faq/list");
-        console.log(resp.data); // 응답 데이터 확인
         setFaqList(resp.data);
-
-        // 첫 번째 버튼 자동 선택
-        if (resp.data.length > 0) {
-            setSelectedType(resp.data[0].faqType);
-        }
+        setFilteredFaqs(resp.data.filter(faq => faq.faqType === "회원"));
     }, []);
 
-    // 타입별 필터링
-    const filteredFaqs = selectedType
-        ? faqList.filter(faq => faq.faqType === selectedType)
-        : faqList;
+    // 타입 필터링
+    const handleTypeChange = (type) => {
+        setSelectedType(type);
+        const filtered = faqList.filter(faq => faq.faqType === type);
+        setFilteredFaqs(filtered);
+    };
 
-    // views
+    // 검색 처리
+    const handleSearch = () => {
+        if (searchTerm.trim() === "") {
+            if (selectedType) {
+                const filtered = faqList.filter(faq => faq.faqType === selectedType);
+                setFilteredFaqs(filtered);
+            } else {
+                setFilteredFaqs(faqList);
+            }
+        } else {
+            const searchedFaqs = faqList.filter(faq =>
+                faq.faqContent.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            setFilteredFaqs(searchedFaqs);
+        }
+    };
+
     return (
         <div className="container mt-4">
             <div className="text-center mb-4">
-                <input
-                    type="text"
-                    className="form-control"
-                    placeholder="검색"
-                    style={{ width: '50%', margin: '0 auto' }}
-                />
+                <div className="input-group mb-3" style={{ width: '50%', margin: '0 auto' }}>
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="검색"
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                    />
+                    <button className="btn btn-primary" onClick={handleSearch}>
+                        검색
+                    </button>
+                </div>
             </div>
             <div className="d-flex justify-content-center mb-4">
                 {Array.from(new Set(faqList.map(faq => faq.faqType))).map(type => (
                     <button
                         key={type}
                         className={`btn mx-2 ${selectedType === type ? 'btn-primary' : 'btn-secondary'}`}
-                        onClick={() => setSelectedType(type)}
+                        onClick={() => handleTypeChange(type)}
                     >
                         {type}
                     </button>
@@ -53,8 +74,7 @@ const Faq = () => {
             <div className="faq-content">
                 {filteredFaqs.map(faq => (
                     <div key={faq.faqNo} className="border p-3 mb-2">
-                        <h5 className="faq-title">{faq.faqType}</h5>
-                        <p className="faq-text">{faq.faqContent}</p>
+                        <span className="faq-text">{faq.faqContent}</span>
                     </div>
                 ))}
             </div>
