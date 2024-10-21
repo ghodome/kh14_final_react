@@ -10,6 +10,8 @@ import WorkList from "./work/WorkList";
 import NoticeDetail from "./Notice/NoticeDetail";
 import WorkRegist from "./work/WorkRegist";
 import {Routes, Route } from 'react-router-dom';
+import Mypage from "./Member/Mypage";
+import MemberUpdate from "./Member/MemberUpdate";
 
 const Container =()=>{
     return (<>
@@ -19,7 +21,10 @@ const Container =()=>{
                     <Routes>
                         <Route path="/" element={<Home/>}/>
                         <Route path="/join" element={<MemberJoin/>}/>
-                        <Route path="/login" element={<MemberLogin/>}/>
+                        <Route path="/lkogin" element={<MemberLogin/>}/>
+                        <Route path="/member/myPage" element={<Mypage />} />
+                        <Route path="/member/update" element={<MemberUpdate />} />
+                        {/* <Route path="/member/myPage" element={<PrivateRoute element={<Mypage />} />}/> */}
                         <Route path="/work/regist" element={<WorkRegist/>}/>
                         <Route path="/work/list" element={<WorkList/>}/>
                         <Route path="/findPw" element={<FindPw/>}/>
