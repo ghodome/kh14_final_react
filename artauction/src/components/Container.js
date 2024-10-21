@@ -14,6 +14,7 @@ import WorkList from "./work/WorkList";
 import NoticeDetail from "./Notice/NoticeDetail";
 import WorkRegist from "./work/WorkRegist";
 import {Routes, Route } from 'react-router-dom';
+import WebSocket from "./websocket/WebSocket";
 
 const Container =()=>{
     return (<>
@@ -36,6 +37,7 @@ const Container =()=>{
                         <Route path="/auction/detail/:auctionNo" element={<Auction/>}/>
                         <Route path="/notice/detail/:noticeNo" element={<NoticeDetail/>}/>
                         <Route path="/faq" element={<Faq/>}/>
+                        <Route path="/websocket" element={<WebSocket/>}/>
                     </Routes>
                 </div>
             </div>
