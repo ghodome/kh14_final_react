@@ -33,8 +33,6 @@ const WorkRegist = () => {
 
     //view
     return (<>
-        <Jumbotron title="작품 등록"/>
-
         <div className="row">
             <div className="col-md-4 offset-md-4">
 
