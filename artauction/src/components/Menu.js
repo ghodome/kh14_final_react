@@ -88,6 +88,7 @@ const Menu = ()=>{
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/work/list">작품</NavLink>
                         </li> 
+                    </ul>
                     <ul className="navbar-nav me-auto">
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/notice">공지사항</NavLink>
