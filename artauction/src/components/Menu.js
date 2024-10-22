@@ -12,6 +12,7 @@ const Menu = () => {
 
     const login = useRecoilValue(loginState);
 
+
     // state
     const [time, setTime] = useState();
     const [timeToShow, setTimeToShow] = useState();
@@ -63,6 +64,7 @@ const Menu = () => {
 
         return () => clearInterval(intervalId);
     }, [afterSecond]);
+    
     const logout = useCallback((e) =>{
         setMemberId("");
         setMemberRank("");
@@ -83,6 +85,8 @@ const Menu = () => {
                     <ul className="navbar-nav me-auto">
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/join">회원가입</NavLink>
+                        </li>
+                        <li className="nav-item">
                             <NavLink className="nav-link" to="/login">로그인</NavLink>
                         </li>
                         <li className="nav-item">

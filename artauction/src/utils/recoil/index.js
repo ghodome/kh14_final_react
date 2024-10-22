@@ -17,16 +17,14 @@ const memberRankState = atom({
 });
 
 const loginState = selector({
-    key:"loginState",
-    get: (state)=>{
-        
-        
-        const memberId = state.get(memberIdState);
-       
-        const memberRank = state.get(memberRankState);
+    key: "loginState",
+    get: ({ get }) => {
+        const memberId = get(memberIdState);
+        const memberRank = get(memberRankState);
 
-        return memberId.length > 0 && memberRank.length > 0;
-    }
+        // memberId와 memberRank가 빈 문자열이 아닐 경우 true 반환
+        return memberId && memberRank ? true : false;
+    },
 });
 
 const memberLoadingState = atom({

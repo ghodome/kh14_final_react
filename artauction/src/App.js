@@ -13,15 +13,15 @@ const App = () => {
   const [memberRank, setMemberRank] = useRecoilState(memberRankState);
   const [memberLoading, setMemberLoading] = useRecoilState(memberLoadingState);
 
-  useEffect(()=>{
-    refreshLogin();
-  }, []);
+  // useEffect(()=>{
+  //   refreshLogin();
+  // }, []);
 
   const refreshLogin = useCallback(async ()=>{
     const sessionToken = window.sessionStorage.getItem("refreshToken");
     const localToken = window.localStorage.getItem("refreshToken");
     if(sessionToken === null && localToken === null){
-      setMemberLoading(true);
+      setMemberLoading(false);
       return;
     }
     const refreshToken = sessionToken || localToken;

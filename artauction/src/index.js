@@ -8,6 +8,9 @@ import "bootswatch/dist/litera/bootstrap.min.css";
 import "bootstrap";
 import { RecoilRoot } from 'recoil';
 import { HashRouter } from 'react-router-dom';
+import axios from 'axios';
+
+// axios.defaults.baseURL=process.env.REACT_APP_BASE_URL;
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

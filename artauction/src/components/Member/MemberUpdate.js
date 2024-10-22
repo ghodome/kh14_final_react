@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Jumbotron from "../Jumbotron";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
@@ -29,10 +29,18 @@ const MemberUpdate = () => {
     };
 
     const loadMember = useCallback(async () => {
-        const token = localStorage.getItem("accessToken");
-        const resp = await axios.get(`http://localhost:8080/member/find`);
-        setMember(resp.data);
-    }, []);
+        try {
+            const token = localStorage.getItem("accessToken");
+            if (token) {
+                axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+            }
+            const resp = await axios.get(`http://localhost:8080/member/find`);
+            setMember(resp.data);
+        } catch (error) {
+            console.error("Failed to load member data:", error);
+            navigate("/login"); // 로그인 페이지로 리다이렉트
+        }
+    }, [navigate]);
 
     const changeInput = useCallback(e => {
         const { name, value } = e.target;
@@ -54,8 +62,6 @@ const MemberUpdate = () => {
             memberAddress1: member.memberAddress1 || undefined,
             memberAddress2: member.memberAddress2 || undefined,
         };
-
-        
 
         await axios.patch("http://localhost:8080/member/update", updateMember);
         navigate("/myPage");

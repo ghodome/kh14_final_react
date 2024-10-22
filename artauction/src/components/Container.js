@@ -17,8 +17,12 @@ import {Routes, Route } from 'react-router-dom';
 import Mypage from "./Member/Mypage";
 import MemberUpdate from "./Member/MemberUpdate";
 import WebSocket from "./websocket/WebSocket";
+import { useRecoilValue } from "recoil";
+import { loginState } from "../utils/recoil";
 
 const Container =()=>{
+    const login = useRecoilValue(loginState);
+
     return (<>
         <div className="container-fluid">
             <div className="row my-5 pt-3">
