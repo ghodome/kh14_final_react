@@ -1,7 +1,5 @@
 import Artist from "./Artist/Artist";
 import Auction from "./Auction/Auction";
-import AuctionList from "./Auction/AuctionList";
-
 import AuctionSchedule from "./Auction/AuctionSchedule";
 import Faq from "./faq/Faq";
 import Home from "./Home";
@@ -17,6 +15,7 @@ import {Routes, Route } from 'react-router-dom';
 import Mypage from "./Member/Mypage";
 import MemberUpdate from "./Member/MemberUpdate";
 import WebSocket from "./websocket/WebSocket";
+import AuctionList from './Auction/AuctionList';
 
 const Container =()=>{
     return (<>
