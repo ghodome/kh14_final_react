@@ -18,6 +18,7 @@ import Mypage from "./Member/Mypage";
 import MemberUpdate from "./Member/MemberUpdate";
 import WebSocket from "./websocket/WebSocket";
 import Charge from "./Member/Charge";
+import ChargeSuccess from "./Member/ChargeSuccess";
 
 const Container =()=>{
     return (<>
@@ -44,6 +45,7 @@ const Container =()=>{
                         <Route path="/notice/detail/:noticeNo" element={<NoticeDetail/>}/>
                         <Route path="/faq" element={<Faq/>}/>
                         <Route path="/charge" element={<Charge/>}/>
+                        <Route path="/charge/success/:partnerOrderId" element={<ChargeSuccess/>}/>
                         <Route path="/websocket" element={<WebSocket/>}/>
                     </Routes>
                 </div>
