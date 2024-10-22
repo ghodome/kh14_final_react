@@ -2,19 +2,22 @@ import { Navigate, useNavigate, useParams } from "react-router";
 import Jumbotron from "../Jumbotron";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
+import moment from "moment";
+import "moment/locale/ko";  //moment 한국어 정보 불러오기
+moment.locale("ko");  //moment에 한국어를 기본 언어로 설정
 
 
 const AuctionScheduleDetail = ()=>{
      //parameter
-     const {auctionScheduleNo} = useParams();
+    const {auctionScheduleNo} = useParams();
 
      //navigator
-     const navigate = useNavigate();
+    const navigate = useNavigate();
 
      //state
-     const [auctionSchedule, setAuctionSchedule] = useState({});
+    const [auctionSchedule, setAuctionSchedule] = useState({});
 
-     const [input, setInput] = useState({
+    const [target, setTarget] = useState({    //수정
         auctionScheduleNo : "",
         auctionScheduleTitle : "",
         auctionScheduleStartDate : "",
@@ -34,23 +37,35 @@ const AuctionScheduleDetail = ()=>{
             setAuctionSchedule(resp.data);
     }, [auctionSchedule, auctionScheduleNo]);
 
-    const changeInput = useCallback(e=>{
-        setInput({
-            ...input,
+    const changeTarget = useCallback(e=>{
+        setTarget({
+            ...target,
             [e.target.name] : e.target.value
-        })
-    }, [input]);
+        });
+    }, [target]);
 
-    const editAuctionSchedule = useCallback(async ()=>{
-        await axios.put("http://localhost:8080/auctionSchedule/", input);
-        changeInput();
+    // target 청소
+    const clearTarget = useCallback(e=>{
+        setTarget({
+            auctionScheduleNo : "",
+            auctionScheduleTitle : "",
+            auctionScheduleStartDate : "",
+            auctionScheduleEndDate : "",
+            auctionScheduleState : "",
+            auctionScheduleNotice : "",
+        })
+    }, [target])
+
+    const saveTarget = useCallback(async ()=>{
+        await axios.put("http://localhost:8080/auctionSchedule/");
         loadAuctionSchedule();
     }, [auctionSchedule, input]);
 
-    const deleteAuctionSchedule = useCallback(async ()=>{
+
         await axios.delete("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
         navigate("/auctionschedule");
     }, [auctionSchedule, auctionScheduleNo]);
+
     
     //view
     return (<>
@@ -84,7 +99,7 @@ const AuctionScheduleDetail = ()=>{
                     시작일
                 </div>
                 <div className="col-sm-9">
-                    {auctionSchedule.auctionScheduleStartDate}
+                    {moment(auctionSchedule.auctionScheduleStartDate).format("yyyy/MM/DD (dd)Ta hh:mm")}
                 </div>
             </div>
 
@@ -93,7 +108,7 @@ const AuctionScheduleDetail = ()=>{
                     종료일
                 </div>
                 <div className="col-sm-9">
-                    {auctionSchedule.auctionScheduleEndDate}
+                {moment(auctionSchedule.auctionScheduleEndDate).format("yyyy/MM/DD (dd)Ta hh:mm")}
                 </div>
             </div>
             
@@ -114,11 +129,79 @@ const AuctionScheduleDetail = ()=>{
                 <button className="btn btn-secondary ms-2" 
                                 onClick={e=>navigate("/auctionschedule")}>목록보기</button>
                     <button className="btn btn-warning ms-2" 
-                                onClick={editAuctionSchedule}>수정하기</button>
+                                onClick={openEditModal}>수정하기</button>
                     <button className="btn btn-danger ms-2" 
                                 onClick={deleteAuctionSchedule}>삭제하기</button>
             </div>
         </div>
+
+
+        {/* 경매 일정 수정 모달 */}
+        <div className="modal fade" tabIndex="-1"
+                                ref={editModal} data-bs-backdrop="static">
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+
+                                <div className="modal-header">
+                                    <h5 className="modal-title">
+                                        경매 일정 수정
+                                    </h5>
+                                    <button type="button" className="btn-close" 
+                                        data-bs-dismiss="modal" aria-label="Close"
+                                        onClick={closeEditModal}>
+                                    <span aria-hidden="true"></span>
+                                    </button>
+                                </div>
+
+                                <div className="modal-body">
+                                    {/* 경매 일정 등록 */}
+                                    <div className="row mt-4">
+                                        <div className="col">
+                                            <label>경매 일정명</label>
+                                            <input type="text" className="form-control mb-4" 
+                                                    name="auctionScheduleTitle" value={target.auctionScheduleTitle} 
+                                                    onChange={changeTarget}/>
+                                            
+                                            <label>일정 시작일</label>
+                                            <input type="datetime-local" className="form-control mb-4" 
+                                                    name="auctionScheduleStartDate" value={target.auctionScheduleStartDate} 
+                                                    onChange={changeTarget}/>
+
+                                            <label>일정 종료일</label>
+                                            <input type="datetime-local" className="form-control mb-4" 
+                                                    name="auctionScheduleEndDate" value={target.auctionScheduleEndDate} 
+                                                    onChange={changeTarget}/>
+                                            
+                                            <label>일정 상태</label>
+                                            <select className="form-select mb-4" name="auctionScheduleState" 
+                                                    value={target.auctionScheduleState} onChange={changeTarget}>
+                                                <option value="">선택하세요</option>
+                                                <option>예정경매</option>
+                                                <option>진행경매</option>
+                                                <option>종료경매</option>
+                                            </select>
+
+                                            <label>안내사항</label>
+                                            <textarea type="text" className="form-control mb-4" 
+                                                    name="auctionScheduleNotice" value={target.auctionScheduleNotice} 
+                                                    onChange={changeTarget}/>
+
+                                            <label>이미지 첨부</label>
+                                            {/* <input type="file" id="input" multiple /> */}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-secondary btn-manual-close" 
+                                                onClick={closeEditModal}>취소</button>
+                                <button type="button" className="btn btn-success"
+                                                onClick={saveTarget}>등록</button>
+                                   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
     
     </>)
 
