@@ -119,11 +119,11 @@ const AuctionSchedule = ()=>{
                                 <div className="d-flex flex-row">
                                     <div className="p-2">경매시작일</div>
                                     <div className="p-2">
-                                        {moment(auctionSchedule.auctionScheduleStartDate).format("yyyy/MM/DD (dd)Ta hh:mm")}</div>
+                                        {moment(auctionSchedule.auctionScheduleStartDate).format("yyyy/MM/DD (dd) a hh:mm")}</div>
                                 </div>
                                 <div className="d-flex flex-row">
                                     <div className="p-2">경매종료일</div>
-                                    <div className="p-2">{moment(auctionSchedule.auctionScheduleEndDate).format("yyyy/MM/DD (dd)Ta hh:mm")}</div>
+                                    <div className="p-2">{moment(auctionSchedule.auctionScheduleEndDate).format("yyyy/MM/DD (dd) a hh:mm")}</div>
                                 </div>
 
                                 <div className="d-flex flex-row mt-2 mb-2">

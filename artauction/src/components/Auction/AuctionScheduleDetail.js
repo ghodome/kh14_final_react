@@ -1,23 +1,24 @@
 import { Navigate, useNavigate, useParams } from "react-router";
 import Jumbotron from "../Jumbotron";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import moment from "moment";
 import "moment/locale/ko";  //moment 한국어 정보 불러오기
+import { Modal } from "bootstrap";
 moment.locale("ko");  //moment에 한국어를 기본 언어로 설정
 
 
 const AuctionScheduleDetail = ()=>{
      //parameter
-    const {auctionScheduleNo} = useParams();
+     const {auctionScheduleNo} = useParams();
 
      //navigator
-    const navigate = useNavigate();
+     const navigate = useNavigate();
 
      //state
-    const [auctionSchedule, setAuctionSchedule] = useState({});
+     const [auctionSchedule, setAuctionSchedule] = useState({});
 
-    const [target, setTarget] = useState({    //수정
+     const [target, setTarget] = useState({    //수정
         auctionScheduleNo : "",
         auctionScheduleTitle : "",
         auctionScheduleStartDate : "",
@@ -37,6 +38,8 @@ const AuctionScheduleDetail = ()=>{
             setAuctionSchedule(resp.data);
     }, [auctionSchedule, auctionScheduleNo]);
 
+
+    //수정
     const changeTarget = useCallback(e=>{
         setTarget({
             ...target,
@@ -44,7 +47,6 @@ const AuctionScheduleDetail = ()=>{
         });
     }, [target]);
 
-    // target 청소
     const clearTarget = useCallback(e=>{
         setTarget({
             auctionScheduleNo : "",
@@ -59,12 +61,32 @@ const AuctionScheduleDetail = ()=>{
     const saveTarget = useCallback(async ()=>{
         await axios.put("http://localhost:8080/auctionSchedule/");
         loadAuctionSchedule();
-    }, [auctionSchedule, input]);
+        closeEditModal();
+    }, [target]);
 
+    //삭제
+    const deleteAuctionSchedule = useCallback(async ()=>{
+        const choice = window.confirm("정말 삭제하시겠습니까?");
+        if(choice === false) return;
 
         await axios.delete("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
         navigate("/auctionschedule");
-    }, [auctionSchedule, auctionScheduleNo]);
+    }, [auctionSchedule]);
+
+    //수정모달
+    const editModal = useRef();
+
+    const openEditModal = useCallback((auctionSchedule)=>{
+        const tag = Modal.getOrCreateInstance(editModal.current);
+        tag.show();
+        setTarget({...auctionSchedule});
+    }, [editModal]);
+
+    const closeEditModal = useCallback(()=>{
+        const tag = Modal.getInstance(editModal.current);
+        tag.hide();
+        clearTarget(); 
+    }, [editModal]);
 
     
     //view
@@ -99,7 +121,7 @@ const AuctionScheduleDetail = ()=>{
                     시작일
                 </div>
                 <div className="col-sm-9">
-                    {moment(auctionSchedule.auctionScheduleStartDate).format("yyyy/MM/DD (dd)Ta hh:mm")}
+                    {moment(auctionSchedule.auctionScheduleStartDate).format("yyyy/MM/DD (dd) a hh:mm")}
                 </div>
             </div>
 
@@ -108,7 +130,7 @@ const AuctionScheduleDetail = ()=>{
                     종료일
                 </div>
                 <div className="col-sm-9">
-                {moment(auctionSchedule.auctionScheduleEndDate).format("yyyy/MM/DD (dd)Ta hh:mm")}
+                    {moment(auctionSchedule.auctionScheduleEndDate).format("yyyy/MM/DD (dd) a hh:mm")}
                 </div>
             </div>
             
@@ -129,15 +151,15 @@ const AuctionScheduleDetail = ()=>{
                 <button className="btn btn-secondary ms-2" 
                                 onClick={e=>navigate("/auctionschedule")}>목록보기</button>
                     <button className="btn btn-warning ms-2" 
-                                onClick={openEditModal}>수정하기</button>
+                                onClick={e=>openEditModal(auctionSchedule)}>수정하기</button>
                     <button className="btn btn-danger ms-2" 
-                                onClick={deleteAuctionSchedule}>삭제하기</button>
+                                onClick={e=>deleteAuctionSchedule(auctionSchedule)}>삭제하기</button>
             </div>
         </div>
 
 
-        {/* 경매 일정 수정 모달 */}
-        <div className="modal fade" tabIndex="-1"
+    {/* 경매 일정 수정 모달 */}
+    <div className="modal fade" tabIndex="-1"
                                 ref={editModal} data-bs-backdrop="static">
                         <div className="modal-dialog">
                             <div className="modal-content">
@@ -154,7 +176,6 @@ const AuctionScheduleDetail = ()=>{
                                 </div>
 
                                 <div className="modal-body">
-                                    {/* 경매 일정 등록 */}
                                     <div className="row mt-4">
                                         <div className="col">
                                             <label>경매 일정명</label>
