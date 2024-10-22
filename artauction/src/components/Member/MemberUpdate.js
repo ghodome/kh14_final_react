@@ -34,12 +34,13 @@ const MemberUpdate = () => {
         setMember(resp.data);
     }, []);
 
-    const changeInput = useCallback (e=> {
-        setMember({
-            ...member,
-            [e.target.name] : e.target.value
-        });
-    });
+    const changeInput = useCallback(e => {
+        const { name, value } = e.target;
+        setMember(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -56,7 +57,7 @@ const MemberUpdate = () => {
 
         
 
-        await axios.patch("http://localhost:8080/member/update/", updateMember);
+        await axios.patch("http://localhost:8080/member/update", updateMember);
         navigate("/myPage");
     };
 

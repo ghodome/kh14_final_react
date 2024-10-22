@@ -70,37 +70,41 @@ const Menu = ()=>{
   
     
     return(<>
+
         <nav className="navbar navbar-expand bg-light fixed-top" data-bs-theme="light">
             <div className="container-fluid">
                 <div className="collapse navbar-collapse" id="top-menu">
                     <ul className="navbar-nav me-auto">
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/join">회원가입</NavLink>
-                        </li> 
+                            <NavLink className="nav-link" to="/login">로그인</NavLink>
+                        </li>
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/artist">작가</NavLink>
                         </li>
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/auctionschedule">경매</NavLink>
-                        </li> 
+                        </li>
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/work/list">작품</NavLink>
-                        </li> 
+                        </li>
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/work/regist">작품등록</NavLink>
-                        </li> 
+                        </li>
                     </ul>
                     <ul className="navbar-nav me-auto">
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/notice">공지사항</NavLink>
-                        </li> 
-                        
+                        </li>
+                        <li className="nav-item">
+                            <NavLink className="nav-link" to="#">{timeToShow && (<p>{timeToShow}</p>)}</NavLink>
+                        </li>
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/faq">FAQ</NavLink>
-                        </li> 
+                        </li>
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/websocket">websocket</NavLink>
-                        </li> 
+                        </li>
                     </ul>
                     <ul className="navbar-nav me-auto">
                         <li className="nav-item">
