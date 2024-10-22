@@ -68,6 +68,7 @@ const WebSocketChat = () => {
                             value={input}
                             onChange={e => setInput(e.target.value)}
                             placeholder="메시지를 입력하세요"
+                            onKeyUp={e=>{if(e.key=='Enter') sendMessage();}}
                         />
                         <button className='btn btn-primary' onClick={sendMessage}>보냄</button>
                     </div>

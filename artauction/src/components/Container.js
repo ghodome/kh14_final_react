@@ -1,7 +1,5 @@
 import Artist from "./Artist/Artist";
 import Auction from "./Auction/Auction";
-import AuctionList from "./Auction/AuctionList";
-
 import AuctionSchedule from "./Auction/AuctionSchedule";
 import Faq from "./faq/Faq";
 import Home from "./Home";
@@ -16,6 +14,7 @@ import {Routes, Route } from 'react-router-dom';
 import Mypage from "./Member/Mypage";
 import MemberUpdate from "./Member/MemberUpdate";
 import WebSocket from "./websocket/WebSocket";
+import AuctionList from './Auction/AuctionList';
 
 const Container =()=>{
     return (<>
@@ -25,7 +24,7 @@ const Container =()=>{
                     <Routes>
                         <Route path="/" element={<Home/>}/>
                         <Route path="/join" element={<MemberJoin/>}/>
-                        <Route path="/lkogin" element={<MemberLogin/>}/>
+                        <Route path="/login" element={<MemberLogin/>}/>
                         <Route path="/member/myPage" element={<Mypage />} />
                         <Route path="/member/update" element={<MemberUpdate />} />
                         {/* <Route path="/member/myPage" element={<PrivateRoute element={<Mypage />} />}/> */}
