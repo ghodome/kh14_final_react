@@ -26,7 +26,7 @@ const Auction = () => {
         <>
             {auction ? ( // auction이 null이 아닐 때만 렌더링
                 <>
-                    <Jumbotron title="경매 상세 페이지" />
+                    <Jumbotron title={`{auctionNo}`} />
                     <div className="row mt-4">
                         <div className="col-8">
                             사진<br/>

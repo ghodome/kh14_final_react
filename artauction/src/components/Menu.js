@@ -73,7 +73,7 @@ const Menu = ()=>{
 
         <nav className="navbar navbar-expand bg-light fixed-top" data-bs-theme="light">
             <div className="container-fluid">
-                <div className="collapse navbar-collapse" id="top-menu">
+                <div className="collapse navbar-collapse text-nowrap" id="top-menu">
                     <ul className="navbar-nav me-auto">
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/join">회원가입</NavLink>
@@ -106,7 +106,6 @@ const Menu = ()=>{
                             <NavLink className="nav-link" to="/charge">포인트 충전하기</NavLink>
                         </li> 
 
-                        </li>
                     </ul>
                     <ul className="navbar-nav me-auto">
                         <li className="nav-item">

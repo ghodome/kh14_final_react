@@ -1,5 +1,5 @@
 import Artist from "./Artist/Artist";
-import Auction from "./Auction/Auction";
+import AuctionDetail from "./Auction/AuctionDetail"
 import AuctionSchedule from "./Auction/AuctionSchedule";
 import Faq from "./faq/Faq";
 import Home from "./Home";
@@ -41,7 +41,7 @@ const Container =()=>{
                         <Route path="/auctionschedule/detail/:auctionScheduleNo" element={<AuctionScheduleDetail/>}/>
                         <Route path="/notice" element={<Notice/>}/>
                         <Route path="/auctionList/:auctionScheduleNo" element={<AuctionList/>}/>
-                        <Route path="/auction/detail/:auctionNo" element={<Auction/>}/>
+                        <Route path="/auction/detail/:auctionNo" element={<AuctionDetail/>}/>
                         <Route path="/notice/detail/:noticeNo" element={<NoticeDetail/>}/>
                         <Route path="/faq" element={<Faq/>}/>
                         <Route path="/charge" element={<Charge/>}/>
