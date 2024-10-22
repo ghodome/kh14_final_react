@@ -25,7 +25,7 @@ const Container =()=>{
                     <Routes>
                         <Route path="/" element={<Home/>}/>
                         <Route path="/join" element={<MemberJoin/>}/>
-                        <Route path="/lkogin" element={<MemberLogin/>}/>
+                        <Route path="/login" element={<MemberLogin/>}/>
                         <Route path="/member/myPage" element={<Mypage />} />
                         <Route path="/member/update" element={<MemberUpdate />} />
                         {/* <Route path="/member/myPage" element={<PrivateRoute element={<Mypage />} />}/> */}
