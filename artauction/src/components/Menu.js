@@ -77,6 +77,8 @@ const Menu = ()=>{
                     <ul className="navbar-nav me-auto">
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/join">회원가입</NavLink>
+                        </li>
+                        <li className="nav-item">
                             <NavLink className="nav-link" to="/login">로그인</NavLink>
                         </li>
                         <li className="nav-item">
@@ -92,9 +94,6 @@ const Menu = ()=>{
                     <ul className="navbar-nav me-auto">
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/notice">공지사항</NavLink>
-                        </li>
-                        <li className="nav-item">
-                            <NavLink className="nav-link" to="#">{timeToShow && (<p>{timeToShow}</p>)}</NavLink>
                         </li>
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/faq">FAQ</NavLink>
