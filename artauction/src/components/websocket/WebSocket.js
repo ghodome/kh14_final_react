@@ -62,6 +62,7 @@ const WebSocket = ()=>{
         setInput("");
     }, [input, client, connect]);
 
+
     //view
     return (<>
         <Jumbotron title="웹소켓 클라이언트" 
@@ -76,6 +77,7 @@ const WebSocket = ()=>{
                             onClick={sendMessage}>
                         보내기
                     </button>
+
                 </div>
             </div>
         </div>
