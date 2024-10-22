@@ -47,12 +47,10 @@ const AuctionScheduleDetail = ()=>{
         loadAuctionSchedule();
     }, [auctionSchedule, input]);
 
-
     const deleteAuctionSchedule = useCallback(async ()=>{
         await axios.delete("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
         navigate("/auctionschedule");
     }, [auctionSchedule, auctionScheduleNo]);
-
     
     //view
     return (<>
