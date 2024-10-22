@@ -17,6 +17,7 @@ import {Routes, Route } from 'react-router-dom';
 import Mypage from "./Member/Mypage";
 import MemberUpdate from "./Member/MemberUpdate";
 import WebSocket from "./websocket/WebSocket";
+import AuctionScheduleDetail from "./Auction/AuctionScheduleDetail";
 
 const Container =()=>{
     return (<>
@@ -37,6 +38,7 @@ const Container =()=>{
                         <Route path="/work" element={<WorkRegist/>}/>
                         <Route path="/artist" element={<Artist/>}/>
                         <Route path="/auctionschedule" element={<AuctionSchedule/>}/>
+                        <Route path="/auctionschedule/detail/:auctionScheduleNo" element={<AuctionScheduleDetail/>}/>
                         <Route path="/notice" element={<Notice/>}/>
                         <Route path="/auctionList/:auctionScheduleNo" element={<AuctionList/>}/>
                         <Route path="/auction/detail/:auctionNo" element={<Auction/>}/>
