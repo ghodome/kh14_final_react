@@ -63,7 +63,6 @@ const AuctionScheduleDetail = ()=>{
         closeChangeModal();
     }, [target]);
 
-
     // 수정 모달
     const changeModal = useRef();
 
@@ -78,8 +77,6 @@ const AuctionScheduleDetail = ()=>{
         tag.hide();
         clearTarget();
     }, [changeModal]);
-
-
 
     const deleteAuctionSchedule = useCallback(async ()=>{
         const choice = window.confirm("정말 삭제하시겠습니까?");
