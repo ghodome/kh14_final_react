@@ -90,6 +90,9 @@ const Menu = ()=>{
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/websocket">websocket</NavLink>
                         </li> 
+                        <li className="nav-item">
+                            <NavLink className="nav-link" to="/charge">포인트 충전하기</NavLink>
+                        </li> 
                     </ul>
                 </div>
             </div>
