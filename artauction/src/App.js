@@ -1,13 +1,10 @@
 
 import Container from './components/Container';
 import Menu from './components/Menu';
-import { RecoilRoot, useRecoilState } from 'recoil';
-import { memberIdState, memberLoadingState, memberRankState } from './utils/recoil';
-import { useCallback, useEffect } from 'react';
-import axios from 'axios';
 
 
 const App = () => {
+
 
   const [memberId, setMemberId] = useRecoilState(memberIdState);
   const [memberRank, setMemberRank] = useRecoilState(memberRankState);
