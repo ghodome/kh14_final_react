@@ -36,7 +36,7 @@ const AuctionScheduleDetail = ()=>{
     const loadAuctionSchedule = useCallback(async ()=>{
             const resp = await axios.get("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
             setAuctionSchedule(resp.data);
-    }, [auctionSchedule, auctionScheduleNo]);
+    }, [auctionSchedule]);
 
 
     //수정
@@ -59,8 +59,8 @@ const AuctionScheduleDetail = ()=>{
     }, [target])
 
     const saveTarget = useCallback(async ()=>{
-        await axios.put("http://localhost:8080/auctionSchedule/");
-        loadAuctionSchedule();
+        const resp = await axios.put("http://localhost:8080/auctionSchedule/");
+        loadAuctionSchedule(resp.data);
         closeEditModal();
     }, [target]);
 
@@ -97,7 +97,7 @@ const AuctionScheduleDetail = ()=>{
 
             <div className="row mt-4 text-center">
                 <div className="col">
-                    <img src="https://placehold.co/300" class="img-thumbnail" alt=""/>           
+                    <img src="https://placehold.co/300" className="img-thumbnail" alt=""/>           
                 </div>
             </div>
 
@@ -217,7 +217,7 @@ const AuctionScheduleDetail = ()=>{
                                     <button type="button" className="btn btn-secondary btn-manual-close" 
                                                 onClick={closeEditModal}>취소</button>
                                 <button type="button" className="btn btn-success"
-                                                onClick={saveTarget}>등록</button>
+                                                onClick={saveTarget}>수정</button>
                                    
                                 </div>
                             </div>
