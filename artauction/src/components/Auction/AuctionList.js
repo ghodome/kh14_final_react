@@ -1,26 +1,31 @@
 import { useCallback, useEffect, useState } from "react";
 import Jumbotron from "../Jumbotron";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const AuctionList = ()=>{
     const {auctionScheduleNo} = useParams();
     const [auctionList,setAuctionList] = useState([]);
-
+    const navigate = useNavigate();
     const loadAuctionList = useCallback(async()=>{
         const resp = await axios.get(`http://localhost:8080/auction/${auctionScheduleNo}`)
         setAuctionList(resp.data);
     },[]);
+    
+    const detail = useCallback((target)=>{
+        navigate(`/auction/detail/${target}`); 
+    },[])
     useEffect(()=>{
         loadAuctionList();
     },[]);
+    
     return (<>
         <Jumbotron title="경매 모음"/>
         <div className="row mt-4">
             {auctionList.map(list=>(
                 <div className="col-3" key={list.auctionNo}>
                     <h4>{list.auctionNo}</h4>
-                    사진
+                    <p onClick={e=>detail(list.auctionNo)}>사진</p>
                     <br/>
                     {list.artistName}
                     <br/>

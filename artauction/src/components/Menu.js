@@ -100,12 +100,19 @@ const Menu = ()=>{
                         </li>
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/websocket">websocket</NavLink>
+
+                        </li> 
+                        <li className="nav-item">
+                            <NavLink className="nav-link" to="/charge">포인트 충전하기</NavLink>
+                        </li> 
+
                         </li>
                     </ul>
                     <ul className="navbar-nav me-auto">
                         <li className="nav-item">
                             <NavLink className="nav-link" to="#">{timeToShow&&(<div>{timeToShow}</div>)}</NavLink>
                         </li>
+
                     </ul>
                 </div>
             </div>
