@@ -59,34 +59,12 @@ const AuctionScheduleDetail = ()=>{
     const saveTarget = useCallback(async ()=>{
         await axios.put("http://localhost:8080/auctionSchedule/");
         loadAuctionSchedule();
-        closeChangeModal();
-    }, [target]);
+    }, [auctionSchedule, input]);
 
-    //삭제
-    const deleteAuctionSchedule = useCallback(async (target)=>{
-        const choice = window.confirm("정말 삭제하시겠습니까?");
-        if(choice === false) return;
 
         await axios.delete("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
         navigate("/auctionschedule");
-    }, [auctionSchedule]);
-
-    //수정모달
-    const editModal = useRef();
-
-    const openEditModal = useCallback((auctionSchedule)=>{
-        const tag = Modal.getOrCreateInstance(editModal.current);
-        tag.show();
-
-        setTarget({...auctionSchedule});
-    }, [editModal]);
-
-    const closeEditModal = useCallback(()=>{
-        const tag = Modal.getInstance(editModal.current);
-        tag.hide();
-        clearTarget();  //수정입력창 정리
-    }, [editModal]);
-
+    }, [auctionSchedule, auctionScheduleNo]);
 
     
     //view
