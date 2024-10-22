@@ -4,6 +4,9 @@ import { useEffect } from 'react';
 import axios from 'axios';
 import { Modal } from "bootstrap";
 import { useNavigate } from 'react-router-dom';
+import moment from "moment";
+import "moment/locale/ko";  
+moment.locale("ko");  
 
 const AuctionSchedule = ()=>{
     //navigator
@@ -58,9 +61,7 @@ const AuctionSchedule = ()=>{
         });
     }, [insert]);
 
-
-
-    // 입력 모달
+    // 등록 모달
     const insertModal = useRef();
 
     const openInsertModal = useCallback(()=>{
@@ -101,7 +102,7 @@ const AuctionSchedule = ()=>{
                         <div className="row" key={auctionSchedule.auctionScheduleNo}>
 
                             <div className="col-9 p-4 d-flex flex-column position-static">
-                                <div className="d-flex flex-row mb-2">
+                                <div className="d-flex flex-row mb-2 ms-2">
                                 {auctionSchedule.auctionScheduleState === '진행경매' &&(
                                     <div className="badge text-bg-success text-wrap">{auctionSchedule.auctionScheduleState}</div>
                                 )}
@@ -113,21 +114,25 @@ const AuctionSchedule = ()=>{
                                 )}
                                 </div>
                                 <div className="d-flex flex-row">
-                                    <h3>{auctionSchedule.auctionScheduleTitle}</h3>
+                                    <h3 className="ms-2">{auctionSchedule.auctionScheduleTitle}</h3>
                                 </div>
                                 <div className="d-flex flex-row">
-                                    <div className="p-2">경매시작일</div>
-                                    <div className="p-2">{auctionSchedule.auctionScheduleStartDate}</div>
+                                    <div className="p-2">시작일</div>
+                                    <div className="p-2">
+                                        {moment(auctionSchedule.auctionScheduleStartDate).format("yyyy/MM/DD (dd) a hh:mm")}
+                                    </div>
                                 </div>
                                 <div className="d-flex flex-row">
-                                    <div className="p-2">경매종료일</div>
-                                    <div className="p-2">{auctionSchedule.auctionScheduleEndDate}</div>
+                                    <div className="p-2">종료일</div>
+                                    <div className="p-2">
+                                        {moment(auctionSchedule.auctionScheduleEndDate).format("yyyy/MM/DD (dd) a hh:mm")}
+                                    </div>
                                 </div>
 
                                 <div className="d-flex flex-row mt-2 mb-2">
                                 {auctionSchedule.auctionScheduleState === '진행경매' &&(
                                     <button className="btn btn-outline-secondary mt-2 col-3"
-                                        onClick={e=>navigate("/auctionList/")}>상세보기</button>
+                                        onClick={e=>navigate("/auctionList/"+auctionSchedule.auctionScheduleNo)}>상세보기</button>
                                 )}
                                 {auctionSchedule.auctionScheduleState !== '진행경매' &&(
                                     <button className="btn btn-outline-secondary mt-2 col-3"
@@ -138,7 +143,7 @@ const AuctionSchedule = ()=>{
                             </div>
                                 
                             <div className="col-3 p-4">
-                                <img src="https://placehold.co/200" class="img-thumbnail" alt=""/> 
+                                <img src="https://placehold.co/200" className="img-thumbnail" alt=""/> 
                             </div>
                             
                             <hr/>  
@@ -179,7 +184,8 @@ const AuctionSchedule = ()=>{
 
                                             <label>일정 종료일</label>
                                             <input type="datetime-local" className="form-control mb-4" 
-                                                    name="auctionScheduleEndDate" value={insert.auctionScheduleEndDate} 
+                                                    name="auctionScheduleEndDate" 
+                                                    value={insert.auctionScheduleEndDate} 
                                                     onChange={insertInput}/>
                                             
                                             <label>일정 상태</label>
