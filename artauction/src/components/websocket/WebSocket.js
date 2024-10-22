@@ -1,87 +1,99 @@
 import { useCallback, useEffect, useState } from 'react';
-import Jumbotron from '../Jumbotron';
-import SockJS from 'sockjs-client';
-import { Client } from '@stomp/stompjs';
-
-const WebSocketChat = () => {
-    // state
+import Jumbotron from './../Jumbotron';
+import SockJS from "sockjs-client";
+import { Client } from "@stomp/stompjs";
+import moment from "moment";
+import "moment/locale/ko";
+moment.locale("ko");
+const WebSocket = ()=>{
+    //state
     const [input, setInput] = useState("");
     const [messageList, setMessageList] = useState([]);
     const [client, setClient] = useState(null);
     const [connect, setConnect] = useState(false);
-
-    // effect
-    useEffect(() => {
+    
+   
+    //effect
+    useEffect(()=>{
         connectToServer();
-        return () => {
+        return ()=>{
             disconnectFromServer();
         }
     }, []);
-
-    // callback
-    const connectToServer = useCallback(() => {
+    //callback
+    const connectToServer = useCallback(()=>{
         const socket = new SockJS("http://localhost:8080/ws");
-        const stompClient = new Client({
-            webSocketFactory: () => socket,
-            onConnect: () => {
-                setConnect(true);
-                stompClient.subscribe("/public/chat", (message) => {
-                    setMessageList(prev => [...prev, JSON.parse(message.body)]);
+        const client = new Client({
+            webSocketFactory : ()=>socket,
+            onConnect: ()=>{
+                client.subscribe("/public/chat", (message)=>{
+                    const json = JSON.parse(message.body);
+                    setMessageList(prev=>[...prev, json]);//순서 보장
                 });
+                setConnect(true);
             },
-            onDisconnect: () => {
+            onDisconnect: ()=>{
                 setConnect(false);
             },
-            debug: (str) => {
-                console.log(str);
+            debug: (str)=>{
+                console.log("[DEBUG] " + str);
             }
         });
-        stompClient.activate();
-        setClient(stompClient);
-    }, []);
-
-    const disconnectFromServer = useCallback(() => {
-        if (client) {
+        client.activate();
+        setClient(client);
+    }, [client, connect]);
+    const disconnectFromServer = useCallback(()=>{
+        if(client) {
             client.deactivate();
         }
-    }, [client]);
+    }, [client, connect]);
 
-    const sendMessage = useCallback(() => {
-        if (client === null || !connect || input.length === 0) return;
+    const sendMessage = useCallback(()=>{
+        if(client === null) return;
+        if(connect === false) return;
+        if(input.length === 0) return;
+
+        const json = {content : input};
+
         client.publish({
-            destination: "/art/chat",
-            body: JSON.stringify({ content: input }), // 메시지 포맷에 맞게 변환
+            destination: "/app/chat",
+            body: JSON.stringify(json)
         });
-        setMessageList(prev => [...prev, { content: input }]); // 입력한 메시지를 리스트에 추가
         setInput("");
     }, [input, client, connect]);
 
-    return (
-        <>
-            <Jumbotron title="웹소켓" content={connect ? "연결됨" : "종료됨"} />
-            <div className='row mt-4'>
-                <div className='col'>
-                    <div className='input-group mb-3'>
-                        <input
-                            type='text'
-                            className='form-control'
-                            value={input}
-                            onChange={e => setInput(e.target.value)}
-                            placeholder="메시지를 입력하세요"
-                        />
-                        <button className='btn btn-primary' onClick={sendMessage}>보냄</button>
-                    </div>
-                    <ul className='message-list'>
-                        {messageList.map((message, index) => (
-                            <li key={index} className='message'>
-                                {message.content}
-                            </li>
-                        ))}
-                    </ul>
+    //view
+    return (<>
+        <Jumbotron title="웹소켓 클라이언트" 
+                content={"현재 연결 상태 = " + (connect ? "연결됨" : "종료됨")}/>
+        <div className="row mt-4">
+            <div className='col'>
+                <div className='input-group'>
+                    <input type="text" className="form-control"
+                            value={input} 
+                            onChange={e=>setInput(e.target.value)}/>
+                    <button className="btn btn-success"
+                            onClick={sendMessage}>
+                        보내기
+                    </button>
                 </div>
             </div>
-        </>
-    );
-};
+        </div>
+        <div className="row mt-4">
+            <div className="col">
+                <ul className="list-group">
+                    {messageList.map((message, index)=>(
+                    <li className="list-group-item" key={index}>
+                        <p>{message.content}</p>
+                        <p className='text-muted'>{moment(message.time).format("a h:mm")}
+                            ({moment(message.time).fromNow()})
+                        </p>
+                    </li>
+                    ))}
+                </ul>
 
-export default WebSocketChat;
+            </div>
+        </div>
+    </>);
+};
+export default WebSocket;
