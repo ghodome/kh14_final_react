@@ -12,15 +12,15 @@ const AuctionScheduleDetail = ()=>{
      const navigate = useNavigate();
 
      //state
-     const [auctionSchedule, setAuctionSchedule] = useState(null);
-     const [load, setLoad] = useState(false);
+     const [auctionSchedule, setAuctionSchedule] = useState({});
 
      const [input, setInput] = useState({
         auctionScheduleNo : "",
         auctionScheduleTitle : "",
         auctionScheduleStartDate : "",
         auctionScheduleEndDate : "",
-        auctionScheduleState : ""
+        auctionScheduleState : "",
+        auctionScheduleNotice : "",
     });
 
     //effect
@@ -30,14 +30,8 @@ const AuctionScheduleDetail = ()=>{
 
     //callback
     const loadAuctionSchedule = useCallback(async ()=>{
-        try {
             const resp = await axios.get("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
             setAuctionSchedule(resp.data);
-        }
-        catch(e) {
-            setAuctionSchedule(null);
-        }
-        setLoad(true);
     }, [auctionSchedule, auctionScheduleNo]);
 
     const changeInput = useCallback(e=>{
@@ -47,11 +41,11 @@ const AuctionScheduleDetail = ()=>{
         })
     }, [input]);
 
-    // const editAuctionSchedule = useCallback(async ()=>{
-    //     await axios.put("http://localhost:8080/auctionSchedule/", input);
-    //     changeInput();
-    //     loadAuctionSchedule();
-    // }, [auctionSchedule, input]);
+    const editAuctionSchedule = useCallback(async ()=>{
+        await axios.put("http://localhost:8080/auctionSchedule/", input);
+        changeInput();
+        loadAuctionSchedule();
+    }, [auctionSchedule, input]);
 
 
     const deleteAuctionSchedule = useCallback(async ()=>{
@@ -59,100 +53,61 @@ const AuctionScheduleDetail = ()=>{
         navigate("/auctionschedule");
     }, [auctionSchedule, auctionScheduleNo]);
 
-
+    
     //view
-    if(load === false) {
-        return (<>
-            <Jumbotron title="?번 경매 일정 상세정보"/>
-
-            <div className="row mt-4">
-                <div className="col-sm-3">
-                    경매 일정명
-                </div>
-                <div className="col-sm-9">
-                    <span className="placeholder col-6"></span>
-                </div>
-            </div>
-
-            <div className="row mt-4">
-                <div className="col-sm-3">
-                    일정 시작일
-                </div>
-                <div className="col-sm-9">
-                <span className="placeholder col-4"></span>
-                </div>
-            </div>
-
-            <div className="row mt-4">
-                <div className="col-sm-3">
-                    일정 종료일
-                </div>
-                <div className="col-sm-9">
-                <span className="placeholder col-4"></span>
-                </div>
-            </div>
-
-            <div className="row mt-4">
-                <div className="col-sm-3">
-                    일정 상태
-                </div>
-                <div className="col-sm-9">
-                    <span className="placeholder col-3"></span>
-                </div>
-            </div>
-
-            {/* 각종 버튼들 */}
-            <div className="row mt-4">
-                <div className="col text-end">
-                    <button className="btn btn-secondary ms-2">목록보기</button>
-                    <button className="btn btn-warning ms-2">수정하기</button>
-                    <button className="btn btn-danger ms-2">삭제하기</button>
-                </div>
-            </div>
-        </>);
-    }
-    if(auctionSchedule === null) {
-        return <Navigate to="/notFound"/>
-    }
-
-    //view. 2-(1)
     return (<>
         <Jumbotron title={auctionScheduleNo +"번 경매 일정 상세정보"}/>
 
-        <div className="row mt-4">
-            <div className="col-sm-3">
-                경매 일정명
-            </div>
-            <div className="col-sm-9">
-                {auctionSchedule.auctionScheduleTitle}
-            </div>
-        </div>
+        <div className="container w-50">  
 
-        <div className="row mt-4">
-            <div className="col-sm-3">
-                일정 시작일
+            <div className="row mt-4 text-center">
+                <div className="col">
+                    <img src="https://placehold.co/300" class="img-thumbnail" alt=""/>           
+                </div>
             </div>
-            <div className="col-sm-9">
-                {auctionSchedule.auctionScheduleStartDate}
-            </div>
-        </div>
 
-        <div className="row mt-4">
-            <div className="col-sm-3">
-                일정 종료일
+            <div className="row mt-4">
+                <div className="col">
+                    {auctionSchedule.auctionScheduleState === '진행경매' &&(
+                        <div className="badge text-bg-success text-wrap">{auctionSchedule.auctionScheduleState}</div>
+                    )}
+                    {auctionSchedule.auctionScheduleState === '예정경매' &&(
+                        <div className="badge text-bg-info text-wrap">{auctionSchedule.auctionScheduleState}</div>
+                    )}
+                    {auctionSchedule.auctionScheduleState === '종료경매' &&(
+                        <div className="badge text-bg-secondary text-wrap">{auctionSchedule.auctionScheduleState}</div>
+                    )}
+                    <h3 className="mt-2">{auctionSchedule.auctionScheduleTitle}</h3>
+                </div>
             </div>
-            <div className="col-sm-9">
-                {auctionSchedule.auctionScheduleEndDate}
-            </div>
-        </div>
 
-        <div className="row mt-4">
-            <div className="col-sm-3">
-                일정 상태
+            <div className="row mt-4">
+                <div className="col-sm-3">
+                    시작일
+                </div>
+                <div className="col-sm-9">
+                    {auctionSchedule.auctionScheduleStartDate}
+                </div>
             </div>
-            <div className="col-sm-9">
-                {auctionSchedule.auctionScheduleState}
+
+            <div className="row mt-4">
+                <div className="col-sm-3">
+                    종료일
+                </div>
+                <div className="col-sm-9">
+                    {auctionSchedule.auctionScheduleEndDate}
+                </div>
             </div>
+            
+            <div className="row mt-4">
+                <div className="col-sm-3">
+                    Notice
+                </div>
+                <div className="col-sm-9">
+                    {auctionSchedule.auctionScheduleNotice}
+                </div>
+            </div>
+
         </div>
 
         {/* 각종 버튼들 */}
@@ -160,14 +115,13 @@ const AuctionScheduleDetail = ()=>{
             <div className="col text-end">
                 <button className="btn btn-secondary ms-2" 
                                 onClick={e=>navigate("/auctionschedule")}>목록보기</button>
-                    {/* <button className="btn btn-warning ms-2" 
-                                onClick={editAuctionSchedule}>수정하기</button> */}
+                    <button className="btn btn-warning ms-2" 
+                                onClick={editAuctionSchedule}>수정하기</button>
                     <button className="btn btn-danger ms-2" 
                                 onClick={deleteAuctionSchedule}>삭제하기</button>
             </div>
         </div>
     
-
     </>)
 
 };
