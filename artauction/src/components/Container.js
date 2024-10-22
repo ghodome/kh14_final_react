@@ -18,6 +18,7 @@ import { useRecoilValue } from "recoil";
 import { loginState } from "../utils/recoil";
 
 import Charge from "./Member/Charge";
+import ChargeSuccess from "./Member/ChargeSuccess";
 
 import AuctionScheduleDetail from "./Auction/AuctionScheduleDetail";
 import AuctionList from './Auction/AuctionList';
@@ -49,6 +50,7 @@ const Container =()=>{
                         <Route path="/notice/detail/:noticeNo" element={<NoticeDetail/>}/>
                         <Route path="/faq" element={<Faq/>}/>
                         <Route path="/charge" element={<Charge/>}/>
+                        <Route path="/charge/success/:partnerOrderId" element={<ChargeSuccess/>}/>
                         <Route path="/websocket" element={<WebSocket/>}/>
                     </Routes>
                 </div>
