@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import Jumbotron from "../Jumbotron";
 
 const Time = ()=>{
     const [time, setTime] = useState();
@@ -51,11 +51,7 @@ const Time = ()=>{
         return () => clearInterval(intervalId);
     }, [afterSecond]);
     return (<>
-        <ul className="navbar-nav me-auto">
-            <li className="nav-item">
-                <NavLink className="nav-link" to="#">{timeToShow && (<div>{timeToShow}</div>)}</NavLink>
-            </li>
-        </ul>
+        <Jumbotron title={timeToShow && (<div>{timeToShow}</div>)}/>
     </>)
 }
 
