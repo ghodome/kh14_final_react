@@ -188,7 +188,7 @@ const Artist = () => {
             <div className="row">
                 <div className="col">
                     <label>출생</label>
-                    <input type="text" 
+                    <input type="date" 
                     name="artistBirth" 
                     className="form-control" 
                     value={input.artistBirth} 
@@ -200,7 +200,7 @@ const Artist = () => {
             <div className="row">
                 <div className="col">
                     <label>사망</label>
-                    <input type="text" 
+                    <input type="date" 
                     name="artistDeath" 
                     className="form-control" 
                     value={input.artistDeath} 
@@ -230,7 +230,7 @@ const Artist = () => {
 
     <div className="row mt-3 mx-3">
         <div className="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
-            {artistList.map((artist) => (
+            {artistList.length>0&&artistList.map((artist) => (
                 <div className="mb-3 shadow-sm" key={artist.artistNo}>
                 <div className="row g-0">
                     <div className="col-md-2 d-flex">
@@ -240,7 +240,7 @@ const Artist = () => {
                     </div>
                     <div className="col-md-3 d-flex">
                     <div className="list-group-item">
-                        <h5 className="mb-0">{artist.artistName}</h5>
+                        {artist.artistName}
                     </div>
                     </div>
                     <div className="col-md-5 d-flex">
@@ -336,7 +336,7 @@ const Artist = () => {
                     <div className="row">
                     <div className="col-10">
                         {updateStatus.artistBirth==true?(<>
-                        <input type="text" name="artistBirth"
+                        <input type="date" name="artistBirth"
                         value={updateInput.artistBirth} 
                         className="form-control"
                         onChange={e=>changeUpdateInput(e)}></input>
@@ -355,7 +355,7 @@ const Artist = () => {
                     <div className="row">
                     <div className="col-10">
                         {updateStatus.artistDeath==true?(<>
-                        <input type="text" name="artistDeath"
+                        <input type="date" name="artistDeath"
                         value={updateInput.artistDeath} 
                         className="form-control"
                         onChange={e=>changeUpdateInput(e)}></input>

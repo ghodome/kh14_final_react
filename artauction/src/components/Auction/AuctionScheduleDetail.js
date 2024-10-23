@@ -30,12 +30,23 @@ const AuctionScheduleDetail = ()=>{
     });
 
     const [presentInput, setPresentInput]= useState({
-        auctionScheduleNo:auctionScheduleNo
+        auctionScheduleNo: auctionScheduleNo,
+        workNo: "",
+        auctionLot: "",
+        auctionStartPrice: "",
+        auctionLowPrice: "",
+        auctionHighPrice: "",
+        auctionConsigner: "",
+        auctionConsignmentFee: "",
+        auctionNetProceeds: ""
     });
+
+    const [auctionList, setAuctionList] =useState([]);
 
     //effect
     useEffect(()=>{
         loadAuctionSchedule();
+        loadAuctionList();
     }, []);
 
     //callback
@@ -109,13 +120,15 @@ const AuctionScheduleDetail = ()=>{
 
     const registPresentInput=useCallback(async ()=>{
         const resp=await axios.post(`http://localhost:8080/auction/`,presentInput);
+        console.log(presentInput.auctionLot===null)
         if(resp.status===200) 
             window.alert("등록이완료되었습니다.");
-        setPresentInput({
-            auctionScheduleNo:auctionScheduleNo
-        });
         closePresentModal();
+        loadAuctionList();
+        clearPresentModal();
+        
     },[presentInput])
+
     const openPresentModal=useCallback(()=>{
         if(presentModal.current){
             const tag = Modal.getOrCreateInstance(presentModal.current);
@@ -124,9 +137,61 @@ const AuctionScheduleDetail = ()=>{
     },[presentModal])
 
     const closePresentModal=useCallback(()=>{
+        if(presentModal.current){
         const tag = Modal.getInstance(presentModal.current);
         tag.hide();
-    },[presentModal,registPresentInput])
+    }
+        
+    },[presentModal,registPresentInput]);
+
+    const clearPresentModal = useCallback(() => {
+        setPresentInput((prev) => ({
+            ...prev,
+            auctionScheduleNo: auctionScheduleNo, 
+            workNo: '',
+            auctionStartPrice: '',
+            auctionLowPrice: '',
+            auctionHighPrice: '',
+            auctionState: '',
+            auctionConsigner: '',
+            auctionConsignmentFee: '',
+            auctionNetProceeds: '',
+        }));
+    }, [auctionScheduleNo]);
+
+    const loadAuctionList=useCallback(async ()=>{
+        const resp=await axios.get(`http://localhost:8080/auction/auctionList/${auctionScheduleNo}`);
+        setAuctionList(resp.data);
+    },[auctionList]);
+
+    const deleteLot=useCallback(async (auction)=>{
+        const resp=await axios.delete("http://localhost:8080/auction/"+auction.auctionNo)
+        if(resp.status===200)
+        window.alert(`LOT : ${auction.auctionLot}, ${auction.workTitle}이(가) 삭제되었습니다`);
+        loadAuctionList();
+    },[auctionList]);
+
+    const cancelLot=useCallback(async (auction)=>{
+        if(window.confirm("출품을 취소하시겠습니까?")){
+            const resp=await axios.get("http://localhost:8080/auction/cancelPresent/"+auction.auctionNo);
+            if(resp.status===200)
+                window.alert(`LOT : ${auction.auctionLot}, ${auction.workTitle}의 출품이 취소되었습니다`);
+            clearPresentModal();
+            loadAuctionList();
+        }
+    },[auctionList]);
+
+    const uncancelLot=useCallback(async (auction)=>{
+        if(window.confirm("출품 하시겠습니까?")){
+            const resp=await axios.get("http://localhost:8080/auction/uncancelPresent/"+auction.auctionNo);
+            if(resp.status===200)
+                window.alert(`LOT : ${auction.auctionLot}, ${auction.workTitle}의 출품이 등록되었습니다`);
+            loadAuctionList();
+            
+        }
+    },[auctionList]);
+
+
 
     //view
     return (<>
@@ -187,7 +252,7 @@ const AuctionScheduleDetail = ()=>{
         {/* 각종 버튼들 */}
         <div className="row mt-4">
             <div className="col text-end">
-                <button className="btn btn-secondary ms-2" 
+                <button className="btn btn-success ms-2" 
                                 onClick={openPresentModal}>출품 등록</button>
                 <button className="btn btn-secondary ms-2" 
                                 onClick={e=>navigate("/auctionschedule")}>목록보기</button>
@@ -195,6 +260,43 @@ const AuctionScheduleDetail = ()=>{
                                 onClick={e=>openEditModal(auctionSchedule)}>수정하기</button>
                     <button className="btn btn-danger ms-2" 
                                 onClick={e=>deleteAuctionSchedule(auctionSchedule)}>삭제하기</button>
+            </div>
+        </div>
+        {/* 출품 목록 (카드) */}
+        <div className="row mt-5">
+            <div className="col">
+                {auctionList.length > 0 && (<h3 className="text-center my-3">출품 목록</h3>)}
+                <ul className="row mt-2">
+                    {auctionList.map((auction, index) => (
+                        auction.auctionState === '출품취소' ? (
+                            <div className="col-8 offset-2 col-sm-5 offset-sm-1 col-md-4 offset-md-0 mb-3 opacity-50 bg-secondary}" key={index}>
+                                <div className="card">
+                                    <div className="card-body text-nowrap">
+                                        <h5 className="card-title">LOT {auction.auctionLot}</h5>
+                                        <p className="card-text">{auction.workTitle}</p>
+                                        <p className="card-text">{auction.workMaterials}</p>
+                                        <p className="card-text">{auction.workCategory}</p>
+                                        <button type="button" className="btn btn-danger card-text mx-2" onClick={e => deleteLot(auction)}>삭제</button>
+                                        <button type="button" className="btn btn-success card-text mx-2" onClick={e => uncancelLot(auction)}>등록</button>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="col-8 offset-2 col-sm-5 offset-sm-1 col-md-4 offset-md-0 mb-3" key={index}>
+                                <div className="card">
+                                    <div className="card-body text-nowrap">
+                                        <h5 className="card-title">LOT {auction.auctionLot}</h5>
+                                        <p className="card-text">{auction.workTitle}</p>
+                                        <p className="card-text">{auction.workMaterials}</p>
+                                        <p className="card-text">{auction.workCategory}</p>
+                                        <button type="button" className="btn btn-danger card-text mx-2" onClick={e => deleteLot(auction)}>삭제</button>
+                                        <button type="button" className="btn btn-warning card-text mx-2" onClick={e => cancelLot(auction)}>취소</button>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    ))}
+                </ul>
             </div>
         </div>
                     
@@ -214,7 +316,7 @@ const AuctionScheduleDetail = ()=>{
               <div className="row">
                 <div className="col">
                     <label>작품 번호</label>
-                    <input type="number" 
+                    <input type="text" 
                     value={presentInput.workNo} 
                     name="workNo" 
                     className="form-control" 
@@ -223,22 +325,34 @@ const AuctionScheduleDetail = ()=>{
                     autoComplete="off"/>
                 </div>
             </div>
-            <div className="row">
+              <div className="row">
                 <div className="col">
                     <label>출품 번호</label>
-                    <input type="number" 
+                    <input type="text" 
+                    value={presentInput.auctionLot} 
                     name="auctionLot" 
                     className="form-control" 
-                    value={presentInput.auctionLot} 
                     onChange={e => changePresentInput(e)} 
-                    placeholder="출품 번호"
+                    placeholder="출품 번호는 비어있는 Lot가 있을시에만 입력하세요"
+                    autoComplete="off"/>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col">
+                    <label>시작 가격</label>
+                    <input type="text" 
+                    name="auctionStartPrice" 
+                    className="form-control" 
+                    value={presentInput.auctionStartPrice} 
+                    onChange={e => changePresentInput(e)} 
+                    placeholder="숫자만"
                     autoComplete="off"/>
                 </div>
             </div>
             <div className="row">
                 <div className="col">
                     <label>예상 최저가</label>
-                    <input type="number" 
+                    <input type="text" 
                     name="auctionLowPrice" 
                     className="form-control" 
                     value={presentInput.auctionLowPrice} 
@@ -250,7 +364,7 @@ const AuctionScheduleDetail = ()=>{
             <div className="row">
                 <div className="col">
                     <label>예상 최고가</label>
-                    <input type="number" 
+                    <input type="text" 
                     name="auctionHighPrice" 
                     className="form-control" 
                     value={presentInput.auctionHighPrice} 
@@ -274,7 +388,7 @@ const AuctionScheduleDetail = ()=>{
             <div className="row">
                 <div className="col">
                     <label>위탁 수수료</label>
-                    <input type="number" 
+                    <input type="text" 
                     name="auctionConsignmentFee" 
                     className="form-control" 
                     value={presentInput.auctionConsignmentFee} 
@@ -286,7 +400,7 @@ const AuctionScheduleDetail = ()=>{
             <div className="row">
                 <div className="col">
                     <label>위탁 대금</label>
-                    <input type="number" 
+                    <input type="text" 
                     name="auctionNetProceeds" 
                     className="form-control" 
                     value={presentInput.auctionNetProceeds} 
@@ -373,7 +487,7 @@ const AuctionScheduleDetail = ()=>{
                                 <div className="modal-footer">
                                     <button type="button" className="btn btn-secondary btn-manual-close" 
                                                 onClick={closeEditModal}>취소</button>
-                                <button type="button" className="btn btn-success"
+                                    <button type="button" className="btn btn-success"
                                                 onClick={saveTarget}>수정</button>
                                    
                                 </div>
@@ -381,8 +495,7 @@ const AuctionScheduleDetail = ()=>{
                         </div>
                     </div>
     
-    </>)
-
+    </>);
 };
 
 export default AuctionScheduleDetail;
