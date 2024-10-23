@@ -9,6 +9,8 @@ moment.locale("ko");  //moment에 한국어를 기본 언어로 설정
 
 
 const AuctionScheduleDetail = ()=>{
+    //ref
+    const presentModal=useRef();
      //parameter
      const {auctionScheduleNo} = useParams();
 
@@ -27,6 +29,10 @@ const AuctionScheduleDetail = ()=>{
         auctionScheduleNotice : "",
     });
 
+    const [presentInput, setPresentInput]= useState({
+        auctionScheduleNo:auctionScheduleNo
+    });
+
     //effect
     useEffect(()=>{
         loadAuctionSchedule();
@@ -36,7 +42,7 @@ const AuctionScheduleDetail = ()=>{
     const loadAuctionSchedule = useCallback(async ()=>{
             const resp = await axios.get("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
             setAuctionSchedule(resp.data);
-    }, [auctionSchedule, auctionScheduleNo]);
+    }, [auctionSchedule]);
 
 
     //수정
@@ -58,9 +64,22 @@ const AuctionScheduleDetail = ()=>{
         })
     }, [target])
 
-    const saveTarget = useCallback(async ()=>{
-        await axios.put("http://localhost:8080/auctionSchedule/");
+    const changePresentInput=useCallback((e)=>{
+        setPresentInput({
+            ...presentInput,
+            [e.target.name]:e.target.value
+        })
+    },[presentInput])
+
+    const editAuctionSchedule = useCallback(async ()=>{
+        await axios.put("http://localhost:8080/auctionSchedule/", target);
+        changeTarget();
         loadAuctionSchedule();
+    }, [auctionSchedule, target]);
+
+    const saveTarget = useCallback(async ()=>{
+        const resp = await axios.put("http://localhost:8080/auctionSchedule/");
+        loadAuctionSchedule(resp.data);
         closeEditModal();
     }, [target]);
 
@@ -88,7 +107,27 @@ const AuctionScheduleDetail = ()=>{
         clearTarget(); 
     }, [editModal]);
 
-    
+    const registPresentInput=useCallback(async ()=>{
+        const resp=await axios.post(`http://localhost:8080/auction/`,presentInput);
+        if(resp.status===200) 
+            window.alert("등록이완료되었습니다.");
+        setPresentInput({
+            auctionScheduleNo:auctionScheduleNo
+        });
+        closePresentModal();
+    },[presentInput])
+    const openPresentModal=useCallback(()=>{
+        if(presentModal.current){
+            const tag = Modal.getOrCreateInstance(presentModal.current);
+            tag.show();
+        }
+    },[presentModal])
+
+    const closePresentModal=useCallback(()=>{
+        const tag = Modal.getInstance(presentModal.current);
+        tag.hide();
+    },[presentModal,registPresentInput])
+
     //view
     return (<>
         <Jumbotron title={auctionScheduleNo +"번 경매 일정 상세정보"}/>
@@ -97,7 +136,7 @@ const AuctionScheduleDetail = ()=>{
 
             <div className="row mt-4 text-center">
                 <div className="col">
-                    <img src="https://placehold.co/300" class="img-thumbnail" alt=""/>           
+                    <img src="https://placehold.co/300" className="img-thumbnail" alt=""/>           
                 </div>
             </div>
 
@@ -149,6 +188,8 @@ const AuctionScheduleDetail = ()=>{
         <div className="row mt-4">
             <div className="col text-end">
                 <button className="btn btn-secondary ms-2" 
+                                onClick={openPresentModal}>출품 등록</button>
+                <button className="btn btn-secondary ms-2" 
                                 onClick={e=>navigate("/auctionschedule")}>목록보기</button>
                     <button className="btn btn-warning ms-2" 
                                 onClick={e=>openEditModal(auctionSchedule)}>수정하기</button>
@@ -156,6 +197,122 @@ const AuctionScheduleDetail = ()=>{
                                 onClick={e=>deleteAuctionSchedule(auctionSchedule)}>삭제하기</button>
             </div>
         </div>
+                    
+        {/* 출품용 모달 */}
+        <div className="modal fade" tabIndex="-1" ref={presentModal}>
+        <div className="modal-dialog">
+          <div className="modal-content">
+          <div className="modal-header">
+              <h5 className="modal-title">출품 등록</h5>
+              <button
+                type="button"
+                className="btn-close"
+                aria-label="Close"
+                onClick={closePresentModal}></button>
+            </div>
+            <div className="modal-body">
+              <div className="row">
+                <div className="col">
+                    <label>작품 번호</label>
+                    <input type="number" 
+                    value={presentInput.workNo} 
+                    name="workNo" 
+                    className="form-control" 
+                    onChange={e => changePresentInput(e)} 
+                    placeholder="작품 번호"
+                    autoComplete="off"/>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col">
+                    <label>출품 번호</label>
+                    <input type="number" 
+                    name="auctionLot" 
+                    className="form-control" 
+                    value={presentInput.auctionLot} 
+                    onChange={e => changePresentInput(e)} 
+                    placeholder="출품 번호"
+                    autoComplete="off"/>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col">
+                    <label>예상 최저가</label>
+                    <input type="number" 
+                    name="auctionLowPrice" 
+                    className="form-control" 
+                    value={presentInput.auctionLowPrice} 
+                    onChange={e => changePresentInput(e)} 
+                    placeholder="예상 최저가"
+                    autoComplete="off"/>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col">
+                    <label>예상 최고가</label>
+                    <input type="number" 
+                    name="auctionHighPrice" 
+                    className="form-control" 
+                    value={presentInput.auctionHighPrice} 
+                    onChange={e => changePresentInput(e)} 
+                    placeholder="예상 최고가"
+                    autoComplete="off"/>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col">
+                    <label>위탁자</label>
+                    <input type="text" 
+                    name="auctionConsigner" 
+                    className="form-control" 
+                    value={presentInput.auctionConsigner} 
+                    onChange={e => changePresentInput(e)} 
+                    placeholder="위탁자"
+                    autoComplete="off"/>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col">
+                    <label>위탁 수수료</label>
+                    <input type="number" 
+                    name="auctionConsignmentFee" 
+                    className="form-control" 
+                    value={presentInput.auctionConsignmentFee} 
+                    onChange={e => changePresentInput(e)} 
+                    placeholder="숫자만"
+                    autoComplete="off"/>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col">
+                    <label>위탁 대금</label>
+                    <input type="number" 
+                    name="auctionNetProceeds" 
+                    className="form-control" 
+                    value={presentInput.auctionNetProceeds} 
+                    onChange={e => changePresentInput(e)} 
+                    placeholder="숫자만"
+                    autoComplete="off"/>
+                </div>
+            </div>
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-lg btn-success"
+                onClick={registPresentInput}>
+                등록
+              </button>
+              <button
+                type="button"
+                className="btn btn-lg btn-secondary"
+                onClick={closePresentModal}>
+                취소
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
 
     {/* 경매 일정 수정 모달 */}
@@ -217,7 +374,7 @@ const AuctionScheduleDetail = ()=>{
                                     <button type="button" className="btn btn-secondary btn-manual-close" 
                                                 onClick={closeEditModal}>취소</button>
                                 <button type="button" className="btn btn-success"
-                                                onClick={saveTarget}>등록</button>
+                                                onClick={saveTarget}>수정</button>
                                    
                                 </div>
                             </div>

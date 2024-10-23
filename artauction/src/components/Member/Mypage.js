@@ -22,6 +22,11 @@ const Mypage = () => {
     }, [navigate]);
 
     const handleDelete = useCallback(async () => {
+        const confirmDelete = window.confirm("정말 탈퇴하시겠습니까?");
+        if (!confirmDelete) {
+            return; 
+        }
+    
         try {
             await axios.delete("http://localhost:8080/member/delete/" + member.memberId);
             navigate("/login");
@@ -30,7 +35,6 @@ const Mypage = () => {
             // 추가적인 오류 처리 가능
         }
     }, [member.memberId, navigate]);
-
     return (
         <>
             <Jumbotron title={`${member.memberName} 님의 정보`} />

@@ -25,16 +25,14 @@ const MemberUpdate = () => {
         const script = document.createElement("script");
         script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
         script.async = true;
+        script.onload = () => console.log("Daum Postcode API 로드 완료");
+        script.onerror = () => console.error("Daum Postcode API 로드 실패");
         document.body.appendChild(script);
     };
 
     const loadMember = useCallback(async () => {
         try {
-            const token = localStorage.getItem("accessToken");
-            if (token) {
-                axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-            }
-            const resp = await axios.get(`http://localhost:8080/member/find`);
+            const resp = await axios.get("http://localhost:8080/member/find");
             setMember(resp.data);
         } catch (error) {
             console.error("Failed to load member data:", error);
@@ -63,8 +61,8 @@ const MemberUpdate = () => {
             memberAddress2: member.memberAddress2 || undefined,
         };
 
-        await axios.patch("http://localhost:8080/member/update", updateMember);
-        navigate("/myPage");
+            await axios.patch("http://localhost:8080/member/update", updateMember);
+            navigate("/myPage");
     };
 
     const sample6_execDaumPostcode = () => {
@@ -99,7 +97,7 @@ const MemberUpdate = () => {
                         <div className="mb-3">
                             <input type="password"
                                 name="memberPw"
-                                value={member.memberPw}
+                                value={member.memberPw || ""}
                                 onChange={changeInput}
                                 placeholder="비밀번호"
                                 className="form-control"

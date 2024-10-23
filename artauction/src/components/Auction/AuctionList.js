@@ -20,7 +20,7 @@ const AuctionList = ()=>{
     },[]);
     
     return (<>
-        <Jumbotron title="경매 모음"/>
+        <Jumbotron title={`옥션 스케쥴 넘버 : ${auctionScheduleNo}`} />
         <div className="row mt-4">
             {auctionList.map(list=>(
                 <div className="col-3" key={list.auctionNo}>
@@ -45,7 +45,6 @@ const AuctionList = ()=>{
                     <br/>
                     {list.auctionState}
                 </div>
-
             ))}
         </div>
     </>);
