@@ -25,6 +25,8 @@ const MemberUpdate = () => {
         const script = document.createElement("script");
         script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
         script.async = true;
+        script.onload = () => console.log("Daum Postcode API 로드 완료");
+        script.onerror = () => console.error("Daum Postcode API 로드 실패");
         document.body.appendChild(script);
     };
 
@@ -33,12 +35,20 @@ const MemberUpdate = () => {
             const token = localStorage.getItem("accessToken");
             if (token) {
                 axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+            } else {
+                console.error("Access token not found");
+                navigate("/login");
+                return;
             }
-            const resp = await axios.get(`http://localhost:8080/member/find`);
+
+            const resp = await axios.get("http://localhost:8080/member/find");
             setMember(resp.data);
         } catch (error) {
-            console.error("Failed to load member data:", error);
-            navigate("/login"); // 로그인 페이지로 리다이렉트
+            console.error("Failed to load member data:", error.response || error.message);
+            if (error.response?.status === 401) {
+                // 토큰이 만료되었거나 유효하지 않다면 로그인 페이지로 리다이렉트
+                navigate("/login");
+            }
         }
     }, [navigate]);
 
@@ -63,8 +73,24 @@ const MemberUpdate = () => {
             memberAddress2: member.memberAddress2 || undefined,
         };
 
-        await axios.patch("http://localhost:8080/member/update", updateMember);
-        navigate("/myPage");
+        try {
+            const token = localStorage.getItem("accessToken");
+            if (token) {
+                axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+            } else {
+                console.error("Access token not found");
+                navigate("/login");
+                return;
+            }
+
+            await axios.patch("http://localhost:8080/member/update", updateMember);
+            navigate("/myPage");
+        } catch (error) {
+            console.error("Failed to update member:", error.response || error.message);
+            if (error.response?.status === 401) {
+                navigate("/login");
+            }
+        }
     };
 
     const sample6_execDaumPostcode = () => {

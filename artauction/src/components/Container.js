@@ -22,6 +22,7 @@ import ChargeSuccess from "./Member/ChargeSuccess";
 
 import AuctionScheduleDetail from "./Auction/AuctionScheduleDetail";
 import AuctionList from './Auction/AuctionList';
+import PrivateRoute from "./router/PrivateRoute";
 
 
 const Container =()=>{
@@ -36,8 +37,8 @@ const Container =()=>{
                         <Route path="/join" element={<MemberJoin/>}/>
                         <Route path="/login" element={<MemberLogin/>}/>
                         <Route path="/member/myPage" element={<Mypage />} />
-                        <Route path="/member/update" element={<MemberUpdate />} />
-                        {/* <Route path="/member/myPage" element={<PrivateRoute element={<Mypage />} />}/> */}
+                        <Route path="/member/update" element={<PrivateRoute element={<MemberUpdate />} />} />
+                        <Route path="/member/myPage" element={<PrivateRoute element={<Mypage />} />}/>
                         <Route path="/work/list" element={<WorkList/>}/>
                         <Route path="/findPw" element={<FindPw/>}/>
                         <Route path="/changePw/:token" element={<ChangePw/>}/>
