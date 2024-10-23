@@ -32,23 +32,11 @@ const MemberUpdate = () => {
 
     const loadMember = useCallback(async () => {
         try {
-            const token = localStorage.getItem("accessToken");
-            if (token) {
-                axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-            } else {
-                console.error("Access token not found");
-                navigate("/login");
-                return;
-            }
-
             const resp = await axios.get("http://localhost:8080/member/find");
             setMember(resp.data);
         } catch (error) {
-            console.error("Failed to load member data:", error.response || error.message);
-            if (error.response?.status === 401) {
-                // 토큰이 만료되었거나 유효하지 않다면 로그인 페이지로 리다이렉트
-                navigate("/login");
-            }
+            console.error("Failed to load member data:", error);
+            navigate("/login"); // 로그인 페이지로 리다이렉트
         }
     }, [navigate]);
 
@@ -73,24 +61,8 @@ const MemberUpdate = () => {
             memberAddress2: member.memberAddress2 || undefined,
         };
 
-        try {
-            const token = localStorage.getItem("accessToken");
-            if (token) {
-                axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-            } else {
-                console.error("Access token not found");
-                navigate("/login");
-                return;
-            }
-
             await axios.patch("http://localhost:8080/member/update", updateMember);
             navigate("/myPage");
-        } catch (error) {
-            console.error("Failed to update member:", error.response || error.message);
-            if (error.response?.status === 401) {
-                navigate("/login");
-            }
-        }
     };
 
     const sample6_execDaumPostcode = () => {
@@ -125,7 +97,7 @@ const MemberUpdate = () => {
                         <div className="mb-3">
                             <input type="password"
                                 name="memberPw"
-                                value={member.memberPw}
+                                value={member.memberPw || ""}
                                 onChange={changeInput}
                                 placeholder="비밀번호"
                                 className="form-control"

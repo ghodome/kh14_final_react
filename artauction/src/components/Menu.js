@@ -10,6 +10,7 @@ const Menu = () => {
     const navigate = useNavigate();
     const [memberId, setMemberId] = useRecoilState(memberIdState);
     const [memberRank, setMemberRank] = useRecoilState(memberRankState);
+   
     const login = useRecoilValue(loginState);
 
     const logout = useCallback(() => {
