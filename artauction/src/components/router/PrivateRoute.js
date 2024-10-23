@@ -15,7 +15,7 @@ const PrivateRoute = (props)=>{
         return <h1>Loading...</h1>
     }
 
-    return login === true ? props.element : <Navigate to="/member/login"/>;
+    return login === true ? props.element : <Navigate to="/login"/>;
 };
 
 export default PrivateRoute;
