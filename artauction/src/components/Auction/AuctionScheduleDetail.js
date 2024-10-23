@@ -72,10 +72,10 @@ const AuctionScheduleDetail = ()=>{
     },[presentInput])
 
     const editAuctionSchedule = useCallback(async ()=>{
-        await axios.put("http://localhost:8080/auctionSchedule/", input);
-        changeInput();
+        await axios.put("http://localhost:8080/auctionSchedule/", target);
+        changeTarget();
         loadAuctionSchedule();
-    }, [auctionSchedule, input]);
+    }, [auctionSchedule, target]);
 
     const saveTarget = useCallback(async ()=>{
         const resp = await axios.put("http://localhost:8080/auctionSchedule/");

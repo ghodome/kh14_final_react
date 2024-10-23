@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { loginState, memberIdState, memberRankState } from "../utils/recoil";
+import Time from "./time/Time";
 
 
 const Menu = () => {
@@ -10,54 +11,6 @@ const Menu = () => {
     const [memberId, setMemberId] = useRecoilState(memberIdState);
     const [memberRank, setMemberRank] = useRecoilState(memberRankState);
     const login = useRecoilValue(loginState);
-
-    const [time, setTime] = useState();
-    const [timeToShow, setTimeToShow] = useState();
-
-    const getTime = useCallback(async () => {
-        try {
-            const resp = await axios.get("http://localhost:8080/time/");
-            const currentTime = resp.data;
-            const date = new Date(currentTime);
-            const hours = date.getHours().toString().padStart(2, '0');
-            const minutes = date.getMinutes().toString().padStart(2, '0');
-            const seconds = date.getSeconds().toString().padStart(2, '0');
-            setTime(date);
-            setTimeToShow(`${hours}:${minutes}:${seconds}`);
-        } catch (error) {
-            console.error("시간 요청 오류:", error);
-        }
-    }, []);
-
-    const afterSecond = useCallback(() => {
-        setTime((prevTime) => {
-            if (!prevTime) return;
-
-            const date = new Date(prevTime);
-            date.setSeconds(date.getSeconds() + 1);
-            const hours = date.getHours().toString().padStart(2, '0');
-            const minutes = date.getMinutes().toString().padStart(2, '0');
-            const seconds = date.getSeconds().toString().padStart(2, '0');
-
-            setTimeToShow(`${hours}:${minutes}:${seconds}`);
-            return date;
-        });
-    }, []);
-
-    useEffect(() => {
-        getTime();
-        const intervalId = setInterval(() => {
-            getTime();
-        }, 30000);
-        return () => clearInterval(intervalId);
-    }, [getTime]);
-
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            afterSecond();
-        }, 1000);
-        return () => clearInterval(intervalId);
-    }, [afterSecond]);
 
     const logout = useCallback(() => {
         setMemberId("");
@@ -67,6 +20,7 @@ const Menu = () => {
         window.sessionStorage.removeItem("refreshToken");
         navigate("/");
     }, [navigate, setMemberId, setMemberRank]);
+
 
     return (
         <>
@@ -126,11 +80,7 @@ const Menu = () => {
                                 <NavLink className="nav-link" to="/charge">포인트 충전하기</NavLink>
                             </li>
                         </ul>
-                        <ul className="navbar-nav me-auto">
-                            <li className="nav-item">
-                                <NavLink className="nav-link" to="#">{timeToShow && (<div>{timeToShow}</div>)}</NavLink>
-                            </li>
-                        </ul>
+                        
                     </div>
                 </div>
             </nav>
