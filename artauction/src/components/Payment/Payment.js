@@ -91,6 +91,7 @@ const Payment = () =>{
                             <th>가격</th>
                         </tr>
                     </thead>
+                    
                     <tbody>
                         {/* {dealList.map(deal=>(
                         <tr key={deal.dealId}>
