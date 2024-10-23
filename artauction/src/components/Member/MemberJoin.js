@@ -132,7 +132,7 @@ const MemberJoin = () => {
                                 value={input.memberPost}
                                 readOnly
                             />
-                            <input type="button" onClick={sample6_execDaumPostcode} value="우편번호 찾기" />
+                           <button type="button" onClick={sample6_execDaumPostcode} className="btn btn-primary mt-2">우편번호 찾기</button>
                         </div>
                     </div>
                     <div className="row mt-4">
