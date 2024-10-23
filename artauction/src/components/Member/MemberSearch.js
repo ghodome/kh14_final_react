@@ -5,8 +5,14 @@ import { throttle } from "lodash";
 import { PiTildeBold } from "react-icons/pi";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { FaChevronDown } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const MemberSearch = () => {
+    const navigate = useNavigate();
+    const [basicSearch, setBasicSearch] = useState({
+        keyword: "",
+        column: "member_id" 
+    });
     const [input, setInput] = useState({
         memberId: "",
         memberName: "",
@@ -20,13 +26,14 @@ const MemberSearch = () => {
         endMemberJoinDate: "",
         orderList: [],
     });
-
+    
     const [result, setResult] = useState({
         count: 0,
         last: true,
         memberList: []
     });
-
+    
+    const [modalIsOpen, setModalIsOpen] = useState(false);
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(10);
 
@@ -80,28 +87,30 @@ const MemberSearch = () => {
             const newOrderList = prevInput.orderList.includes(order)
                 ? prevInput.orderList.filter(o => o !== order)
                 : [...prevInput.orderList, order];
-    
+
             return { ...prevInput, orderList: newOrderList };
         });
     };
     const sendRequest = useCallback(async () => {
         loading.current = true;
-    
+
         const resp = await axios.post("http://localhost:8080/member/search", {
             ...input,
             beginRow: (page - 1) * size,
             endRow: page * size,
         });
-    
+        const filteredMemberList = resp.data.memberList.filter(member => member.memberRank !== '관리자');
+
         setResult(prevResult => ({
             ...prevResult,
             last: resp.data.last,
-            memberList: page === 1 ? resp.data.memberList : [...prevResult.memberList, ...resp.data.memberList],
+            memberList: page === 1 ? filteredMemberList : [...prevResult.memberList, ...filteredMemberList],
             count: resp.data.count,
         }));
-    
         loading.current = false;
-    }, [input, page]);    
+    }, [input, page]);
+
+    
 
     const setFirstPage = useCallback(() => {
 
@@ -116,6 +125,10 @@ const MemberSearch = () => {
         setPage(pageNumber);
     };
     const loading = useRef(false);
+    const handleMemberClick = (memberId) => {
+        navigate(`/member/${memberId}`);
+    };
+    
 
     return (<>
         <Jumbotron title="회원 조회" />
@@ -149,23 +162,6 @@ const MemberSearch = () => {
                 <input type="email" className="form-control"
                     name="memberEmail" value={input.memberEmail}
                     onChange={changeInputString} />
-            </div>
-        </div>
-        <div className="row mt-4">
-            <label className="col-sm-3 col-form-label">등급</label>
-            <div className="col-sm-9">
-                <label>
-                    <input type="checkbox" className="form-check-input"
-                        name="memberRankList" value="회원"
-                        onChange={changeInputArray} />
-                    <span className="ms-1">일반회원</span>
-                </label>
-                <label className="ms-4">
-                    <input type="checkbox" className="form-check-input"
-                        name="memberRankList" value="관리자"
-                        onChange={changeInputArray} />
-                    <span className="ms-1">관리자</span>
-                </label>
             </div>
         </div>
         <div className="row mt-4">
@@ -207,32 +203,32 @@ const MemberSearch = () => {
         <div className="row mt-4">
             <label className="col-sm-3 col-form-label">정렬방식</label>
             <div className="col-sm-9">
-            <div className="col-sm-9">
-        <label>
-            <input type="checkbox" 
-            className="form-check-input"
-            onChange={() => changeOrder("member_id ASC")} />
-            <span className="ms-1">아이디 오름차순</span>
-        </label>
-        <label className="ms-4">
-            <input type="checkbox" 
-            className="form-check-input"
-            onChange={() => changeOrder("member_id DESC")} />
-            <span className="ms-1">아이디 내림차순</span>
-        </label>
-        <label className="ms-4">
-            <input type="checkbox" 
-            className="form-check-input"
-            onChange={() => changeOrder("member_name ASC")} />
-            <span className="ms-1">이름 오름차순</span>
-        </label>
-        <label className="ms-4">
-            <input type="checkbox" 
-            className="form-check-input"
-            onChange={() => changeOrder("member_name DESC")} />
-            <span className="ms-1">이름 내림차순</span>
-        </label>
-    </div>
+                <div className="col-sm-9">
+                    <label>
+                        <input type="checkbox"
+                            className="form-check-input"
+                            onChange={() => changeOrder("member_id ASC")} />
+                        <span className="ms-1">아이디 오름차순</span>
+                    </label>
+                    <label className="ms-4">
+                        <input type="checkbox"
+                            className="form-check-input"
+                            onChange={() => changeOrder("member_id DESC")} />
+                        <span className="ms-1">아이디 내림차순</span>
+                    </label>
+                    <label className="ms-4">
+                        <input type="checkbox"
+                            className="form-check-input"
+                            onChange={() => changeOrder("member_name ASC")} />
+                        <span className="ms-1">이름 오름차순</span>
+                    </label>
+                    <label className="ms-4">
+                        <input type="checkbox"
+                            className="form-check-input"
+                            onChange={() => changeOrder("member_name DESC")} />
+                        <span className="ms-1">이름 내림차순</span>
+                    </label>
+                </div>
             </div>
         </div>
         <div className="row mt-4">
@@ -249,62 +245,33 @@ const MemberSearch = () => {
             <div className="col">
                 <ul className="list-group">
                     {result.memberList.map(member => (
-                        <li className="list-group-item" key={member.memberId}>
-                            <h3>{member.memberId}</h3>
-                            <div className="row">
-                                <div className="col-3">이름</div>
-                                <div className="col-3">{member.memberName}</div>
-                            </div>
-                            <div className="row">
-                                <div className="col-3">이메일</div>
-                                <div className="col-3">{member.memberEmail}</div>
-                            </div>
-                            <div className="row">
-                                <div className="col-3">연락처</div>
-                                <div className="col-3">{member.memberContact}</div>
-                            </div>
-                            <div className="row">
-                                <div className="col-3">등급</div>
-                                <div className="col-3">{member.memberRank}</div>
-                            </div>
-                            <div className="row">
-                                <div className="col-3">포인트</div>
-                                <div className="col-3">{member.memberPoint}</div>
-                            </div>
-                            <div className="row">
-                                <div className="col-3">주소</div>
-                                <div className="col-9">
-                                    {member.memberPost !== null && (<>
-                                        [{member.memberPost}]
-                                        {member.memberAddress1}
-                                        {member.memberAddress2}
-                                    </>)}
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-3">가입일</div>
-                                <div className="col-3">{member.memberJoinDate}</div>
-                            </div>
-                        </li>
+                         <li 
+                         className="list-group-item" 
+                         key={member.memberId} 
+                         onClick={() => handleMemberClick(member.memberId)} 
+                         style={{ cursor: 'pointer' }}
+                     >
+                         <h3>{member.memberId}({member.memberName})</h3>
+                     </li>
                     ))}
                 </ul>
             </div>
         </div>
         <div className="row mt-4">
-    <div className="col">
-        <nav>
-            <ul className="pagination justify-content-center">
-                {[...Array(Math.ceil(result.count / size)).keys()].map(num => (
-                    <li className={`page-item ${page === num + 1 ? 'active' : ''}`} key={num}>
-                        <button className="page-link" onClick={() => handlePageClick(num + 1)}>
-                            {num + 1}
-                        </button>
-                    </li>
-                ))}
-            </ul>
-        </nav>
-    </div>
-</div>
+            <div className="col">
+                <nav>
+                    <ul className="pagination justify-content-center">
+                        {[...Array(Math.ceil(result.count / size)).keys()].map(num => (
+                            <li className={`page-item ${page === num + 1 ? 'active' : ''}`} key={num}>
+                                <button className="page-link" onClick={() => handlePageClick(num + 1)}>
+                                    {num + 1}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
+            </div>
+        </div>
     </>);
 };
 
