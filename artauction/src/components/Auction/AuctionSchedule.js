@@ -2,22 +2,26 @@ import { useCallback, useRef, useState } from 'react';
 import Jumbotron from '../Jumbotron';
 import { useEffect } from 'react';
 import axios from 'axios';
-import { FaAsterisk } from "react-icons/fa6";
-import { FaRegSquarePlus } from "react-icons/fa6";
-import { FaEdit } from "react-icons/fa";
 import { Modal } from "bootstrap";
+import { useNavigate } from 'react-router-dom';
+import moment from "moment";
+import "moment/locale/ko";  //moment 한국어 정보 불러오기
+moment.locale("ko");  //moment에 한국어를 기본 언어로 설정
 
 const AuctionSchedule = ()=>{
+    //navigator
+    const navigate = useNavigate();
+
     // state
     const [auctionScheduleList, setAuctionScheduleList] = useState([]);
 
-    // 등록과 수정을 한번에 처리하기 위한 state
-    const [input, setInput] = useState({
-        auctionScheduleNo : "",
+    // 등록 state
+    const [insert, setInsert] = useState({
         auctionScheduleTitle : "",
         auctionScheduleStartDate : "",
         auctionScheduleEndDate : "",
-        auctionScheduleState : ""
+        auctionScheduleState : "",
+        auctionScheduleNotice : ""
     });
 
     useEffect(()=>{
@@ -30,45 +34,44 @@ const AuctionSchedule = ()=>{
         setAuctionScheduleList(resp.data);
     }, [auctionScheduleList]);
 
-    // 등록 및 수정
-    const changeInput = useCallback(e=>{
-        setInput({
-            ...input,
+    // 등록
+    const insertInput = useCallback(e=>{
+        setInsert({
+            ...insert,
             [e.target.name] : e.target.value
-        })
-    }, [input]);
+        });
+    }, [insert]);
 
-    const clearInput = useCallback(()=>{
-        setInput({
-            auctionScheduleNo : "",
+    const saveInsertInput = useCallback(async ()=>{
+        const resp = await axios.post("http://localhost:8080/auctionSchedule/");
+        setAuctionScheduleList(resp.data);
+        clearInsertInput();
+        closeInsertModal();
+    }, [insert]);
+
+    const clearInsertInput = useCallback(()=>{
+        setInsert({
             auctionScheduleTitle : "",
             auctionScheduleStartDate : "",
             auctionScheduleEndDate : "",
-            auctionScheduleState : ""
+            auctionScheduleState : "", 
+            auctionScheduleNotice : ""
         });
-    }, [input]);
+    }, [insert]);
 
-    // const saveInput = useCallback(async ()=>{
-    //     const resp = await axios.post("http://localhost:8080/auctionSchedule/")
-    //     setAuctionScheduleList(resp.data);
-    //     clearInput();
-    //     closeModal();
-    // }, [input]);
+    // 입력 모달
+    const insertModal = useRef();
 
-    // 입력+수정 모달 Modal
-    const modal = useRef();
-
-    const openModal = useCallback(()=>{
-        const tag = Modal.getOrCreateInstance(modal.current);
+    const openInsertModal = useCallback(()=>{
+        const tag = Modal.getOrCreateInstance(insertModal.current);
         tag.show();
-    }, [modal]);
+    }, [insertModal]);
 
-    const closeModal = useCallback(()=>{
-        const tag = Modal.getInstance(modal.current);
+    const closeInsertModal = useCallback(()=>{
+        const tag = Modal.getInstance(insertModal.current);
         tag.hide();
-        clearInput();
-    }, [modal]);
-
+        clearInsertInput();
+    }, [insertModal]);
 
 
     return (<>
@@ -86,7 +89,7 @@ const AuctionSchedule = ()=>{
                                 
                                 <div className="d-flex flex-reverse ms-2">
                                     <button className="btn btn-outline-primary" 
-                                            onClick={openModal}>경매등록</button>
+                                            onClick={openInsertModal}>경매등록</button>
                                 </div>
                             </div>
                         </div>
@@ -97,38 +100,67 @@ const AuctionSchedule = ()=>{
                         <div className="row" key={auctionSchedule.auctionScheduleNo}>
 
                             <div className="col-9 p-4 d-flex flex-column position-static">
-                                <h3>{auctionSchedule.auctionScheduleTitle}</h3>
+                                <div className="d-flex flex-row mb-2">
+                                {auctionSchedule.auctionScheduleState === '진행경매' &&(
+                                    <div className="badge text-bg-success text-wrap">{auctionSchedule.auctionScheduleState}</div>
+                                )}
+                                {auctionSchedule.auctionScheduleState === '예정경매' &&(
+                                    <div className="badge text-bg-info text-wrap">{auctionSchedule.auctionScheduleState}</div>
+                                )}
+                                {auctionSchedule.auctionScheduleState === '종료경매' &&(
+                                    <div className="badge text-bg-secondary text-wrap">{auctionSchedule.auctionScheduleState}</div>
+                                )}
+                                </div>
+                                <div className="d-flex flex-row">
+                                    <h3>{auctionSchedule.auctionScheduleTitle}</h3>
+                                </div>
                                 <div className="d-flex flex-row">
                                     <div className="p-2">경매시작일</div>
-                                    <div className="p-2">{auctionSchedule.auctionScheduleStartDate}</div>
+                                    <div className="p-2">
+                                        {moment(auctionSchedule.auctionScheduleStartDate).format("yyyy/MM/DD (dd) a hh:mm")}</div>
                                 </div>
                                 <div className="d-flex flex-row">
                                     <div className="p-2">경매종료일</div>
-                                    <div className="p-2">{auctionSchedule.auctionScheduleEndDate}</div>
+                                    <div className="p-2">
+                                        {moment(auctionSchedule.auctionScheduleEndDate).format("yyyy/MM/DD (dd) a hh:mm")}
+                                    </div>
                                 </div>
-                                <button className="btn btn-outline-secondary mt-2 col-3">상세보기</button>
-                            </div>
 
-                            <div className="col-3 p-4">
-                                <p>이미지</p>
+                                <div className="d-flex flex-row mt-2 mb-2">
+                                {auctionSchedule.auctionScheduleState === '진행경매' &&(
+                                    <button className="btn btn-outline-secondary mt-2 col-3"
+                                        onClick={e=>navigate("/auctionList/"+auctionSchedule.auctionScheduleNo)}>상세보기</button>
+                                )}
+                                {auctionSchedule.auctionScheduleState !== '진행경매' &&(
+                                    <button className="btn btn-outline-secondary mt-2 col-3"
+                                            onClick={e=>navigate("/auctionschedule/detail/"+auctionSchedule.auctionScheduleNo)}>상세보기</button>
+                                )}
+                                </div>
+                                     
                             </div>
+                                
+                            <div className="col-3 p-4">
+                                <img src="https://placehold.co/200" className="img-thumbnail" alt=""/> 
+                            </div>
+                            
+                            <hr/>  
 
                         </div>
                     ))}
 
                     {/* 경매 일정 등록 모달 */}
                     <div className="modal fade" tabIndex="-1"
-                                ref={modal} data-bs-backdrop="static">
+                                ref={insertModal} data-bs-backdrop="static">
                         <div className="modal-dialog">
                             <div className="modal-content">
 
                                 <div className="modal-header">
                                     <h5 className="modal-title">
-                                        {/* {addMode ? '경매 일정 등록' : '경매 일정 수정'} */}
+                                        경매 일정 등록
                                     </h5>
                                     <button type="button" className="btn-close" 
                                         data-bs-dismiss="modal" aria-label="Close"
-                                        onClick={closeModal}>
+                                        onClick={closeInsertModal}>
                                     <span aria-hidden="true"></span>
                                     </button>
                                 </div>
@@ -139,47 +171,49 @@ const AuctionSchedule = ()=>{
                                         <div className="col">
                                             <label>경매 일정명</label>
                                             <input type="text" className="form-control mb-4" 
-                                                    name="auctionScheduleTitle" value={input.auctionScheduleTitle} 
-                                                    onChange={changeInput}/>
+                                                    name="auctionScheduleTitle" value={insert.auctionScheduleTitle} 
+                                                    onChange={insertInput}/>
                                             
                                             <label>일정 시작일</label>
-                                            <input type="text" className="form-control mb-4" 
-                                                    name="auctionScheduleStartDate" value={input.auctionScheduleStartDate} 
-                                                    onChange={changeInput}/>
+                                            <input type="datetime-local" className="form-control mb-4" 
+                                                    name="auctionScheduleStartDate" value={insert.auctionScheduleStartDate} 
+                                                    onChange={insertInput}/>
 
                                             <label>일정 종료일</label>
-                                            <input type="text" className="form-control mb-4" 
-                                                    name="auctionScheduleEndDate" value={input.auctionScheduleEndDate} 
-                                                    onChange={changeInput}/>
+                                            <input type="datetime-local" className="form-control mb-4" 
+                                                    name="auctionScheduleEndDate" value={insert.auctionScheduleEndDate} 
+                                                    onChange={insertInput}/>
                                             
                                             <label>일정 상태</label>
                                             <select className="form-select mb-4" name="auctionScheduleState" 
-                                                    value={input.auctionScheduleState} onChange={changeInput}>
+                                                    value={insert.auctionScheduleState} onChange={insertInput}>
                                                 <option value="">선택하세요</option>
                                                 <option>예정경매</option>
                                                 <option>진행경매</option>
                                                 <option>종료경매</option>
                                             </select>
+
+                                            <label>안내사항</label>
+                                            <textarea type="text" className="form-control mb-4" 
+                                                    name="auctionScheduleNotice" value={insert.auctionScheduleNotice} 
+                                                    onChange={insertInput}/>
+
+                                            <label>이미지 첨부</label>
+                                            {/* <input type="file" id="input" multiple /> */}
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="modal-footer">
                                     <button type="button" className="btn btn-secondary btn-manual-close" 
-                                                onClick={closeModal}>취소</button>
-                                    {/* {addMode ? (버튼) : (버튼)} */}
-                                    {/* {addMode ? (
-                                        <button type="button" className="btn btn-success"
-                                                    onClick={saveBook}><FaRegSquarePlus />저장</button>
-                                    ) : (
-                                        <button type="button" className="btn btn-warning"
-                                        onClick={updateBook}><FaEdit />수정</button>
-                                    )} */}
+                                                onClick={closeInsertModal}>취소</button>
+                                <button type="button" className="btn btn-success"
+                                                onClick={saveInsertInput}>등록</button>
+                                   
                                 </div>
                             </div>
                         </div>
                     </div>
-
                     
 
             </div>
