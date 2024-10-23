@@ -16,7 +16,7 @@ const MemberLogin = () => {
     const [display, setDisplay] = useState(false);
     const [stay, setStay] = useState(false);
 
-    const [forgotPw, setForgotPw] = useState(false);
+    const [forgotPw, setForgotPw] = useState(false); 
 
     const [memberId, setMemberId] = useRecoilState(memberIdState);
     const [memberRank, setMemberRank] = useRecoilState(memberRankState);
