@@ -33,6 +33,7 @@ const Menu = () => {
     setTime((prevTime) => {
       if (!prevTime) return;
 
+
       const date = new Date(prevTime);
       date.setSeconds(date.getSeconds() + 1);
       const hours = date.getHours().toString().padStart(2, '0');
@@ -117,6 +118,8 @@ const Menu = () => {
       </nav>
     </>
   );
+
+
 };
 
 export default Menu;
