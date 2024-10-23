@@ -78,6 +78,7 @@ const Mypage = () => {
                     <button type="button" className="btn btn-danger ms-5" onClick={handleDelete}>
                         탈퇴하기
                     </button>
+                    
                 </div>
             </div>
         </>

@@ -22,7 +22,12 @@ import ChargeSuccess from "./Member/ChargeSuccess";
 
 import AuctionScheduleDetail from "./Auction/AuctionScheduleDetail";
 import AuctionList from './Auction/AuctionList';
+
+import Payment from "./Payment/Payment";
+import PaymentSuccess from "./Payment/PaymentSuccess";
+
 import PrivateRoute from "./router/PrivateRoute";
+
 
 
 const Container =()=>{
@@ -49,6 +54,8 @@ const Container =()=>{
                         <Route path="/auction/detail/:auctionNo" element={<AuctionDetail/>}/>
                         <Route path="/notice/detail/:noticeNo" element={<NoticeDetail/>}/>
                         <Route path="/faq" element={<Faq/>}/>
+                        <Route path="/payment" element={<Payment/>}/>
+                        <Route path="/payment/success/:partnerOrderId" element={<PaymentSuccess/>}/>
                         <Route path="/charge" element={<Charge/>}/>
                         <Route path="/charge/success/:partnerOrderId" element={<ChargeSuccess/>}/>
                         <Route path="/websocket" element={<WebSocket/>}/>

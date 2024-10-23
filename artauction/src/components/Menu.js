@@ -57,6 +57,86 @@ const Menu = () => {
                                 </li>
                             </>)}
 
+
+      setTimeToShow(`${hours}:${minutes}:${seconds}`);
+      return date;
+    });
+  }, []);
+
+  useEffect(() => {
+    getTime();
+    const intervalId = setInterval(() => {
+      getTime();
+    }, 30000);
+    return () => clearInterval(intervalId);
+  }, [getTime]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      afterSecond();
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, [afterSecond]);
+
+  const logout = useCallback(() => {
+    setMemberId("");
+    setMemberRank("");
+    delete axios.defaults.headers.common["Authorization"];
+    window.localStorage.removeItem("refreshToken");
+    window.sessionStorage.removeItem("refreshToken");
+    navigate("/");
+  }, [navigate, setMemberId, setMemberRank]);
+
+  return (
+    <>
+      <nav className="navbar navbar-expand bg-light fixed-top" data-bs-theme="light">
+        <div className="container-fluid">
+          <div className="collapse navbar-collapse" id="top-menu">
+            <ul className="navbar-nav me-auto">
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/join">회원가입</NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/login">로그인</NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/artist">작가</NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/auctionschedule">경매</NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/work/list">작품</NavLink>
+              </li>
+            </ul>
+            <ul className="navbar-nav me-auto">
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/notice">공지사항</NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/faq">FAQ</NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/websocket">websocket</NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/charge">포인트 충전하기</NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/payment">결제하기</NavLink>
+              </li>
+            </ul>
+            <ul className="navbar-nav me-auto">
+              <li className="nav-item">
+                <NavLink className="nav-link" to="#">{timeToShow && (<div>{timeToShow}</div>)}</NavLink>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </>
+  );
+
                             <li className="nav-item">
                                 <NavLink className="nav-link" to="/artist">작가</NavLink>
                             </li>
@@ -87,6 +167,7 @@ const Menu = () => {
             </nav>
         </>
     );
+
 };
 
 export default Menu;
