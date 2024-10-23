@@ -52,6 +52,7 @@ const MemberUpdate = () => {
         e.preventDefault();
 
         const updateMember = {
+            memberId: member.memberId,
             memberPw: member.memberPw || undefined,
             memberName: member.memberName || undefined,
             memberEmail: member.memberEmail || undefined,
@@ -62,7 +63,7 @@ const MemberUpdate = () => {
         };
 
             await axios.patch("http://localhost:8080/member/update", updateMember);
-            navigate("/myPage");
+            navigate("/member/mypage");
     };
 
     const sample6_execDaumPostcode = () => {
