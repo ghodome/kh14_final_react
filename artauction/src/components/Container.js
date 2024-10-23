@@ -27,6 +27,7 @@ import Payment from "./Payment/Payment";
 import PaymentSuccess from "./Payment/PaymentSuccess";
 
 import PrivateRoute from "./router/PrivateRoute";
+import MemberSearch from "./Member/MemberSearch";
 
 
 
@@ -43,6 +44,7 @@ const Container =()=>{
                         <Route path="/login" element={<MemberLogin/>}/>
                         <Route path="/member/update" element={<PrivateRoute element={<MemberUpdate />} />} />
                         <Route path="/member/myPage" element={<PrivateRoute element={<Mypage />} />}/>
+                        <Route path="/member/search" element={<MemberSearch />}/>
                         <Route path="/work/list" element={<WorkList/>}/>
                         <Route path="/findPw" element={<FindPw/>}/>
                         <Route path="/changePw/:token" element={<ChangePw/>}/>
