@@ -103,6 +103,9 @@ const Menu = () => {
               <li className="nav-item">
                 <NavLink className="nav-link" to="/charge">포인트 충전하기</NavLink>
               </li>
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/payment">결제하기</NavLink>
+              </li>
             </ul>
             <ul className="navbar-nav me-auto">
               <li className="nav-item">

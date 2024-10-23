@@ -3,8 +3,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Jumbotron from "../Jumbotron";
 
-const ChargeSuccess = ()=>{
-   //partnerOrderId 수신
+const PaymentSuccess = () =>{
+    //partnerOrderId 수신
    const {partnerOrderId} = useParams();
 
    // 로그인 관련 상태
@@ -31,7 +31,7 @@ const ChargeSuccess = ()=>{
     console.log("pgToken = ",pgToken);
       try{
        const resp = await axios.post(
-           "http://localhost:8080/member/charge/approve",
+           "http://localhost:8080/payment/approve",
            {
                partnerOrderId : partnerOrderId,
                pgToken : pgToken,
@@ -57,7 +57,7 @@ const ChargeSuccess = ()=>{
    }
    else if(result ===true){
    return (<>
-       <Jumbotron title="포인트 구매 완료"/>
+       <Jumbotron title="경매 상품 구매 완료"/>
        <div className="row mt-4">
            <div className="col">
               <h3>홈으로</h3>
@@ -73,4 +73,4 @@ const ChargeSuccess = ()=>{
    }
 
 };
-export default ChargeSuccess;
+export default PaymentSuccess;
