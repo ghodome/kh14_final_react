@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { Modal } from "bootstrap";
 import { useNavigate } from "react-router-dom";
+import * as hangul from 'hangul-js';
 
 const WorkList = () => {
 
@@ -18,10 +19,49 @@ const WorkList = () => {
         workCategory: "",
     });
 
-    // ----------------------- 등록 -----------------------------
     //navigate
     const navigate = useNavigate();
 
+    const [artistList, setArtistList] = useState([
+
+    ]);
+    const [keyword, setKeyword] = useState("");
+    const [open, setOpen] = useState(false);
+
+    useEffect(() => {
+        loadArtistList();
+    }, []);
+
+    const loadArtistList = useCallback(async () => {
+        const resp = await axios.get("http://localhost:8080/artist/");
+        setArtistList(resp.data);
+    }, [artistList]);
+
+    const changeKeyword = useCallback(e => {
+        setKeyword(e.target.value);
+        setOpen(e.target.value.length > 0);
+    }, [keyword]);
+
+    const selectKeyword = useCallback(text => {
+        setKeyword(text);
+        setOpen(false);
+    }, [keyword]);
+
+    const searchResult = useMemo(() => {
+        //키워드 결과 없으면 표시X
+        if (keyword.length === 0) return [];
+
+        //키워드 있으면 이름 비교
+        return artistList.filter(artist => {
+            //if(artist.artistName.indexOf(keyword) > 0){
+            if (hangul.search(artist.artistName, keyword) >= 0) {
+                return true;
+            }
+            return false;
+        });
+    }, [keyword, artistList]);
+
+    // ----------------------- 등록 -----------------------------
     const clearInput = useCallback(() => {
         setInput({
             workTitle: "",
@@ -101,13 +141,74 @@ const WorkList = () => {
     }, []);
 
     // ----------------------------------------수정-------------------------------------------
-
-    const changeTarget = useCallback(e => {
+    // 작가 번호 입력시 작가 이름 업데이트
+    const changeArtistNo = useCallback((e) => {
+        const value = e.target.value;
         setTarget({
             ...target,
-            [e.target.name]: e.target.value
+            artistNo: value
         });
-    }, [target, workList]);
+    }, [target]);
+
+    // Blur 이벤트 시 작가 이름과 작품 정보를 동시에 확인
+    const updateArtistBlur = useCallback(() => {
+        // artistList에서 artistNo로 작가 찾기
+        const selectedArtist = artistList.find(artist => String(artist.artistNo) === String(target.artistNo));
+
+        if (selectedArtist) {
+            // 작가 번호에 해당하는 작가가 있으면 작가 이름 설정
+            setTarget(prevTarget => ({
+                ...prevTarget,
+                artistName: selectedArtist.artistName
+            }));
+
+            // workList에서 작가 이름과 작품 제목이 모두 일치하는 작품 찾기
+            const findWork = workList.find(work =>
+                work.artistName === selectedArtist.artistName &&
+                work.workTitle === target.workTitle
+            );
+
+            if (findWork) {
+                // 작품 정보가 있을 경우 해당 정보로 업데이트
+                setTarget(prevTarget => ({
+                    ...prevTarget,
+                    workDescription: findWork.workDescription,
+                    workMaterials: findWork.workMaterials,
+                    workSize: findWork.workSize,
+                    workCategory: findWork.workCategory
+                }));
+            }
+        } else {
+            // 작가 번호가 맞지 않으면 경고 메시지
+            window.alert("해당 작가 번호를 찾을 수 없습니다.");
+        }
+    }, [artistList, workList, target.artistNo, target.workTitle]);
+
+    const changeTarget = useCallback(e => {
+        const { name, value } = e.target;
+
+        if (name === 'artistNo') {
+            const selectedArtist = artistList.find(artist => artist.artistNo === value);
+            if (selectedArtist) {
+                setTarget({
+                    ...target,
+                    artistNo: value,
+                    artistName: selectedArtist.artistName // 작가명 자동 설정
+                });
+            } else {
+                setTarget({
+                    ...target,
+                    artistNo: value,
+                    artistName: "" // 해당 번호에 맞는 작가가 없을 경우 빈 값 설정
+                });
+            }
+        } else {
+            setTarget({
+                ...target,
+                [name]: value
+            });
+        }
+    }, [target, artistList]);
 
     const saveTarget = useCallback(async () => {
         const copy = { ...target };
@@ -128,6 +229,33 @@ const WorkList = () => {
     //view
     return (<>
         <div className="row mt-5">
+            <div className="col">
+                <div className="form-group">
+                    <input type="text" className="form-control"
+                        placeholder="작가 이름"
+                        value={keyword}
+                        onChange={changeKeyword} />
+                    {open === true && (
+                        <ul className="list-group">
+                            {searchResult.map(artist => {
+                                return (
+                                    <li key={artist.artistNo}
+                                        className="list-group-item"
+                                        onClick={e => selectKeyword(artist.artistName)}>
+                                        {artist.artistNo}
+                                        <span className="text-muted ms-4">{artist.artistName}</span>
+                                        <span className="text-muted ms-4">{artist.artistBirth}</span>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    )}
+                </div>
+            </div>
+        </div>
+
+
+        <div className="row mt-4">
             <div className="col text-end">
                 <button className="btn btn-primary" onClick={openInsertModal}>등록</button>
             </div>
@@ -195,9 +323,22 @@ const WorkList = () => {
 
                         <div className="row mt-2">
                             <div className="col">
+                                <label>작가번호</label>
+                                <input className="form-control"
+                                    type="text"
+                                    value={target.artistNo}
+                                    disabled={!isEditing}
+                                    name="artistNo"
+                                    onChange={changeArtistNo}
+                                    onBlur={updateArtistBlur} /> {/* 번호 입력 후 작가 이름과 작품 정보 확인 */}
+                            </div>
+                            <div className="col">
                                 <label>작가명</label>
-                                <input className="form-control" type="text" value={target.artistName} disabled={!isEditing}
-                                    name="artistName" onChange={changeTarget} />
+                                <input className="form-control"
+                                    disabled
+                                    type="text"
+                                    value={target.artistName}
+                                    readOnly /> {/* 작가명 자동 입력 */}
                             </div>
                         </div>
 
@@ -273,7 +414,7 @@ const WorkList = () => {
         </div>
 
         {/* 등록 모달 */}
-        <div className="modal fade" tabindex="-1" ref={insertModal}>
+        <div className="modal fade" tabIndex="-1" ref={insertModal}>
             <div className="modal-dialog">
                 <div className="modal-content">
                     {/* 모달 헤더 - 제목, x버튼 */}

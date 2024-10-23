@@ -14,14 +14,20 @@ import {Routes, Route } from 'react-router-dom';
 import Mypage from "./Member/Mypage";
 import MemberUpdate from "./Member/MemberUpdate";
 import WebSocket from "./websocket/WebSocket";
+import { useRecoilValue } from "recoil";
+import { loginState } from "../utils/recoil";
 
 import Charge from "./Member/Charge";
+import ChargeSuccess from "./Member/ChargeSuccess";
 
 import AuctionScheduleDetail from "./Auction/AuctionScheduleDetail";
 import AuctionList from './Auction/AuctionList';
+import PrivateRoute from "./router/PrivateRoute";
 
 
 const Container =()=>{
+    const login = useRecoilValue(loginState);
+
     return (<>
         <div className="container-fluid">
             <div className="row my-5 pt-3">
@@ -31,8 +37,8 @@ const Container =()=>{
                         <Route path="/join" element={<MemberJoin/>}/>
                         <Route path="/login" element={<MemberLogin/>}/>
                         <Route path="/member/myPage" element={<Mypage />} />
-                        <Route path="/member/update" element={<MemberUpdate />} />
-                        {/* <Route path="/member/myPage" element={<PrivateRoute element={<Mypage />} />}/> */}
+                        <Route path="/member/update" element={<PrivateRoute element={<MemberUpdate />} />} />
+                        <Route path="/member/myPage" element={<PrivateRoute element={<Mypage />} />}/>
                         <Route path="/work/list" element={<WorkList/>}/>
                         <Route path="/findPw" element={<FindPw/>}/>
                         <Route path="/changePw/:token" element={<ChangePw/>}/>
@@ -45,6 +51,7 @@ const Container =()=>{
                         <Route path="/notice/detail/:noticeNo" element={<NoticeDetail/>}/>
                         <Route path="/faq" element={<Faq/>}/>
                         <Route path="/charge" element={<Charge/>}/>
+                        <Route path="/charge/success/:partnerOrderId" element={<ChargeSuccess/>}/>
                         <Route path="/websocket" element={<WebSocket/>}/>
                     </Routes>
                 </div>

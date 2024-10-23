@@ -4,6 +4,9 @@ import { useEffect } from 'react';
 import axios from 'axios';
 import { Modal } from "bootstrap";
 import { useNavigate } from 'react-router-dom';
+import moment from "moment";
+import "moment/locale/ko";  //moment 한국어 정보 불러오기
+moment.locale("ko");  //moment에 한국어를 기본 언어로 설정
 
 const AuctionSchedule = ()=>{
     //navigator
@@ -11,8 +14,6 @@ const AuctionSchedule = ()=>{
 
     // state
     const [auctionScheduleList, setAuctionScheduleList] = useState([]);
-
-    // const selectedFile = document.getElementById("input").files[0];
 
     // 등록 state
     const [insert, setInsert] = useState({
@@ -57,8 +58,6 @@ const AuctionSchedule = ()=>{
             auctionScheduleNotice : ""
         });
     }, [insert]);
-
-
 
     // 입력 모달
     const insertModal = useRef();
@@ -117,17 +116,20 @@ const AuctionSchedule = ()=>{
                                 </div>
                                 <div className="d-flex flex-row">
                                     <div className="p-2">경매시작일</div>
-                                    <div className="p-2">{auctionSchedule.auctionScheduleStartDate}</div>
+                                    <div className="p-2">
+                                        {moment(auctionSchedule.auctionScheduleStartDate).format("yyyy/MM/DD (dd) a hh:mm")}</div>
                                 </div>
                                 <div className="d-flex flex-row">
                                     <div className="p-2">경매종료일</div>
-                                    <div className="p-2">{auctionSchedule.auctionScheduleEndDate}</div>
+                                    <div className="p-2">
+                                        {moment(auctionSchedule.auctionScheduleEndDate).format("yyyy/MM/DD (dd) a hh:mm")}
+                                    </div>
                                 </div>
 
                                 <div className="d-flex flex-row mt-2 mb-2">
                                 {auctionSchedule.auctionScheduleState === '진행경매' &&(
                                     <button className="btn btn-outline-secondary mt-2 col-3"
-                                        onClick={e=>navigate("/auctionList/")}>상세보기</button>
+                                        onClick={e=>navigate("/auctionList/"+auctionSchedule.auctionScheduleNo)}>상세보기</button>
                                 )}
                                 {auctionSchedule.auctionScheduleState !== '진행경매' &&(
                                     <button className="btn btn-outline-secondary mt-2 col-3"
@@ -138,7 +140,7 @@ const AuctionSchedule = ()=>{
                             </div>
                                 
                             <div className="col-3 p-4">
-                                <img src="https://placehold.co/200" class="img-thumbnail" alt=""/> 
+                                <img src="https://placehold.co/200" className="img-thumbnail" alt=""/> 
                             </div>
                             
                             <hr/>  
