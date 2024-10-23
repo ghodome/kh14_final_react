@@ -10,7 +10,7 @@ const Menu = () => {
     const navigate = useNavigate();
     const [memberId, setMemberId] = useRecoilState(memberIdState);
     const [memberRank, setMemberRank] = useRecoilState(memberRankState);
-   
+
     const login = useRecoilValue(loginState);
 
     const logout = useCallback(() => {
@@ -38,6 +38,13 @@ const Menu = () => {
                                         ({memberRank})
                                     </NavLink>
                                 </li>
+                                {memberRank === '관리자' && (
+                                    <li className="nav-item">
+                                        <NavLink className="nav-link" to="/member/search">
+                                            회원조회
+                                        </NavLink>
+                                    </li>
+                                )}
                                 <li className="nav-item">
                                     <NavLink className="nav-link" to="/"
                                         onClick={logout}>
@@ -81,7 +88,7 @@ const Menu = () => {
                                 <NavLink className="nav-link" to="/charge">포인트 충전하기</NavLink>
                             </li>
                         </ul>
-                        
+
                     </div>
                 </div>
             </nav>
