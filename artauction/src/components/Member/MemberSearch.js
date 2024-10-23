@@ -18,6 +18,7 @@ const MemberSearch = () => {
         memberAddress: "",
         beginMemberJoinDate: "",
         endMemberJoinDate: "",
+        orderList: [],
     });
 
     const [result, setResult] = useState({
@@ -42,9 +43,6 @@ const MemberSearch = () => {
 
         if (page === 1) {
             sendRequest();
-        }
-        if (page >= 2) {
-            sendMoreRequest();
         }
     }, [input.beginRow, input.endRow]);
 
@@ -76,34 +74,35 @@ const MemberSearch = () => {
             });
         }
     }, [input]);
+
+    const changeOrder = (order) => {
+        setInput(prevInput => {
+            const newOrderList = prevInput.orderList.includes(order)
+                ? prevInput.orderList.filter(o => o !== order)
+                : [...prevInput.orderList, order];
+    
+            return { ...prevInput, orderList: newOrderList };
+        });
+    };
     const sendRequest = useCallback(async () => {
         loading.current = true;
-        
+    
         const resp = await axios.post("http://localhost:8080/member/search", {
             ...input,
             beginRow: (page - 1) * size,
-            endRow: page * size
+            endRow: page * size,
         });
-
+    
         setResult(prevResult => ({
             ...prevResult,
             last: resp.data.last,
             memberList: page === 1 ? resp.data.memberList : [...prevResult.memberList, ...resp.data.memberList],
-            count: resp.data.count 
+            count: resp.data.count,
         }));
+    
+        loading.current = false;
+    }, [input, page]);    
 
-        loading.current = false;
-    }, [input, page]);
-    const sendMoreRequest = useCallback(async () => {
-        loading.current = true;
-        const resp = await axios.post("http://localhost:8080/member/search", input);
-        setResult({
-            ...result,
-            last: resp.data.last,
-            memberList: [...result.memberList, ...resp.data.memberList]
-        });
-        loading.current = false;
-    }, [input.beginRow, input.endRow]);
     const setFirstPage = useCallback(() => {
 
         setPage(prev => null);
@@ -112,31 +111,6 @@ const MemberSearch = () => {
         }, 1);
 
     }, [page]);
-
-    useEffect(() => {
-        if (page === null) return;
-        if (result.last === true) return;
-
-        const resizeHandler = throttle(() => {
-            const percent = getScrollPercent();
-            console.log("percent = " + percent);
-            if (percent >= 70 && loading.current === false) {
-                setPage(page + 1);
-            }
-        }, 250);
-
-        window.addEventListener("scroll", resizeHandler);
-
-        return () => {
-            window.removeEventListener("scroll", resizeHandler);
-        };
-    });
-    const getScrollPercent = useCallback(() => {
-        const scrollTop = window.scrollY || document.documentElement.scrollTop;
-        const documentHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const scrollPercent = (scrollTop / documentHeight) * 100;
-        return scrollPercent;
-    });
 
     const handlePageClick = (pageNumber) => {
         setPage(pageNumber);
@@ -233,7 +207,32 @@ const MemberSearch = () => {
         <div className="row mt-4">
             <label className="col-sm-3 col-form-label">정렬방식</label>
             <div className="col-sm-9">
-
+            <div className="col-sm-9">
+        <label>
+            <input type="checkbox" 
+            className="form-check-input"
+            onChange={() => changeOrder("member_id ASC")} />
+            <span className="ms-1">아이디 오름차순</span>
+        </label>
+        <label className="ms-4">
+            <input type="checkbox" 
+            className="form-check-input"
+            onChange={() => changeOrder("member_id DESC")} />
+            <span className="ms-1">아이디 내림차순</span>
+        </label>
+        <label className="ms-4">
+            <input type="checkbox" 
+            className="form-check-input"
+            onChange={() => changeOrder("member_name ASC")} />
+            <span className="ms-1">이름 오름차순</span>
+        </label>
+        <label className="ms-4">
+            <input type="checkbox" 
+            className="form-check-input"
+            onChange={() => changeOrder("member_name DESC")} />
+            <span className="ms-1">이름 내림차순</span>
+        </label>
+    </div>
             </div>
         </div>
         <div className="row mt-4">
