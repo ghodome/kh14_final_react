@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import Jumbotron from "../Jumbotron";
 import { CgLogIn } from "react-icons/cg";
 import FindPw from "./FindPw";
+import { useRecoilState } from "recoil";
+import { memberIdState, memberRankState } from "../../utils/recoil";
 
 const MemberLogin = () => {
     const navigate = useNavigate();
@@ -16,8 +18,8 @@ const MemberLogin = () => {
 
     const [forgotPw, setForgotPw] = useState(false);
 
-    const [memberId, setMemberId] = useState(false);
-    const [memberRank, setMemberRank] = useState(false);
+    const [memberId, setMemberId] = useRecoilState(memberIdState);
+    const [memberRank, setMemberRank] = useRecoilState(memberRankState);
 
 
     const changeInput = useCallback(e => {

@@ -1,5 +1,4 @@
 
-
 import { useRecoilState, useRecoilValue } from "recoil";
 import { loginState, memberLoadingState } from "../../utils/recoil";
 import { Navigate } from "react-router";
@@ -13,7 +12,7 @@ const PrivateRoute = (props)=>{
     //로딩 진행중이잖아! 기다려!
     if(memberLoading === false) {
         return <h1>Loading...</h1>
-    }
+    } 
 
     return login === true ? props.element : <Navigate to="/login"/>;
 };
