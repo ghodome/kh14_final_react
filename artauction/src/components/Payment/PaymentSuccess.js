@@ -2,16 +2,18 @@ import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Jumbotron from "../Jumbotron";
+import { useRecoilValue } from "recoil";
+import { loginState, memberLoadingState } from "../../utils/recoil";
 
 const PaymentSuccess = () =>{
     //partnerOrderId 수신
    const {partnerOrderId} = useParams();
 
    // 로그인 관련 상태
-//    const login = useRecoilValue(loginState); 리코일 생기면 이걸로 ㄱㄱ
-    const login = true;
-//    const memberLoading = useRecoilValue(memberLoadingState);
-    const memberLoading = true;
+   const login = useRecoilValue(loginState); //리코일 생기면 이걸로 ㄱㄱ
+    // const login = true;
+   const memberLoading = useRecoilValue(memberLoadingState);
+    // const memberLoading = true;
    //결제 승인 상태
    const [result,setResult] = useState(null);// null: 시작전 true:성공 false:실패
    
@@ -60,9 +62,10 @@ const PaymentSuccess = () =>{
        <Jumbotron title="경매 상품 구매 완료"/>
        <div className="row mt-4">
            <div className="col">
-              <h3>홈으로</h3>
-              <h3>마이페이지로</h3>
-              <h3>경매 페이지로</h3>
+              <h3>모나리자</h3>
+              <h3>1,000,000 결제 완료</h3>
+              <h3>상품 번호 :  1</h3>
+              <h3>상품 번호 :  1</h3>
            </div>
        </div>
        

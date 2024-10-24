@@ -28,10 +28,15 @@ import PaymentSuccess from "./Payment/PaymentSuccess";
 
 import PrivateRoute from "./router/PrivateRoute";
 import MemberSearch from "./Member/MemberSearch";
+import Items from "./RandomBox/Items";
 import AdminRoute from "./router/AdminRoute";
 import MemberDetail from "./Member/MemberDetail";
+
 import MemberChatList from "./websocket/MemberChatList";
 import MemberChatRoom from "./websocket/MemberChatRoom";
+
+import MemberEdit from "./Member/MemberEdit";
+
 
 
 
@@ -47,9 +52,11 @@ const Container = () => {
                         <Route path="/join" element={<MemberJoin />} />
                         <Route path="/login" element={<MemberLogin />} />
                         <Route path="/member/update" element={<PrivateRoute element={<MemberUpdate />} />} />
+
                         <Route path="/member/myPage" element={<PrivateRoute element={<Mypage />} />} />
-                        <Route path="/member/search" element={<AdminRoute element={<MemberSearch />} />} />
-                        <Route path="/member/:memberId" element={<AdminRoute element={<MemberDetail />} />} />
+                        <Route path="/admin/member/list" element={<AdminRoute element={<MemberSearch />} />} />
+                        <Route path="admin/member/detail/:memberId" element={<AdminRoute element={<MemberDetail />} />} />
+                        <Route path="admin/member/edit/:memberId" element={<AdminRoute element={<MemberEdit />} />} />
                         <Route path="/work/list" element={<WorkList />} />
                         <Route path="/findPw" element={<FindPw />} />
                         <Route path="/changePw/:token" element={<ChangePw />} />
@@ -66,8 +73,13 @@ const Container = () => {
                         <Route path="/charge" element={<Charge />} />
                         <Route path="/charge/success/:partnerOrderId" element={<ChargeSuccess />} />
                         <Route path="/websocket" element={<WebSocket />} />
+
                         <Route path="/websocket/memberchatlist" element={<MemberChatList />} />
                         <Route path="/websocket/memberchatroom" element={<MemberChatRoom />} />
+
+                        <Route path="/randomBox" element={<Items/>}/>
+
+
                     </Routes>
                 </div>
             </div>

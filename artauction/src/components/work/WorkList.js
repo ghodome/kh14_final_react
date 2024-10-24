@@ -9,7 +9,6 @@ const WorkList = () => {
     //state
     const [workList, setWorkList] = useState([]);
     const [isEditing, setIsEditing] = useState(false); // 추가된 상태
-    const [images, setImages] = useState([]);
     const [target, setTarget] = useState({
         artistNo: "",
         artistName: "",
@@ -32,10 +31,6 @@ const WorkList = () => {
     useEffect(() => {
         loadArtistList();
     }, []);
-
-     //파일 선택 Ref
-     const inputFileRef = useRef(null);
-
 
     const loadArtistList = useCallback(async () => {
         const resp = await axios.get("http://localhost:8080/artist/");
@@ -86,63 +81,12 @@ const WorkList = () => {
         workSize: "",
         workCategory: ""
     });
-    //callback
-    const changeInput = useCallback(e=>{
-        if (e.target.type === "file") {
-            const files = Array.from(e.target.files);
-            setInput({
-                ...input,
-                attachList : files
-            });
-            // 이미지 미리보기
-            const imageUrls = files.map(file => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                return new Promise((resolve) => {
-                    reader.onloadend = () => {
-                        resolve(reader.result); // 파일 읽기가 끝난 후 URL을 불러오기
-                    };
-                });
-            });    
-            Promise.all(imageUrls).then(urls => {
-                setImages(urls); // 모든 이미지 URL을 상태에 저장
-            });
-        }
-        else{
-            setInput({
-                ...input,
-                [e.target.name] : e.target.value
-            });
-        }
-    },[input]);
-
-    const workInsert = useCallback(async() =>{
-        //객체 생성, multipart/form-data 형식으로 전송해줌
-        const formData = new FormData();
-    
-        const fileList = inputFileRef.current.files;
-
-        for(let i =0; i < fileList.length; i++) {
-            formData.append("attachList", fileList[i]);
-        }
-        
-        //formData에 추가
-        formData.append("workTitle", input.productName);
-        formData.append("workDescription", input.productCategory);
-        formData.append("workMaterials", input.productPrice);
-        formData.append("workSize", input.productDetail);
-        formData.append("workCategory", input.productQty);
-
-        await axios.post("/work/insert", formData,{
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
-          inputFileRef.current.value = ""
-          navigate("/work");
-    });  
-    
-
+    const changeInput = useCallback(e => {
+        setInput({
+            ...input,
+            [e.target.name]: e.target.value
+        });
+    }, [input]);
 
     const insertWork = useCallback(async () => {
         const resp = await axios.post("http://localhost:8080/work/", input);
@@ -480,18 +424,6 @@ const WorkList = () => {
                     </div>
                     {/* 모달 본문 */}
                     <div className="modal-body">
-                        <div className="row mt-4">
-                            <div className="col">
-                                <label className="form-label">이미지</label>
-                                {/*  multiple accept -> 어떤 형식 받을건가*/}
-                                <input type="file" className="form-control" name="attachList" multiple accept="image/*" onChange={changeInput} ref={inputFileRef}/>
-                                {images.map((image, index) => (
-                                    <img key={index} src={image} alt={`미리보기 ${index + 1}`} style={{ maxWidth: '100px', margin: '5px' }} />
-                                ))}
-                            </div>
-                        </div>
-
-
                         <div className="row mt-2">
                             <div className="col">
                                 <label>작품명</label>
