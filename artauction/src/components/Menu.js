@@ -10,15 +10,15 @@ const Menu = () => {
     const navigate = useNavigate();
     const [memberId, setMemberId] = useRecoilState(memberIdState);
     const [memberRank, setMemberRank] = useRecoilState(memberRankState);
-   
+
     const login = useRecoilValue(loginState);
 
     const logout = useCallback(() => {
         setMemberId("");
         setMemberRank("");
         delete axios.defaults.headers.common["Authorization"];
-        window.localStorage.removeItem("refreshToken");
-        window.sessionStorage.removeItem("refreshToken");
+        window.localStorage.removeItem("refreshToken1");
+        window.sessionStorage.removeItem("refreshToken1");
         navigate("/");
     }, [navigate, setMemberId, setMemberRank]);
 
@@ -40,6 +40,13 @@ const Menu = () => {
                                         ({memberRank})
                                     </NavLink>
                                 </li>
+                                {memberRank === '관리자' && (
+                                    <li className="nav-item">
+                                        <NavLink className="nav-link" to="admin/member/list">
+                                            회원조회
+                                        </NavLink>
+                                    </li>
+                                )}
                                 <li className="nav-item">
                                     <NavLink className="nav-link" to="/"
                                         onClick={logout}>
@@ -90,7 +97,7 @@ const Menu = () => {
                                 <NavLink className="nav-link" to="/randomBox">랜덤박스</NavLink>
                             </li>
                         </ul>
-                        
+
                     </div>
                 </div>
             </nav>

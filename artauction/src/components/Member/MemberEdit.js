@@ -1,10 +1,11 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Jumbotron from "../Jumbotron";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 
-const MemberUpdate = () => {
+const MemberEdit = () => {
     const navigate = useNavigate();
+    const { memberId } = useParams(); // URL에서 memberId 가져오기
 
     const [member, setMember] = useState({
         memberPw: "",
@@ -31,14 +32,10 @@ const MemberUpdate = () => {
     };
 
     const loadMember = useCallback(async () => {
-        try {
-            const resp = await axios.get("http://localhost:8080/member/find");
+        
+            const resp = await axios.get(`http://localhost:8080/member/${memberId}`);
             setMember(resp.data);
-        } catch (error) {
-            console.error("Failed to load member data:", error);
-            navigate("/login"); // 로그인 페이지로 리다이렉트
-        }
-    }, [navigate]);
+    }, [memberId, navigate]);
 
     const changeInput = useCallback(e => {
         const { name, value } = e.target;
@@ -52,7 +49,7 @@ const MemberUpdate = () => {
         e.preventDefault();
 
         const updateMember = {
-            memberId: member.memberId,
+            memberId,
             memberPw: member.memberPw || undefined,
             memberName: member.memberName || undefined,
             memberEmail: member.memberEmail || undefined,
@@ -62,8 +59,14 @@ const MemberUpdate = () => {
             memberAddress2: member.memberAddress2 || undefined,
         };
 
+        try {
             await axios.patch("http://localhost:8080/member/update", updateMember);
-            navigate("/member/mypage");
+            alert("회원 정보가 수정되었습니다.");
+            navigate(`/admin/member/detail/${memberId}`); // 수정 후 해당 회원 상세 페이지로 리다이렉트
+        } catch (error) {
+            console.error("Failed to update member data:", error);
+            alert("회원 정보 수정에 실패했습니다.");
+        }
     };
 
     const sample6_execDaumPostcode = () => {
@@ -91,7 +94,7 @@ const MemberUpdate = () => {
 
     return (
         <>
-            <Jumbotron title={`${member.memberName} 님의 정보수정`} />
+            <Jumbotron title={`${member.memberName} 님의 정보 수정`} />
             <div className="row mt-4">
                 <div className="col-md-6 offset-md-3">
                     <form onSubmit={handleSubmit}>
@@ -111,6 +114,7 @@ const MemberUpdate = () => {
                                 onChange={changeInput}
                                 placeholder="이름"
                                 className="form-control"
+                                required
                             />
                         </div>
                         <div className="mb-3">
@@ -120,6 +124,7 @@ const MemberUpdate = () => {
                                 onChange={changeInput}
                                 placeholder="이메일"
                                 className="form-control"
+                                required
                             />
                         </div>
                         <div className="mb-3">
@@ -129,6 +134,7 @@ const MemberUpdate = () => {
                                 onChange={changeInput}
                                 placeholder="전화번호"
                                 className="form-control"
+                                required
                             />
                         </div>
                         <div className="mb-3">
@@ -161,10 +167,9 @@ const MemberUpdate = () => {
                             />
                         </div>
                         <button className="btn btn-success w-100">수정 완료</button>
-                        <button type="button" className="btn btn-secondary" onClick={() => navigate(`/member/mypage`)}>
+                        <button type="button" className="btn btn-secondary mt-2" onClick={() => navigate(`/admin/member/detail/${memberId}`)}>
                             취소
                         </button>
-
                     </form>
                 </div>
             </div>
@@ -172,4 +177,4 @@ const MemberUpdate = () => {
     );
 };
 
-export default MemberUpdate;
+export default MemberEdit;
