@@ -40,7 +40,7 @@ const Menu = () => {
                                 </li>
                                 {memberRank === '관리자' && (
                                     <li className="nav-item">
-                                        <NavLink className="nav-link" to="/member/search">
+                                        <NavLink className="nav-link" to="admin/member/list">
                                             회원조회
                                         </NavLink>
                                     </li>
