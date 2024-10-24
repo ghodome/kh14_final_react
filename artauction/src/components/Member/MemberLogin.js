@@ -42,10 +42,10 @@ const MemberLogin = () => {
                = "Bearer " + resp.data.accessToken;
    
            if (stay === true) {
-               window.localStorage.setItem("refreshToken", resp.data.refreshToken);
+               window.localStorage.setItem("refreshToken1", resp.data.refreshToken);
            }
            else {
-               window.sessionStorage.setItem("refreshToken", resp.data.refreshToken);
+               window.sessionStorage.setItem("refreshToken1", resp.data.refreshToken);
            }
            navigate("/");
        }
