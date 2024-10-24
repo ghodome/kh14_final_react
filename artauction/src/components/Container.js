@@ -28,6 +28,7 @@ import PaymentSuccess from "./Payment/PaymentSuccess";
 
 import PrivateRoute from "./router/PrivateRoute";
 import MemberSearch from "./Member/MemberSearch";
+import Items from "./RandomBox/Items";
 import AdminRoute from "./router/AdminRoute";
 import MemberDetail from "./Member/MemberDetail";
 import MemberEdit from "./Member/MemberEdit";
@@ -46,6 +47,7 @@ const Container = () => {
                         <Route path="/join" element={<MemberJoin />} />
                         <Route path="/login" element={<MemberLogin />} />
                         <Route path="/member/update" element={<PrivateRoute element={<MemberUpdate />} />} />
+
                         <Route path="/member/myPage" element={<PrivateRoute element={<Mypage />} />} />
                         <Route path="/admin/member/list" element={<AdminRoute element={<MemberSearch />} />} />
                         <Route path="admin/member/detail/:memberId" element={<AdminRoute element={<MemberDetail />} />} />
@@ -66,6 +68,8 @@ const Container = () => {
                         <Route path="/charge" element={<Charge />} />
                         <Route path="/charge/success/:partnerOrderId" element={<ChargeSuccess />} />
                         <Route path="/websocket" element={<WebSocket />} />
+                        <Route path="/randomBox" element={<Items/>}/>
+
                     </Routes>
                 </div>
             </div>
