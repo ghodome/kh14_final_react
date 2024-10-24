@@ -1,12 +1,12 @@
-import { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import Jumbotron from '../Jumbotron';
 import { useEffect } from 'react';
 import axios from 'axios';
 import { Modal } from "bootstrap";
 import { useNavigate } from 'react-router-dom';
 import moment from "moment";
-import "moment/locale/ko";  //moment 한국어 정보 불러오기
-moment.locale("ko");  //moment에 한국어를 기본 언어로 설정
+import "moment/locale/ko";
+moment.locale("ko");
 
 const AuctionSchedule = ()=>{
     //navigator
@@ -21,12 +21,25 @@ const AuctionSchedule = ()=>{
         auctionScheduleStartDate : "",
         auctionScheduleEndDate : "",
         auctionScheduleState : "",
-        auctionScheduleNotice : ""
+        auctionScheduleNotice : "",
+        attachList : []
     });
+
+    const [images, setImages] = useState([]);
 
     useEffect(()=>{
         loadAuctionScheduleList();
     }, []);
+
+    const inputFileRef = useRef(null);
+
+    // useEffect(() => {
+    //     setImages(insert.imageUrls);
+    //     if (insert.imageUrls) {
+    //         console.log(insert.imageUrls[0]);
+    //     }
+    // }, [setImages, insert.imageUrls]);
+    
 
     //callback
     const loadAuctionScheduleList = useCallback(async ()=>{
@@ -35,19 +48,67 @@ const AuctionSchedule = ()=>{
     }, [auctionScheduleList]);
 
     // 등록
-    const insertInput = useCallback(e=>{
-        setInsert({
-            ...insert,
-            [e.target.name] : e.target.value
-        });
+    // const insertInput = useCallback(e=>{
+    //     setInsert({
+    //         ...insert,
+    //         [e.target.name] : e.target.value
+    //     });
+    // }, [insert]);
+
+     const insertInput = useCallback(async (e)=>{
+        if (e.target.type === "file") {
+            const files = Array.from(e.target.files);
+            setInsert({
+                ...insert,
+                attachList : files
+            });
+            const imageUrls = files.map(file => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                return new Promise((resolve) => {
+                    reader.onloadend = () => {
+                        resolve(reader.result); // 파일 읽기가 끝난 후 URL을 불러오기
+                    };
+                });
+            });    
+            Promise.all(imageUrls).then(urls => {
+                setImages(urls); // 모든 이미지 URL을 상태에 저장
+            });
+        }
+        else{
+            setInsert({
+                ...insert,
+                [e.target.name] : e.target.value
+            });
+        }
     }, [insert]);
 
-    const saveInsertInput = useCallback(async ()=>{
-        const resp = await axios.post("http://localhost:8080/auctionSchedule/");
+    const saveInsertInput = useCallback(async() =>{
+        const formData = new FormData();
+        const fileList = inputFileRef.current.files;
+
+        for(let i =0; i < fileList.length; i++) {
+            formData.append("attachList", fileList[i]);
+        }
+
+        //formData에 추가
+        formData.append("auctionScheduleTitle", insert.auctionScheduleTitle);
+        formData.append("auctionScheduleStartDate", insert.auctionScheduleStartDate);
+        formData.append("auctionScheduleEndDate", insert.auctionScheduleEndDate);
+        formData.append("auctionScheduleState", insert.auctionScheduleState);
+        formData.append("auctionScheduleNotice", insert.auctionScheduleNotice);
+
+        // const resp = await axios.post("http://localhost:8080/auctionSchedule/", formData);
+        const resp = await axios.post("http://localhost:8080/auctionSchedule/", formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        inputFileRef.current.value = ""
         setAuctionScheduleList(resp.data);
-        clearInsertInput();
+        loadAuctionScheduleList();
         closeInsertModal();
-    }, [insert]);
+    });  
 
     const clearInsertInput = useCallback(()=>{
         setInsert({
@@ -55,7 +116,8 @@ const AuctionSchedule = ()=>{
             auctionScheduleStartDate : "",
             auctionScheduleEndDate : "",
             auctionScheduleState : "", 
-            auctionScheduleNotice : ""
+            auctionScheduleNotice : "",
+            attachList : []
         });
     }, [insert]);
 
@@ -89,27 +151,29 @@ const AuctionSchedule = ()=>{
                                 
                                 <div className="d-flex flex-reverse ms-2">
                                     <button className="btn btn-outline-primary" 
-                                            onClick={openInsertModal}>경매등록</button>
+                                            onClick={openInsertModal}>경매등록
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* 경매 일정 목록 */}
-                    {auctionScheduleList.map((auctionSchedule)=>(
+                    {auctionScheduleList && auctionScheduleList.map((auctionSchedule)=>(
                         <div className="row" key={auctionSchedule.auctionScheduleNo}>
 
                             <div className="col-9 p-4 d-flex flex-column position-static">
+                                
                                 <div className="d-flex flex-row mb-2">
-                                {auctionSchedule.auctionScheduleState === '진행경매' &&(
-                                    <div className="badge text-bg-success text-wrap">{auctionSchedule.auctionScheduleState}</div>
-                                )}
-                                {auctionSchedule.auctionScheduleState === '예정경매' &&(
-                                    <div className="badge text-bg-info text-wrap">{auctionSchedule.auctionScheduleState}</div>
-                                )}
-                                {auctionSchedule.auctionScheduleState === '종료경매' &&(
-                                    <div className="badge text-bg-secondary text-wrap">{auctionSchedule.auctionScheduleState}</div>
-                                )}
+                                    {auctionSchedule.auctionScheduleState === '진행경매' &&(
+                                        <div className="badge text-bg-success text-wrap">{auctionSchedule.auctionScheduleState}</div>
+                                    )}
+                                    {auctionSchedule.auctionScheduleState === '예정경매' &&(
+                                        <div className="badge text-bg-info text-wrap">{auctionSchedule.auctionScheduleState}</div>
+                                    )}
+                                    {auctionSchedule.auctionScheduleState === '종료경매' &&(
+                                        <div className="badge text-bg-secondary text-wrap">{auctionSchedule.auctionScheduleState}</div>
+                                    )}
                                 </div>
                                 <div className="d-flex flex-row">
                                     <h3>{auctionSchedule.auctionScheduleTitle}</h3>
@@ -117,21 +181,22 @@ const AuctionSchedule = ()=>{
                                 <div className="d-flex flex-row">
                                     <div className="p-2">경매시작일</div>
                                     <div className="p-2">
-                                        {moment(auctionSchedule.auctionScheduleStartDate).format("yyyy/MM/DD (dd) a hh:mm")}</div>
+                                        {moment(auctionSchedule.auctionScheduleStartDate).utc().format("yyyy/MM/DD (dd) a hh:mm")}
+                                    </div>
                                 </div>
                                 <div className="d-flex flex-row">
                                     <div className="p-2">경매종료일</div>
                                     <div className="p-2">
-                                        {moment(auctionSchedule.auctionScheduleEndDate).format("yyyy/MM/DD (dd) a hh:mm")}
+                                        {moment(auctionSchedule.auctionScheduleEndDate).utc().format("yyyy/MM/DD (dd) a hh:mm")}
                                     </div>
                                 </div>
 
                                 <div className="d-flex flex-row mt-2 mb-2">
-                                {auctionSchedule.auctionScheduleState === '진행경매' &&(
+                                {auctionSchedule.auctionScheduleState === '진행경매' && (
                                     <button className="btn btn-outline-secondary mt-2 col-3"
                                         onClick={e=>navigate("/auctionList/"+auctionSchedule.auctionScheduleNo)}>상세보기</button>
                                 )}
-                                {auctionSchedule.auctionScheduleState !== '진행경매' &&(
+                                {auctionSchedule.auctionScheduleState !== '진행경매' && (
                                     <button className="btn btn-outline-secondary mt-2 col-3"
                                             onClick={e=>navigate("/auctionschedule/detail/"+auctionSchedule.auctionScheduleNo)}>상세보기</button>
                                 )}
@@ -169,6 +234,7 @@ const AuctionSchedule = ()=>{
                                     {/* 경매 일정 등록 */}
                                     <div className="row mt-4">
                                         <div className="col">
+
                                             <label>경매 일정명</label>
                                             <input type="text" className="form-control mb-4" 
                                                     name="auctionScheduleTitle" value={insert.auctionScheduleTitle} 
@@ -198,8 +264,13 @@ const AuctionSchedule = ()=>{
                                                     name="auctionScheduleNotice" value={insert.auctionScheduleNotice} 
                                                     onChange={insertInput}/>
 
-                                            <label>이미지 첨부</label>
-                                            {/* <input type="file" id="input" multiple /> */}
+                                            <label className="form-label">이미지 첨부</label><br/>
+                                            <input type="file" className="form-control" name="attachList" multiple 
+                                                    accept="image/*" onChange={insertInput} ref={inputFileRef}/>
+                                                {images && images.map((image, index) => (
+                                                <img key={index} src={image} alt={`미리보기 ${index + 1}`} 
+                                                        style={{ maxWidth: '100px', margin: '5px' }} />
+                                                ))}    
                                         </div>
                                     </div>
                                 </div>
@@ -208,13 +279,13 @@ const AuctionSchedule = ()=>{
                                     <button type="button" className="btn btn-secondary btn-manual-close" 
                                                 onClick={closeInsertModal}>취소</button>
                                 <button type="button" className="btn btn-success"
-                                                onClick={saveInsertInput}>등록</button>
-                                   
+                                                onClick={saveInsertInput}>등록</button>                                  
                                 </div>
+
                             </div>
                         </div>
-                    </div>
-                    
+
+                    </div>                   
 
             </div>
         </div>

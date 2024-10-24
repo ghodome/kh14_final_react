@@ -17,7 +17,7 @@ const AuctionScheduleDetail = ()=>{
 
      //state
      const [auctionSchedule, setAuctionSchedule] = useState({});
-
+   
      const [target, setTarget] = useState({    //수정
         auctionScheduleNo : "",
         auctionScheduleTitle : "",
@@ -35,7 +35,11 @@ const AuctionScheduleDetail = ()=>{
     //callback
     const loadAuctionSchedule = useCallback(async ()=>{
             const resp = await axios.get("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
-            setAuctionSchedule(resp.data);
+            setAuctionSchedule({
+                ...resp.data,
+                auctionScheduleStartDate:new Date(resp.data.auctionScheduleStartDate).toISOString().slice(0,16),
+                auctionScheduleEndDate:new Date(resp.data.auctionScheduleEndDate).toISOString().slice(0,16)
+            });
     }, [auctionSchedule]);
 
 
@@ -59,7 +63,7 @@ const AuctionScheduleDetail = ()=>{
     }, [target])
 
     const saveTarget = useCallback(async ()=>{
-        const resp = await axios.put("http://localhost:8080/auctionSchedule/");
+        const resp = await axios.put("http://localhost:8080/auctionSchedule/",target);
         loadAuctionSchedule(resp.data);
         closeEditModal();
     }, [target]);
@@ -207,8 +211,8 @@ const AuctionScheduleDetail = ()=>{
                                                     name="auctionScheduleNotice" value={target.auctionScheduleNotice} 
                                                     onChange={changeTarget}/>
 
-                                            <label>이미지 첨부</label>
-                                            {/* <input type="file" id="input" multiple /> */}
+                                            <label>이미지 첨부</label><br/>
+                                            <input type="file" id="input" multiple />
                                         </div>
                                     </div>
                                 </div>
