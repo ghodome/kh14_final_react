@@ -17,8 +17,8 @@ const Menu = () => {
         setMemberId("");
         setMemberRank("");
         delete axios.defaults.headers.common["Authorization"];
-        window.localStorage.removeItem("refreshToken");
-        window.sessionStorage.removeItem("refreshToken");
+        window.localStorage.removeItem("refreshToken1");
+        window.sessionStorage.removeItem("refreshToken1");
         navigate("/");
     }, [navigate, setMemberId, setMemberRank]);
 
