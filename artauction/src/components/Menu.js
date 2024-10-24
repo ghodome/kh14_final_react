@@ -45,6 +45,13 @@ const Menu = () => {
                                         </NavLink>
                                     </li>
                                 )}
+                                {memberRank === '관리자' && (
+                                <li className="nav-item">
+                                    <NavLink className="nav-link" to="/websocket/memberchatlist">
+                                        1:1 채팅방
+                                    </NavLink>
+                                </li>
+                                )}
                                 <li className="nav-item">
                                     <NavLink className="nav-link" to="/"
                                         onClick={logout}>

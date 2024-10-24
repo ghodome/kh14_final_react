@@ -30,6 +30,8 @@ import PrivateRoute from "./router/PrivateRoute";
 import MemberSearch from "./Member/MemberSearch";
 import AdminRoute from "./router/AdminRoute";
 import MemberDetail from "./Member/MemberDetail";
+import MemberChatList from "./websocket/MemberChatList";
+import MemberChatRoom from "./websocket/MemberChatRoom";
 
 
 
@@ -64,6 +66,8 @@ const Container = () => {
                         <Route path="/charge" element={<Charge />} />
                         <Route path="/charge/success/:partnerOrderId" element={<ChargeSuccess />} />
                         <Route path="/websocket" element={<WebSocket />} />
+                        <Route path="/websocket/memberchatlist" element={<MemberChatList />} />
+                        <Route path="/websocket/memberchatroom" element={<MemberChatRoom />} />
                     </Routes>
                 </div>
             </div>
