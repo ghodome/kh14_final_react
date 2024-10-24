@@ -11,22 +11,25 @@ import { loginState, memberIdState, memberRankState } from '../../utils/recoil';
 moment.locale("ko");
 
 const WebSocket = () => {
-    // state
     const [input, setInput] = useState("");
-    const [messageList, setMessageList] = useState([]);
+    const [messageList, setMessageList] = useState(() => {
+        const savedMessages = window.localStorage.getItem('messageList');
+        return savedMessages ? JSON.parse(savedMessages) : [];
+    });
     const [client, setClient] = useState(null);
     const [connect, setConnect] = useState(false);
 
-    // recoil - 아이디 불러오기
     const login = useRecoilValue(loginState);
     const memberId = useRecoilValue(memberIdState);
     const memberRank = useRecoilValue(memberRankState);
 
-    // token - 토큰 불러오기
     const accessToken = axios.defaults.headers.common["Authorization"];
     const refreshToken = window.localStorage.getItem("refreshToken") || window.sessionStorage.getItem("refreshToken");
 
-    // effect
+    useEffect(() => {
+        window.localStorage.setItem('messageList', JSON.stringify(messageList));
+    }, [messageList]);
+
     useEffect(() => {
         connectToServer();
         return () => {
@@ -34,7 +37,17 @@ const WebSocket = () => {
         };
     }, [login]);
 
-    // callback
+    const createChatRoom = async () => {
+        try {
+            const response = await axios.post("http://localhost:8080/roomchat/create", {
+                memberId: memberId,
+            });
+            console.log("채팅방 생성 성공:", response.data);
+        } catch (error) {
+            console.error("채팅방 생성 실패:", error);
+        }
+    };
+
     const connectToServer = useCallback(() => {
         const socket = new SockJS("http://localhost:8080/ws");
         const client = new Client({
@@ -42,9 +55,10 @@ const WebSocket = () => {
             onConnect: () => {
                 client.subscribe("/public/chat", (message) => {
                     const json = JSON.parse(message.body);
-                    setMessageList(prev => [...prev, json]); 
+                    setMessageList(prev => [...prev, json]);
                 });
                 setConnect(true);
+                createChatRoom();
             },
             onDisconnect: () => {
                 setConnect(false);
@@ -64,7 +78,6 @@ const WebSocket = () => {
         client.activate();
         setClient(client);
     }, [client, login, accessToken, refreshToken]);
-
 
     const disconnectFromServer = useCallback(() => {
         if (client) {
@@ -93,7 +106,6 @@ const WebSocket = () => {
         setInput("");
     }, [input, client, connect, login, accessToken, refreshToken, memberId]);
 
-    // view
     return (
         <>
             <Jumbotron title="웹소켓 클라이언트"
