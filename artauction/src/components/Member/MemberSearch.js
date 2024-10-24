@@ -1,18 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Jumbotron from "../Jumbotron";
 import axios from "axios";
-import { throttle } from "lodash";
 import { PiTildeBold } from "react-icons/pi";
 import { FaMagnifyingGlass } from "react-icons/fa6";
-import { FaChevronDown } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const MemberSearch = () => {
     const navigate = useNavigate();
     const [basicSearch, setBasicSearch] = useState({
         keyword: "",
-        column: "member_id" 
+        column: "member_id"
     });
+    const [searchColumn, setSearchColumn] = useState("member_id");
     const [input, setInput] = useState({
         memberId: "",
         memberName: "",
@@ -26,16 +25,35 @@ const MemberSearch = () => {
         endMemberJoinDate: "",
         orderList: [],
     });
-    
+
     const [result, setResult] = useState({
         count: 0,
         last: true,
         memberList: []
     });
-    
+
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(10);
+
+    const openModal = () => setModalIsOpen(true);
+    const closeModal = () => setModalIsOpen(false);
+
+    const handleBasicSearchChange = (e) => {
+        setBasicSearch({
+            ...basicSearch,
+            keyword: e.target.value
+        });
+    };
+
+    const handleBasicSearch = async () => {
+        setPage(1);
+        await sendRequest();
+    };
+
+    const handleSearchColumnChange = (e) => {
+        setSearchColumn(e.target.value);
+    };
 
     useEffect(() => {
         setInput({
@@ -65,22 +83,6 @@ const MemberSearch = () => {
             [e.target.name]: parseInt(e.target.value) || ""
         });
     }, [input]);
-    const changeInputArray = useCallback(e => {
-        const origin = input[e.target.name];
-
-        if (e.target.checked === true) {
-            setInput({
-                ...input,
-                [e.target.name]: origin.concat(e.target.value)
-            });
-        }
-        else {
-            setInput({
-                ...input,
-                [e.target.name]: origin.filter(rank => rank !== e.target.value)
-            });
-        }
-    }, [input]);
 
     const changeOrder = (order) => {
         setInput(prevInput => {
@@ -95,6 +97,8 @@ const MemberSearch = () => {
         loading.current = true;
 
         const resp = await axios.post("http://localhost:8080/member/search", {
+            basicKeyword: basicSearch.keyword,
+            searchColumn: searchColumn,
             ...input,
             beginRow: (page - 1) * size,
             endRow: page * size,
@@ -108,9 +112,7 @@ const MemberSearch = () => {
             count: resp.data.count,
         }));
         loading.current = false;
-    }, [input, page]);
-
-    
+    }, [basicSearch, input, page, searchColumn]);
 
     const setFirstPage = useCallback(() => {
 
@@ -124,14 +126,40 @@ const MemberSearch = () => {
     const handlePageClick = (pageNumber) => {
         setPage(pageNumber);
     };
+
     const loading = useRef(false);
+
     const handleMemberClick = (memberId) => {
         navigate(`/member/${memberId}`);
     };
-    
+
 
     return (<>
         <Jumbotron title="회원 조회" />
+        <div className="row mt-4">
+            <label className="col-sm-3 col-form-label">기본 검색</label>
+            <div className="col-sm-9 d-flex">
+                <select onChange={handleSearchColumnChange} value={searchColumn}>
+                    <option value="member_id">아이디</option>
+                    <option value="member_name">이름</option>
+                    <option value="member_email">이메일</option>
+                </select>
+                <input
+                    type="text"
+                    className="form-control"
+                    value={basicSearch.keyword}
+                    onChange={handleBasicSearchChange}
+                />
+            </div>
+        </div>
+        <div className="row mt-4">
+            <div className="col">
+                <button className="btn btn-success w-100" onClick={handleBasicSearch}>
+                    <FaMagnifyingGlass />
+                    <span className="ms-2">기본 검색</span>
+                </button>
+            </div>
+        </div>
         <div className="row mt-4">
             <label className="col-sm-3 col-form-label">아이디</label>
             <div className="col-sm-9">
@@ -245,14 +273,14 @@ const MemberSearch = () => {
             <div className="col">
                 <ul className="list-group">
                     {result.memberList.map(member => (
-                         <li 
-                         className="list-group-item" 
-                         key={member.memberId} 
-                         onClick={() => handleMemberClick(member.memberId)} 
-                         style={{ cursor: 'pointer' }}
-                     >
-                         <h3>{member.memberId}({member.memberName})</h3>
-                     </li>
+                        <li
+                            className="list-group-item"
+                            key={member.memberId}
+                            onClick={() => handleMemberClick(member.memberId)}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <h3>{member.memberId}({member.memberName})</h3>
+                        </li>
                     ))}
                 </ul>
             </div>
