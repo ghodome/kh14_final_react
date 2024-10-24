@@ -6,6 +6,7 @@ import { loginState, memberIdState, memberRankState } from "../../utils/recoil";
 import { useRecoilValue } from "recoil";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
+import moment from "moment";
 
 const Auction = () => {
 
@@ -16,6 +17,7 @@ const Auction = () => {
     const [client, setClient] = useState(null);
     const [messageList, setMessageList] = useState([]);
     const [connect, setConnect] = useState(false);
+    const [input, setInput]=useState();
 
     //recoil
     const login = useRecoilValue(loginState);
@@ -41,14 +43,19 @@ const Auction = () => {
                     const json = JSON.parse(message.body);
                     setMessageList(prev=>[...prev,json]);
                 });
-                client.subscribe(`/auction/${auctionNo}`,(message)=>{
-                    const json = JSON.parse(message.body);
-                    setMessageList(prev=>[...prev,json]);
-                });
+                if(login){
+                    client.subscribe(`/auction/${auctionNo}`,(message)=>{
+                        const json = JSON.parse(message.body);
+                        setMessageList(prev=>[...prev,json]);
+                    });
+                }
                 setConnect(true);
             },
             onDisconnect:()=>{
                 setConnect(false);
+            },
+            debug:(str)=>{
+                console.log("[DEBUG] : "+str);
             }
         });
         if(login  === true){
@@ -64,7 +71,26 @@ const Auction = () => {
         if(client){
             client.deactivate();
         }
-    },[client])
+    },[client]);
+
+    const sendMessage=useCallback(()=>{
+        const json={
+            content:input
+        }
+        const message={
+            destination:"/auction/everyone",
+            body:JSON.stringify(json),
+        }
+        if(client===null||connect===false||input.length===0||input.startsWith("/")){
+            setInput("");
+            return;
+        }
+        else{
+            client.publish(message);
+            setInput("");
+        }
+    },[input,client,connect])
+
 
 
     //effect
@@ -166,7 +192,29 @@ const Auction = () => {
                                 </tbody>
                             </table>
 
-                            <h4>{auctionAndWork.auctionState}</h4>
+                            <div className="row mt-3">
+                                <div className="col-md-10 affset-md-1">
+                                    <div className=" input-group">
+                                        <input type="text" className="form-control"
+                                            value={input} onChange={e=>setInput(e.target.value)} disabled={!login}></input>
+                                        <button type="button" className="btn btn-success"
+                                            onClick={sendMessage} disabled={!login}>보내기</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <ul className="list-group">
+                                {messageList&&messageList.map((message,index)=>(
+                                    <div className="row" key={index}>
+                                        <div className="col">
+                                            <p>{message.senderMemberId}:{message.content.content}</p>
+                                            <p className="text-muted">
+                                                {moment(message.content.bidtime).format("a h:mm")}
+                                                ({moment(message.content.bidtime).fromNow()})
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </ul>
                         </div>
                        <hr/>
                    </div>
