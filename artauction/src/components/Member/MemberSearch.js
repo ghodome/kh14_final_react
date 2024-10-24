@@ -150,7 +150,7 @@ const MemberSearch = () => {
     const loading = useRef(false);
 
     const handleMemberClick = (memberId) => {
-        navigate(`/member/${memberId}`);
+        navigate(`/admin/member/detail/${memberId}`);
     };
 
 
