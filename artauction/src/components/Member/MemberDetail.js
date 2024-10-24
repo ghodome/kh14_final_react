@@ -34,7 +34,7 @@ const MemberDetail = () => {
     
         try {
             await axios.delete(`http://localhost:8080/member/delete/${memberId}`);
-            navigate("/"); // 삭제 후 관리자 페이지로 리다이렉트
+            navigate("/admin/member/list"); // 삭제 후 관리자 페이지로 리다이렉트
         } catch (error) {
             console.error("Failed to delete member:", error);
             alert("탈퇴에 실패했습니다. 다시 시도해 주세요.");

@@ -34,17 +34,6 @@ const MemberSearch = () => {
         last: true,
         memberList: []
     });
-    const handleComplexSearch = async (e) => {
-        e.preventDefault();
-        setBasicSearch({
-            keyword: "",
-            column: "member_id"
-        });
-        await sendRequest();
-        closeModal();
-    };
-
-
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(10);
@@ -60,7 +49,6 @@ const MemberSearch = () => {
     };
 
     const handleBasicSearch = async () => {
-
         setInput({
             memberId: "",
             memberName: "",
@@ -75,7 +63,7 @@ const MemberSearch = () => {
             orderList: [],
         });
 
-        setPage(1);
+        setPage(1); 
         await sendRequest();
     };
 
@@ -84,20 +72,9 @@ const MemberSearch = () => {
     };
 
     useEffect(() => {
-        setInput({
-            ...input,
-            beginRow: page * size - (size - 1),
-            endRow: page * size
-        });
-    }, [page, size]);
-
-    useEffect(() => {
-        if (page === null) return;
-
-        if (page === 1) {
-            sendRequest();
-        }
-    }, [input.beginRow, input.endRow]);
+        
+        sendRequest();
+    }, [input, page]);
 
     const changeInputString = useCallback(e => {
         setInput({
@@ -105,6 +82,7 @@ const MemberSearch = () => {
             [e.target.name]: e.target.value
         });
     }, [input]);
+
     const changeInputNumber = useCallback(e => {
         setInput({
             ...input,
@@ -121,219 +99,224 @@ const MemberSearch = () => {
             return { ...prevInput, orderList: newOrderList };
         });
     };
-    const sendRequest = useCallback(async () => {
-        loading.current = true;
 
+    const sendRequest = useCallback(async () => {
         const resp = await axios.post("http://localhost:8080/member/search", {
             basicKeyword: basicSearch.keyword,
             searchColumn: searchColumn,
             ...input,
             beginRow: (page - 1) * size,
-            endRow: page * size,
+            endRow: page * size - 1,
         });
         const filteredMemberList = resp.data.memberList.filter(member => member.memberRank !== '관리자');
 
-        setResult(prevResult => ({
-            ...prevResult,
+        setResult({
             last: resp.data.last,
-            memberList: page === 1 ? filteredMemberList : [...prevResult.memberList, ...filteredMemberList],
+            memberList: filteredMemberList,
             count: resp.data.count,
-        }));
-        loading.current = false;
+        });
     }, [basicSearch, input, page, searchColumn]);
 
+    const handleComplexSearch = async (e) => {
+        e.preventDefault();
+        setBasicSearch({
+            keyword: "",
+            column: "member_id"
+        });
+        setPage(1); 
+        await sendRequest();
+        closeModal();
+    };
 
     const handlePageClick = (pageNumber) => {
         setPage(pageNumber);
     };
 
-    const loading = useRef(false);
-
     const handleMemberClick = (memberId) => {
         navigate(`/admin/member/detail/${memberId}`);
     };
 
-
-    return (<>
-        <Jumbotron title="회원 조회" />
-        <div className="row mt-4">
-            <label className="col-sm-3 col-form-label">기본 검색</label>
-            <div className="col-sm-9 d-flex">
-                <select className="form-select form-select-sm me-2"
-                    onChange={handleSearchColumnChange} value={searchColumn}>
-                    <option value="member_id">아이디</option>
-                    <option value="member_name">이름</option>
-                    <option value="member_email">이메일</option>
-                </select>
-                <input
-                    type="text"
-                    className="form-control ms-2"
-                    value={basicSearch.keyword}
-                    onChange={handleBasicSearchChange}
-                />
+    return (
+        <>
+            <Jumbotron title="회원 조회" />
+            <div className="row mt-4">
+                <label className="col-sm-3 col-form-label">기본 검색</label>
+                <div className="col-sm-9 d-flex">
+                    <select className="form-select form-select-sm me-2"
+                        onChange={handleSearchColumnChange} value={searchColumn}>
+                        <option value="member_id">아이디</option>
+                        <option value="member_name">이름</option>
+                        <option value="member_email">이메일</option>
+                    </select>
+                    <input
+                        type="text"
+                        className="form-control ms-2"
+                        value={basicSearch.keyword}
+                        onChange={handleBasicSearchChange}
+                    />
+                </div>
             </div>
-        </div>
-        <div className="row mt-4">
-            <div className="col">
-                <button className="btn btn-success w-100" onClick={handleBasicSearch}>
-                    <FaMagnifyingGlass />
-                    <span className="ms-2">기본 검색</span>
-                </button>
-            </div>
-        </div>
-        <button className="btn btn-primary" onClick={openModal}>
-            복합 검색
-        </button>
-        <Modal isOpen={modalIsOpen} onRequestClose={closeModal}>
-            <h2>복합검색</h2>
-            <form>
-                <div className="row mt-4">
-                    <label className="col-sm-3 col-form-label">아이디</label>
-                    <div className="col-sm-9">
-                        <input type="text" className="form-control"
-                            name="memberId" value={input.memberId}
-                            onChange={changeInputString} />
-                    </div>
-                </div>
-                <div className="row mt-4">
-                    <label className="col-sm-3 col-form-label">이름</label>
-                    <div className="col-sm-9">
-                        <input type="text" className="form-control"
-                            name="memberName" value={input.memberName}
-                            onChange={changeInputString} />
-                    </div>
-                </div>
-                <div className="row mt-4">
-                    <label className="col-sm-3 col-form-label">연락처</label>
-                    <div className="col-sm-9">
-                        <input type="tel" className="form-control"
-                            name="memberContact" value={input.memberContact}
-                            onChange={changeInputString} />
-                    </div>
-                </div>
-                <div className="row mt-4">
-                    <label className="col-sm-3 col-form-label">이메일</label>
-                    <div className="col-sm-9">
-                        <input type="email" className="form-control"
-                            name="memberEmail" value={input.memberEmail}
-                            onChange={changeInputString} />
-                    </div>
-                </div>
-                <div className="row mt-4">
-                    <label className="col-sm-3 col-form-label">포인트</label>
-                    <div className="col-sm-9 d-flex">
-                        <input type="text" className="form-control"
-                            name="minMemberPoint" value={input.minMemberPoint}
-                            onChange={changeInputNumber} />
-                        <span className="mx-2">
-                            <PiTildeBold />
-                        </span>
-                        <input type="text" className="form-control"
-                            name="maxMemberPoint" value={input.maxMemberPoint}
-                            onChange={changeInputNumber} />
-                    </div>
-                </div>
-                <div className="row mt-4">
-                    <label className="col-sm-3 col-form-label">주소</label>
-                    <div className="col-sm-9">
-                        <input type="text" className="form-control"
-                            name="memberAddress" value={input.memberAddress}
-                            onChange={changeInputString} />
-                    </div>
-                </div>
-                <div className="row mt-4">
-                    <label className="col-sm-3 col-form-label">가입일</label>
-                    <div className="col-sm-9 d-flex">
-                        <input type="date" className="form-control"
-                            name="beginMemberJoinDate" value={input.beginMemberJoinDate}
-                            onChange={changeInputString} />
-                        <span className="mx-2">
-                            <PiTildeBold />
-                        </span>
-                        <input type="date" className="form-control"
-                            name="endMemberJoinDate" value={input.endMemberJoinDate}
-                            onChange={changeInputString} />
-                    </div>
-                </div>
-                <div className="row mt-4">
-                    <label className="col-sm-3 col-form-label">정렬방식</label>
-                    <div className="col-sm-9">
-                        <div className="col-sm-9">
-                            <label>
-                                <input type="checkbox"
-                                    className="form-check-input"
-                                    onChange={() => changeOrder("member_id ASC")} />
-                                <span className="ms-1">아이디 오름차순</span>
-                            </label>
-                            <label className="ms-4">
-                                <input type="checkbox"
-                                    className="form-check-input"
-                                    onChange={() => changeOrder("member_id DESC")} />
-                                <span className="ms-1">아이디 내림차순</span>
-                            </label>
-                            <label className="ms-4">
-                                <input type="checkbox"
-                                    className="form-check-input"
-                                    onChange={() => changeOrder("member_name ASC")} />
-                                <span className="ms-1">이름 오름차순</span>
-                            </label>
-                            <label className="ms-4">
-                                <input type="checkbox"
-                                    className="form-check-input"
-                                    onChange={() => changeOrder("member_name DESC")} />
-                                <span className="ms-1">이름 내림차순</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div className="row mt-4">
-                    <div className="col">
-                        <button className="btn btn-success" onClick={handleComplexSearch}>
-                            검색
-                        </button>
-                    </div>
-                </div>
-            </form>
-            <button className="btn btn-secondary" onClick={closeModal}>
-                닫기
-            </button>
-
-        </Modal>
-
-        <div className="row mt-4">
-            <div className="col">
-                <ul className="list-group">
-                    {result.memberList.map(member => (
-                        <li
-                            className="list-group-item"
-                            key={member.memberId}
-                            onClick={() => handleMemberClick(member.memberId)}
-                            style={{ cursor: 'pointer' }}
-                        >
-                            <h3>{member.memberId}({member.memberName})</h3>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </div>
-        {modalIsOpen ? null : (
             <div className="row mt-4">
                 <div className="col">
-                    <nav>
-                        <ul className="pagination justify-content-center">
-                            {[...Array(Math.ceil(result.count / size)).keys()].map(num => (
-                                <li className={`page-item ${page === num + 1 ? 'active' : ''}`} key={num}>
-                                    <button className="page-link" onClick={() => handlePageClick(num + 1)}>
-                                        {num + 1}
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    </nav>
+                    <button className="btn btn-success w-100" onClick={handleBasicSearch}>
+                        <FaMagnifyingGlass />
+                        <span className="ms-2">기본 검색</span>
+                    </button>
                 </div>
             </div>
-        )}
-    </>);
+            <button className="btn btn-primary" onClick={openModal}>
+                복합 검색
+            </button>
+            <Modal isOpen={modalIsOpen} onRequestClose={closeModal}>
+                <h2>복합검색</h2>
+                <form>
+                    <div className="row mt-4">
+                        <label className="col-sm-3 col-form-label">아이디</label>
+                        <div className="col-sm-9">
+                            <input type="text" className="form-control"
+                                name="memberId" value={input.memberId}
+                                onChange={changeInputString} />
+                        </div>
+                    </div>
+                    <div className="row mt-4">
+                        <label className="col-sm-3 col-form-label">이름</label>
+                        <div className="col-sm-9">
+                            <input type="text" className="form-control"
+                                name="memberName" value={input.memberName}
+                                onChange={changeInputString} />
+                        </div>
+                    </div>
+                    <div className="row mt-4">
+                        <label className="col-sm-3 col-form-label">연락처</label>
+                        <div className="col-sm-9">
+                            <input type="tel" className="form-control"
+                                name="memberContact" value={input.memberContact}
+                                onChange={changeInputString} />
+                        </div>
+                    </div>
+                    <div className="row mt-4">
+                        <label className="col-sm-3 col-form-label">이메일</label>
+                        <div className="col-sm-9">
+                            <input type="email" className="form-control"
+                                name="memberEmail" value={input.memberEmail}
+                                onChange={changeInputString} />
+                        </div>
+                    </div>
+                    <div className="row mt-4">
+                        <label className="col-sm-3 col-form-label">포인트</label>
+                        <div className="col-sm-9 d-flex">
+                            <input type="text" className="form-control"
+                                name="minMemberPoint" value={input.minMemberPoint}
+                                onChange={changeInputNumber} />
+                            <span className="mx-2">
+                                <PiTildeBold />
+                            </span>
+                            <input type="text" className="form-control"
+                                name="maxMemberPoint" value={input.maxMemberPoint}
+                                onChange={changeInputNumber} />
+                        </div>
+                    </div>
+                    <div className="row mt-4">
+                        <label className="col-sm-3 col-form-label">주소</label>
+                        <div className="col-sm-9">
+                            <input type="text" className="form-control"
+                                name="memberAddress" value={input.memberAddress}
+                                onChange={changeInputString} />
+                        </div>
+                    </div>
+                    <div className="row mt-4">
+                        <label className="col-sm-3 col-form-label">가입일</label>
+                        <div className="col-sm-9 d-flex">
+                            <input type="date" className="form-control"
+                                name="beginMemberJoinDate" value={input.beginMemberJoinDate}
+                                onChange={changeInputString} />
+                            <span className="mx-2">
+                                <PiTildeBold />
+                            </span>
+                            <input type="date" className="form-control"
+                                name="endMemberJoinDate" value={input.endMemberJoinDate}
+                                onChange={changeInputString} />
+                        </div>
+                    </div>
+                    <div className="row mt-4">
+                        <label className="col-sm-3 col-form-label">정렬방식</label>
+                        <div className="col-sm-9">
+                            <div className="col-sm-9">
+                                <label>
+                                    <input type="checkbox"
+                                        className="form-check-input"
+                                        onChange={() => changeOrder("member_id ASC")} />
+                                    <span className="ms-1">아이디 오름차순</span>
+                                </label>
+                                <label className="ms-4">
+                                    <input type="checkbox"
+                                        className="form-check-input"
+                                        onChange={() => changeOrder("member_id DESC")} />
+                                    <span className="ms-1">아이디 내림차순</span>
+                                </label>
+                                <label className="ms-4">
+                                    <input type="checkbox"
+                                        className="form-check-input"
+                                        onChange={() => changeOrder("member_name ASC")} />
+                                    <span className="ms-1">이름 오름차순</span>
+                                </label>
+                                <label className="ms-4">
+                                    <input type="checkbox"
+                                        className="form-check-input"
+                                        onChange={() => changeOrder("member_name DESC")} />
+                                    <span className="ms-1">이름 내림차순</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="row mt-4">
+                        <div className="col">
+                            <button className="btn btn-success" onClick={handleComplexSearch}>
+                                검색
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <button className="btn btn-secondary" onClick={closeModal}>
+                    닫기
+                </button>
+            </Modal>
+
+            <div className="row mt-4">
+                <div className="col">
+                    <ul className="list-group">
+                        {result.memberList.map(member => (
+                            <li
+                                className="list-group-item"
+                                key={member.memberId}
+                                onClick={() => handleMemberClick(member.memberId)}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <h3>{member.memberId}({member.memberName})</h3>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+            {modalIsOpen ? null : (
+                <div className="row mt-4">
+                    <div className="col">
+                        <nav>
+                            <ul className="pagination justify-content-center">
+                                {[...Array(Math.ceil(result.count / size)).keys()].map(num => (
+                                    <li className={`page-item ${page === num + 1 ? 'active' : ''}`} key={num}>
+                                        <button className="page-link" onClick={() => handlePageClick(num + 1)}>
+                                            {num + 1}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            )}
+        </>
+    );
 };
 
 export default MemberSearch;

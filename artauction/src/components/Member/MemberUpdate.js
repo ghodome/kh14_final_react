@@ -63,6 +63,7 @@ const MemberUpdate = () => {
         };
 
             await axios.patch("http://localhost:8080/member/update", updateMember);
+            alert("회원 정보가 수정되었습니다.");
             navigate("/member/mypage");
     };
 
