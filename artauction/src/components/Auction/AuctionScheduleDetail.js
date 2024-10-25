@@ -168,7 +168,8 @@ const AuctionScheduleDetail = ()=>{
     }, [auctionScheduleNo]);
 
     const loadAuctionList=useCallback(async ()=>{
-        const resp=await axios.get(`http://localhost:8080/auction/${auctionScheduleNo}`);
+        const resp=await axios.get(`http://localhost:8080/auction/auctionList/${auctionScheduleNo}`);
+        console.log(resp.data);
         setAuctionList(resp.data);
     },[auctionList]);
 
