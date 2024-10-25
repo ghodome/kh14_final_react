@@ -36,6 +36,7 @@ import MemberChatList from "./websocket/MemberChatList";
 import MemberChatRoom from "./websocket/MemberChatRoom";
 
 import MemberEdit from "./Member/MemberEdit";
+import MemberCheck from "./Member/MemberCheck";
 
 
 
@@ -50,9 +51,9 @@ const Container = () => {
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/join" element={<MemberJoin />} />
+                        <Route path="/check" element={<MemberCheck />} />
                         <Route path="/login" element={<MemberLogin />} />
                         <Route path="/member/update" element={<PrivateRoute element={<MemberUpdate />} />} />
-
                         <Route path="/member/myPage" element={<PrivateRoute element={<Mypage />} />} />
                         <Route path="/admin/member/list" element={<AdminRoute element={<MemberSearch />} />} />
                         <Route path="admin/member/detail/:memberId" element={<AdminRoute element={<MemberDetail />} />} />

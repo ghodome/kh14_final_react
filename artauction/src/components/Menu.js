@@ -62,7 +62,7 @@ const Menu = () => {
                                 </li>
                             </>) : (<>
                                 <li className="nav-item">
-                                    <NavLink className="nav-link" to="/join">
+                                    <NavLink className="nav-link" to="/check">
                                         회원가입
                                     </NavLink>
                                 </li>
