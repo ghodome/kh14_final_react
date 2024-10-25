@@ -75,7 +75,7 @@ const Container = () => {
                         <Route path="/websocket" element={<WebSocket />} />
 
                         <Route path="/websocket/memberchatlist" element={<MemberChatList />} />
-                        <Route path="/websocket/memberchatroom" element={<MemberChatRoom />} />
+                        <Route path="/websocket/memberchatroom/:roomChatNo" element={<MemberChatRoom />} />
 
                         <Route path="/randomBox" element={<Items/>}/>
 
