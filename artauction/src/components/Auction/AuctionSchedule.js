@@ -38,8 +38,9 @@ const AuctionSchedule = () => {
     const loadAuctionScheduleList = useCallback(async ()=>{
         const resp = await axios.post("http://localhost:8080/auctionSchedule/", row);
         setAuctionScheduleList(resp.data.auctionScheduleList);
-    }, [auctionScheduleList, auctionScheduleList]);
-    
+    }, [auctionScheduleList]);
+
+
     // 경매 일정 등록 모달
     const insertModal = useRef();
 
@@ -135,7 +136,7 @@ const AuctionSchedule = () => {
 
     return (<>
             <Jumbotron title="경매 일정" content="예정/진행/종료경매 목록" />
-
+                
             <div className="row mt-4">
                 <div className="col">
                     <div className="d-flex flex-row mt-2 mb-2">
@@ -180,16 +181,16 @@ const AuctionSchedule = () => {
                                 </div>
 
                                 <div className="d-flex flex-row mt-2 mb-2">
-                                {/* {auctionSchedule.auctionScheduleState === '진행경매' &&(
+                                {schedule.auctionScheduleState === '진행경매' &&(
                                     <button className="btn btn-outline-secondary mt-2 col-3"
-                                        onClick={e=>navigate("/auctionList/"+auctionSchedule.auctionScheduleNo)}>상세보기</button>
+                                        onClick={e=>navigate("/auctionList/"+schedule.auctionScheduleNo)}>상세보기</button>
                                 )}
-                                {auctionSchedule.auctionScheduleState !== '진행경매' &&(
+                                {schedule.auctionScheduleState !== '진행경매' &&(
                                     <button className="btn btn-outline-secondary mt-2 col-3"
-                                            onClick={e=>navigate("/auctionschedule/detail/"+auctionSchedule.auctionScheduleNo)}>상세보기</button>
-                                )} */}
-                                <button className="btn btn-outline-secondary mt-2 col-3"
-                                        onClick={e=>navigate("/auctionschedule/detail/"+schedule.auctionScheduleNo)}>상세보기</button>
+                                            onClick={e=>navigate("/auctionschedule/detail/"+schedule.auctionScheduleNo)}>상세보기</button>
+                                )}
+                                {/* <button className="btn btn-outline-secondary mt-2 col-3"
+                                        onClick={e=>navigate("/auctionschedule/detail/"+schedule.auctionScheduleNo)}>상세보기</button> */}
                                 </div>
                                      
                             </div>

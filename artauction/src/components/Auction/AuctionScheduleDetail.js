@@ -20,6 +20,8 @@ const AuctionScheduleDetail = ()=>{
      //state
      const [auctionSchedule, setAuctionSchedule] = useState({});
 
+     const [images, setImages] = useState([]); // 이미지 미리보기 URL 목록
+
      const [target, setTarget] = useState({    //수정
         auctionScheduleNo : "",
         auctionScheduleTitle : "",
@@ -53,20 +55,47 @@ const AuctionScheduleDetail = ()=>{
     //callback
     const loadAuctionSchedule = useCallback(async ()=>{
         const resp = await axios.get("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
-        setAuctionSchedule({
-            ...resp.data,
-            auctionScheduleStartDate:new Date(resp.data.auctionScheduleStartDate).toISOString().slice(0,16),
-            auctionScheduleEndDate:new Date(resp.data.auctionScheduleEndDate).toISOString().slice(0,16)
-        });
+        setAuctionSchedule(resp.data);
+        console.log(resp.data);
     }, [auctionSchedule]);
 
 
     //수정
+    // const changeTarget = useCallback(e=>{
+    //     setTarget({
+    //         ...target,
+    //         [e.target.name] : e.target.value
+    //     });
+    // }, [target]);
+
+    //수정내용 작성
     const changeTarget = useCallback(e=>{
-        setTarget({
-            ...target,
-            [e.target.name] : e.target.value
-        });
+        if (e.target.type === "file") {
+            const files = Array.from(e.target.files);
+            setTarget({ 
+                ...target, 
+                attachList: files 
+            });
+            //이미지 미리보기
+            const imageUrls = files.map(file => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    return new Promise((resolve) => {
+                        reader.onloadend = () => {
+                            resolve(reader.result);
+                        };
+                    });
+                })
+            Promise.all(imageUrls).then(urls => {
+                setImages(urls);
+            })
+        } 
+        else {
+            setTarget({ 
+                ...target, 
+                [e.target.name]: e.target.value 
+            });
+        }
     }, [target]);
 
     const clearTarget = useCallback(e=>{
@@ -207,8 +236,9 @@ const AuctionScheduleDetail = ()=>{
         <div className="container w-50">  
 
             <div className="row mt-4 text-center">
-                <div className="col">
-                    <img src="https://placehold.co/300" className="img-thumbnail" alt=""/>           
+                <div className="col my-4">
+                        <img src={`http://localhost:8080/attach/download/${auctionSchedule.attachment}`} 
+                            className="img-thumbnail" alt="" height='300px' width='500px' />
                 </div>
             </div>
 
