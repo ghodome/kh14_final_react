@@ -27,6 +27,7 @@ const memberRankState = atom({
     default:""
 });
 
+
 const loginState = selector({
     key: "loginState",//식별자
     get: (state)=>{//state에서 원하는 항목을 읽어서 계산한 뒤 반환

@@ -27,6 +27,7 @@ const MemberSearch = () => {
         beginMemberJoinDate: "",
         endMemberJoinDate: "",
         orderList: [],
+        isBlocked: false,
     });
 
     const [result, setResult] = useState({
@@ -61,9 +62,10 @@ const MemberSearch = () => {
             beginMemberJoinDate: "",
             endMemberJoinDate: "",
             orderList: [],
+            isBlocked: false,
         });
 
-        setPage(1); 
+        setPage(1);
         await sendRequest();
     };
 
@@ -72,7 +74,7 @@ const MemberSearch = () => {
     };
 
     useEffect(() => {
-        
+
         sendRequest();
     }, [input, page]);
 
@@ -104,11 +106,13 @@ const MemberSearch = () => {
         const resp = await axios.post("http://localhost:8080/member/search", {
             basicKeyword: basicSearch.keyword,
             searchColumn: searchColumn,
+            isBlocked: input.isBlocked,
             ...input,
             beginRow: (page - 1) * size,
             endRow: page * size - 1,
         });
-        const filteredMemberList = resp.data.memberList.filter(member => member.memberRank !== '관리자');
+        const allMembers = resp.data.memberList;
+        const filteredMemberList = allMembers.filter(member => member.memberRank !== '관리자');
 
         setResult({
             last: resp.data.last,
@@ -123,7 +127,7 @@ const MemberSearch = () => {
             keyword: "",
             column: "member_id"
         });
-        setPage(1); 
+        setPage(1);
         await sendRequest();
         closeModal();
     };
@@ -238,6 +242,20 @@ const MemberSearch = () => {
                                 onChange={changeInputString} />
                         </div>
                     </div>
+                    <div className="row mt-4">
+                        <label className="col-sm-3 col-form-label">차단 여부</label>
+                        <div className="col-sm-9">
+                            <input
+                                type="checkbox"
+                                className="form-check-input"
+                                name="isBlocked"
+                                checked={input.isBlocked}
+                                onChange={e => setInput({ ...input, isBlocked: e.target.checked })}
+                            />
+                            <span className="ms-1">차단된 회원만 보기</span>
+                        </div>
+                    </div>
+
                     <div className="row mt-4">
                         <label className="col-sm-3 col-form-label">정렬방식</label>
                         <div className="col-sm-9">
