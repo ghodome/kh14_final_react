@@ -4,9 +4,10 @@ import axios from "axios";
 import { PiTildeBold } from "react-icons/pi";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-import Modal from "react-modal";
+// import Modal from "react-modal";
+import { Modal } from "bootstrap";
 
-Modal.setAppElement('#root');
+// Modal.setAppElement('#root');
 
 const MemberSearch = () => {
     const navigate = useNavigate();
