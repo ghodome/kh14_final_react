@@ -8,6 +8,7 @@ const WorkList = () => {
 
     //state
     const [workList, setWorkList] = useState([]);
+    const [images, setImages] = useState([]);
     const [isEditing, setIsEditing] = useState(false); // 추가된 상태
     const [target, setTarget] = useState({
         artistNo: "",
@@ -17,7 +18,14 @@ const WorkList = () => {
         workMaterials: "",
         workSize: "",
         workCategory: "",
+        attachList:[],
     });
+    const [inputKeyword, setInputKeyword] = useState({
+        column : "",
+        keyword : "",
+        beginRow : "",
+        endRow : ""
+      });
 
     //navigate
     const navigate = useNavigate();
@@ -27,11 +35,9 @@ const WorkList = () => {
     ]);
     const [keyword, setKeyword] = useState("");
     const [open, setOpen] = useState(false);
+    const [image,setImage]=useState();
 
-    useEffect(() => {
-        loadArtistList();
-    }, []);
-
+    
     const loadArtistList = useCallback(async () => {
         const resp = await axios.get("http://localhost:8080/artist/");
         setArtistList(resp.data);
@@ -53,7 +59,6 @@ const WorkList = () => {
 
         //키워드 있으면 이름 비교
         return artistList.filter(artist => {
-            //if(artist.artistName.indexOf(keyword) > 0){
             if (hangul.search(artist.artistName, keyword) >= 0) {
                 return true;
             }
@@ -69,30 +74,85 @@ const WorkList = () => {
             workDescription: "",
             workMaterials: "",
             workSize: "",
-            workCategory: ""
+            workCategory: "",
+            attachList:[]
         });
     }, []);
     const [input, setInput] = useState({
-        workNo: "",
         workTitle: "",
         artistNo: "",
         workDescription: "",
         workMaterials: "",
         workSize: "",
-        workCategory: ""
+        workCategory: "",
+        attachList:[]
     });
-    const changeInput = useCallback(e => {
-        setInput({
-            ...input,
-            [e.target.name]: e.target.value
-        });
-    }, [input]);
 
-    const insertWork = useCallback(async () => {
-        const resp = await axios.post("http://localhost:8080/work/", input);
-        closeInsertModal();
+    //callback
+    const changeInput = useCallback(e=>{
+        if (e.target.type === "file") {
+            const files = Array.from(e.target.files);
+            setInput({
+                ...input,
+                attachList : files
+            });
+            // 이미지 미리보기
+            const imageUrls = files.map(file => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                return new Promise((resolve) => {
+                    reader.onloadend = () => {
+                        resolve(reader.result); // 파일 읽기가 끝난 후 URL을 불러오기
+                    };
+                });
+            });    
+            Promise.all(imageUrls).then(urls => {
+                setImages(urls); // 모든 이미지 URL을 상태에 저장
+            });
+        }
+        else{
+            setInput({
+                ...input,
+                [e.target.name] : e.target.value
+            });
+        }
+    },[input]);
+
+    const inputFileRef = useRef(null);
+
+
+    const insertWork = useCallback(async() =>{
+        const formData = new FormData();
+    
+        const fileList = inputFileRef.current.files;
+
+        for(let i =0; i < fileList.length; i++) {
+            formData.append("attachList", fileList[i]);
+        }
+        
+        formData.append("workTitle", input.workTitle);
+        formData.append("artistNo", input.artistNo);
+        formData.append("workDescription", input.workDescription);
+        formData.append("workMaterials", input.workMaterials);
+        formData.append("workSize", input.workSize);
+        formData.append("workCategory", input.workCategory);
+
+        // 실제로 어떤 값이 전송되는지 로그 확인
+        console.log("attachment:", input.attachList);
+
+        await axios.post("http://localhost:8080/work/", formData,{
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+        });
+        inputFileRef.current.value = ""
+        navigate("/work/list");
+        clearInput();
         loadWorkList();
-    }, [input]);
+        closeInsertModal();
+        setImages([]);
+    });
+
 
     const insertModal = useRef();
     const openInsertModal = useCallback(() => {
@@ -104,6 +164,7 @@ const WorkList = () => {
         var tag = Modal.getInstance(insertModal.current);
         tag.hide();
         clearInput();//입력창 청소
+        setImages([]);
     }, [insertModal]);
 
     //----------------------------------------------------------
@@ -113,9 +174,10 @@ const WorkList = () => {
     }, []);
 
     const loadWorkList = useCallback(async () => {
-        const resp = await axios.get("http://localhost:8080/work/");
-        setWorkList(resp.data);
-    }, [workList]);
+        const resp = await axios.post("http://localhost:8080/work/",inputKeyword);
+        console.log(resp.data);
+        setWorkList(resp.data.workList);
+    }, [workList,inputKeyword]);
 
     const editModal = useRef();
     const openEditModal = useCallback((work) => {
@@ -210,21 +272,38 @@ const WorkList = () => {
         }
     }, [target, artistList]);
 
+    
     const saveTarget = useCallback(async () => {
         const copy = { ...target };
         await axios.patch("http://localhost:8080/work/", copy);
-
+        
         loadWorkList();
         closeEditModal();
     }, [target]);
-
+    
     const toggleEditMode = () => {
         if (isEditing) {
             saveTarget();
         }
         setIsEditing(!isEditing);
     };
-    // -------------------------------------------------------------------------------------------
+
+    // const loadImageWork=useCallback(async ()=>{
+    //     const resp=await axios.get("http://localhost:8080/180",{
+    //         responseType: 'blob' // 이미지 데이터를 Blob으로 받기 위해 responseType 설정
+    //     });
+    //     const imageUrl = URL.createObjectURL(new Blob([resp.data])); // Blob 데이터를 이미지 URL로 변환
+    //     setImage(imageUrl); // 변환한 URL을 state에 저장하여 렌더링
+
+    // },[]);
+
+    useEffect(() => {
+        loadArtistList();
+        // loadImageWork();
+    }, []);
+
+
+
 
     //view
     return (<>
@@ -269,14 +348,13 @@ const WorkList = () => {
 
         <div className="row mt-4">
             <div className="col-md-10 offset-md-1">
-                <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-4">
+                <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-5">
                     {/* 카드 */}
-                    {workList.map(work => (
+                    {loadWorkList&&workList.map(work => (
                         <div className="col mb-3" key={work.workNo}>
                             <div className="card">
                                 <h3 className="card-header">
-                                    <img src="https://via.placeholder.com/300.jpg"
-                                        className="card-img-top" />
+                                <img src={`http://localhost:8080/attach/download/${work.attachment}`} className="card-img-top" />
                                 </h3>
                                 <div className="card-body">
                                     <h5 className="card-title">{work.workTitle}</h5>
@@ -307,11 +385,13 @@ const WorkList = () => {
                     </div>
                     {/* 모달 본문 */}
                     <div className="modal-body">
+                    {/* {workList.map(work => (  */}
                         <div className="row mt-2">
                             <div className="col d-flex justify-content-center">
-                                <img src="https://via.placeholder.com/300.jpg" className="card-img-top" style={{ width: 200 }} />
+                            {/* <img src={`http://localhost:8080/attach/download/${work.attachment}`} style={{ width: 200 }} /> */}
                             </div>
                         </div>
+                    {/* ))} */}
 
                         <div className="row mt-2">
                             <div className="col">
@@ -424,6 +504,17 @@ const WorkList = () => {
                     </div>
                     {/* 모달 본문 */}
                     <div className="modal-body">
+                        <div className="row mt-2">
+                            <div className="col">
+                            <label className="form-label">파일</label>
+                                {/*  multiple accept -> 어떤 형식 받을건가*/}
+                                <input type="file" className="form-control" name="attachList" multiple accept="image/*" onChange={changeInput} ref={inputFileRef}/>
+                                {images.map((image, index) => (
+                                    <img key={index} src={image} alt={`미리보기 ${index + 1}`} style={{ maxWidth: '100px', margin: '5px' }} />
+                                ))}
+                            </div>
+                        </div>
+
                         <div className="row mt-2">
                             <div className="col">
                                 <label>작품명</label>
