@@ -67,7 +67,8 @@ const MemberLogin = () => {
                     <div className="col">
                         <input type="text" name="memberId" className="form-control"
                             placeholder="아이디 입력"
-                            value={input.memberId} onChange={changeInput} />
+                            value={input.memberId} onChange={changeInput} 
+                            onKeyUp={e=>e.key==='Enter'&&sendLoginRequest()}/>
                     </div>
                 </div>
 
@@ -75,7 +76,8 @@ const MemberLogin = () => {
                     <div className="col">
                         <input type={display ? "text" : "password"} name="memberPw" className="form-control"
                             placeholder="비밀번호 입력"
-                            value={input.memberPw} onChange={changeInput} />
+                            value={input.memberPw} onChange={changeInput}
+                            onKeyUp={e=>e.key==='Enter'&&sendLoginRequest()} />
                     </div>
                 </div>
 
