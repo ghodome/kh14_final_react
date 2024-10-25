@@ -14,3 +14,4 @@ const AdminRoute = ({ element }) => {
 };
 
 export default AdminRoute;
+    
