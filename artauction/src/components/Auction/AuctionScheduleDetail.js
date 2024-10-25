@@ -27,6 +27,7 @@ const AuctionScheduleDetail = ()=>{
         auctionScheduleEndDate : "",
         auctionScheduleState : "",
         auctionScheduleNotice : "",
+        attachList: []
     });
 
     const [presentInput, setPresentInput]= useState({
@@ -51,8 +52,12 @@ const AuctionScheduleDetail = ()=>{
 
     //callback
     const loadAuctionSchedule = useCallback(async ()=>{
-            const resp = await axios.get("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
-            setAuctionSchedule(resp.data);
+        const resp = await axios.get("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
+        setAuctionSchedule({
+            ...resp.data,
+            auctionScheduleStartDate:new Date(resp.data.auctionScheduleStartDate).toISOString().slice(0,16),
+            auctionScheduleEndDate:new Date(resp.data.auctionScheduleEndDate).toISOString().slice(0,16)
+        });
     }, [auctionSchedule]);
 
 
@@ -72,6 +77,7 @@ const AuctionScheduleDetail = ()=>{
             auctionScheduleEndDate : "",
             auctionScheduleState : "",
             auctionScheduleNotice : "",
+            attachList: []
         })
     }, [target])
 
@@ -89,7 +95,7 @@ const AuctionScheduleDetail = ()=>{
     }, [auctionSchedule, target]);
 
     const saveTarget = useCallback(async ()=>{
-        const resp = await axios.put("http://localhost:8080/auctionSchedule/");
+        const resp = await axios.put("http://localhost:8080/auctionSchedule/", target);
         loadAuctionSchedule(resp.data);
         closeEditModal();
     }, [target]);
@@ -109,7 +115,9 @@ const AuctionScheduleDetail = ()=>{
     const openEditModal = useCallback((auctionSchedule)=>{
         const tag = Modal.getOrCreateInstance(editModal.current);
         tag.show();
-        setTarget({...auctionSchedule});
+        setTarget({
+            ...auctionSchedule
+        });
     }, [editModal]);
 
     const closeEditModal = useCallback(()=>{
@@ -118,6 +126,7 @@ const AuctionScheduleDetail = ()=>{
         clearTarget(); 
     }, [editModal]);
 
+    //출품작 등록
     const registPresentInput=useCallback(async ()=>{
         const resp=await axios.post(`http://localhost:8080/auction/`,presentInput);
         console.log(presentInput.auctionLot===null)
@@ -126,7 +135,6 @@ const AuctionScheduleDetail = ()=>{
         closePresentModal();
         loadAuctionList();
         clearPresentModal();
-        
     },[presentInput])
 
     const openPresentModal=useCallback(()=>{
@@ -160,7 +168,7 @@ const AuctionScheduleDetail = ()=>{
     }, [auctionScheduleNo]);
 
     const loadAuctionList=useCallback(async ()=>{
-        const resp=await axios.get(`http://localhost:8080/auction/auctionList/${auctionScheduleNo}`);
+        const resp=await axios.get(`http://localhost:8080/auction/${auctionScheduleNo}`);
         setAuctionList(resp.data);
     },[auctionList]);
 
@@ -190,7 +198,6 @@ const AuctionScheduleDetail = ()=>{
             
         }
     },[auctionList]);
-
 
 
     //view
@@ -302,198 +309,201 @@ const AuctionScheduleDetail = ()=>{
                     
         {/* 출품용 모달 */}
         <div className="modal fade" tabIndex="-1" ref={presentModal}>
-        <div className="modal-dialog">
-          <div className="modal-content">
-          <div className="modal-header">
-              <h5 className="modal-title">출품 등록</h5>
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Close"
-                onClick={closePresentModal}></button>
-            </div>
-            <div className="modal-body">
-              <div className="row">
-                <div className="col">
-                    <label>작품 번호</label>
-                    <input type="text" 
-                    value={presentInput.workNo} 
-                    name="workNo" 
-                    className="form-control" 
-                    onChange={e => changePresentInput(e)} 
-                    placeholder="작품 번호"
-                    autoComplete="off"/>
+            <div className="modal-dialog">
+            <div className="modal-content">
+            <div className="modal-header">
+                <h5 className="modal-title">출품 등록</h5>
+                <button
+                    type="button"
+                    className="btn-close"
+                    aria-label="Close"
+                    onClick={closePresentModal}></button>
+                </div>
+
+                <div className="modal-body">
+                <div className="row">
+                    <div className="col">
+                        <label>작품 번호</label>
+                        <input type="text" 
+                        value={presentInput.workNo} 
+                        name="workNo" 
+                        className="form-control" 
+                        onChange={e => changePresentInput(e)} 
+                        placeholder="작품 번호"
+                        autoComplete="off"/>
+                    </div>
+
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <label>출품 번호</label>
+                        <input type="text" 
+                        value={presentInput.auctionLot} 
+                        name="auctionLot" 
+                        className="form-control" 
+                        onChange={e => changePresentInput(e)} 
+                        placeholder="출품 번호는 비어있는 Lot가 있을시에만 입력하세요"
+                        autoComplete="off"/>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <label>시작 가격</label>
+                        <input type="text" 
+                        name="auctionStartPrice" 
+                        className="form-control" 
+                        value={presentInput.auctionStartPrice} 
+                        onChange={e => changePresentInput(e)} 
+                        placeholder="숫자만"
+                        autoComplete="off"/>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <label>예상 최저가</label>
+                        <input type="text" 
+                        name="auctionLowPrice" 
+                        className="form-control" 
+                        value={presentInput.auctionLowPrice} 
+                        onChange={e => changePresentInput(e)} 
+                        placeholder="예상 최저가"
+                        autoComplete="off"/>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <label>예상 최고가</label>
+                        <input type="text" 
+                        name="auctionHighPrice" 
+                        className="form-control" 
+                        value={presentInput.auctionHighPrice} 
+                        onChange={e => changePresentInput(e)} 
+                        placeholder="예상 최고가"
+                        autoComplete="off"/>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <label>위탁자</label>
+                        <input type="text" 
+                        name="auctionConsigner" 
+                        className="form-control" 
+                        value={presentInput.auctionConsigner} 
+                        onChange={e => changePresentInput(e)} 
+                        placeholder="위탁자"
+                        autoComplete="off"/>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <label>위탁 수수료</label>
+                        <input type="text" 
+                        name="auctionConsignmentFee" 
+                        className="form-control" 
+                        value={presentInput.auctionConsignmentFee} 
+                        onChange={e => changePresentInput(e)} 
+                        placeholder="숫자만"
+                        autoComplete="off"/>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <label>위탁 대금</label>
+                        <input type="text" 
+                        name="auctionNetProceeds" 
+                        className="form-control" 
+                        value={presentInput.auctionNetProceeds} 
+                        onChange={e => changePresentInput(e)} 
+                        placeholder="숫자만"
+                        autoComplete="off"/>
+                    </div>
+                </div>
+                </div>
+                <div className="modal-footer">
+                <button
+                    type="button"
+                    className="btn btn-lg btn-success"
+                    onClick={registPresentInput}>
+                    등록
+                </button>
+                <button
+                    type="button"
+                    className="btn btn-lg btn-secondary"
+                    onClick={closePresentModal}>
+                    취소
+                </button>
                 </div>
             </div>
-              <div className="row">
-                <div className="col">
-                    <label>출품 번호</label>
-                    <input type="text" 
-                    value={presentInput.auctionLot} 
-                    name="auctionLot" 
-                    className="form-control" 
-                    onChange={e => changePresentInput(e)} 
-                    placeholder="출품 번호는 비어있는 LOT가 있을시에만 입력하세요"
-                    autoComplete="off"/>
-                </div>
             </div>
-            <div className="row">
-                <div className="col">
-                    <label>시작 가격</label>
-                    <input type="text" 
-                    name="auctionStartPrice" 
-                    className="form-control" 
-                    value={presentInput.auctionStartPrice} 
-                    onChange={e => changePresentInput(e)} 
-                    placeholder="숫자만"
-                    autoComplete="off"/>
-                </div>
-            </div>
-            <div className="row">
-                <div className="col">
-                    <label>예상 최저가</label>
-                    <input type="text" 
-                    name="auctionLowPrice" 
-                    className="form-control" 
-                    value={presentInput.auctionLowPrice} 
-                    onChange={e => changePresentInput(e)} 
-                    placeholder="예상 최저가"
-                    autoComplete="off"/>
-                </div>
-            </div>
-            <div className="row">
-                <div className="col">
-                    <label>예상 최고가</label>
-                    <input type="text" 
-                    name="auctionHighPrice" 
-                    className="form-control" 
-                    value={presentInput.auctionHighPrice} 
-                    onChange={e => changePresentInput(e)} 
-                    placeholder="예상 최고가"
-                    autoComplete="off"/>
-                </div>
-            </div>
-            <div className="row">
-                <div className="col">
-                    <label>위탁자</label>
-                    <input type="text" 
-                    name="auctionConsigner" 
-                    className="form-control" 
-                    value={presentInput.auctionConsigner} 
-                    onChange={e => changePresentInput(e)} 
-                    placeholder="위탁자"
-                    autoComplete="off"/>
-                </div>
-            </div>
-            <div className="row">
-                <div className="col">
-                    <label>위탁 수수료</label>
-                    <input type="text" 
-                    name="auctionConsignmentFee" 
-                    className="form-control" 
-                    value={presentInput.auctionConsignmentFee} 
-                    onChange={e => changePresentInput(e)} 
-                    placeholder="숫자만"
-                    autoComplete="off"/>
-                </div>
-            </div>
-            <div className="row">
-                <div className="col">
-                    <label>위탁 대금</label>
-                    <input type="text" 
-                    name="auctionNetProceeds" 
-                    className="form-control" 
-                    value={presentInput.auctionNetProceeds} 
-                    onChange={e => changePresentInput(e)} 
-                    placeholder="숫자만"
-                    autoComplete="off"/>
-                </div>
-            </div>
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-lg btn-success"
-                onClick={registPresentInput}>
-                등록
-              </button>
-              <button
-                type="button"
-                className="btn btn-lg btn-secondary"
-                onClick={closePresentModal}>
-                취소
-              </button>
-            </div>
-          </div>
         </div>
-      </div>
 
 
-    {/* 경매 일정 수정 모달 */}
-    <div className="modal fade" tabIndex="-1"
-                                ref={editModal} data-bs-backdrop="static">
-                        <div className="modal-dialog">
-                            <div className="modal-content">
+        {/* 경매 일정 수정 모달 */}
+        <div className="modal fade" tabIndex="-1"
+                ref={editModal} data-bs-backdrop="static">
+            <div className="modal-dialog">
+                <div className="modal-content">
 
-                                <div className="modal-header">
-                                    <h5 className="modal-title">
-                                        경매 일정 수정
-                                    </h5>
-                                    <button type="button" className="btn-close" 
-                                        data-bs-dismiss="modal" aria-label="Close"
-                                        onClick={closeEditModal}>
-                                    <span aria-hidden="true"></span>
-                                    </button>
-                                </div>
+                    <div className="modal-header">
+                        <h5 className="modal-title">
+                            경매 일정 수정
+                        </h5>
+                        <button type="button" className="btn-close" 
+                            data-bs-dismiss="modal" aria-label="Close"
+                            onClick={closeEditModal}>
+                        <span aria-hidden="true"></span>
+                        </button>
+                    </div>
 
-                                <div className="modal-body">
-                                    <div className="row mt-4">
-                                        <div className="col">
-                                            <label>경매 일정명</label>
-                                            <input type="text" className="form-control mb-4" 
-                                                    name="auctionScheduleTitle" value={target.auctionScheduleTitle} 
-                                                    onChange={changeTarget}/>
-                                            
-                                            <label>일정 시작일</label>
-                                            <input type="datetime-local" className="form-control mb-4" 
-                                                    name="auctionScheduleStartDate" value={target.auctionScheduleStartDate} 
-                                                    onChange={changeTarget}/>
+                    <div className="modal-body">
+                        <div className="row mt-4">
+                            <div className="col">
+                                <label>경매 일정명</label>
+                                <input type="text" className="form-control mb-4" 
+                                        name="auctionScheduleTitle" value={target.auctionScheduleTitle} 
+                                        onChange={changeTarget}/>
+                                                
+                                <label>일정 시작일</label>
+                                <input type="datetime-local" className="form-control mb-4" 
+                                    name="auctionScheduleStartDate" value={target.auctionScheduleStartDate} 
+                                    onChange={changeTarget}/>
 
-                                            <label>일정 종료일</label>
-                                            <input type="datetime-local" className="form-control mb-4" 
-                                                    name="auctionScheduleEndDate" value={target.auctionScheduleEndDate} 
-                                                    onChange={changeTarget}/>
-                                            
-                                            <label>일정 상태</label>
-                                            <select className="form-select mb-4" name="auctionScheduleState" 
-                                                    value={target.auctionScheduleState} onChange={changeTarget}>
-                                                <option value="">선택하세요</option>
-                                                <option>예정경매</option>
-                                                <option>진행경매</option>
-                                                <option>종료경매</option>
-                                            </select>
+                                <label>일정 종료일</label>
+                                <input type="datetime-local" className="form-control mb-4" 
+                                        name="auctionScheduleEndDate" value={target.auctionScheduleEndDate} 
+                                        onChange={changeTarget}/>
+                                                
+                                <label>일정 상태</label>
+                                <select className="form-select mb-4" name="auctionScheduleState" 
+                                        value={target.auctionScheduleState} onChange={changeTarget}>
+                                    <option value="">선택하세요</option>
+                                    <option>예정경매</option>
+                                    <option>진행경매</option>
+                                    <option>종료경매</option>
+                                </select>
 
-                                            <label>안내사항</label>
-                                            <textarea type="text" className="form-control mb-4" 
-                                                    name="auctionScheduleNotice" value={target.auctionScheduleNotice} 
-                                                    onChange={changeTarget}/>
+                                <label>안내사항</label>
+                                <textarea type="text" className="form-control mb-4" 
+                                    name="auctionScheduleNotice" value={target.auctionScheduleNotice} 
+                                    onChange={changeTarget}/>
 
-                                            <label>이미지 첨부</label>
-                                            {/* <input type="file" id="input" multiple /> */}
-                                        </div>
-                                    </div>
-                                </div>
+                                <label>이미지 첨부</label>
+                                <input type="file" id="input" multiple />
 
-                                <div className="modal-footer">
-                                    <button type="button" className="btn btn-secondary btn-manual-close" 
-                                                onClick={closeEditModal}>취소</button>
-                                    <button type="button" className="btn btn-success"
-                                                onClick={saveTarget}>수정</button>
-                                   
-                                </div>
                             </div>
                         </div>
                     </div>
+
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary btn-manual-close" 
+                                    onClick={closeEditModal}>취소</button>
+                        <button type="button" className="btn btn-success"
+                                    onClick={saveTarget}>수정</button>
+                                    
+                    </div>
+                </div>
+            </div>
+        </div>
     
     </>);
 };
