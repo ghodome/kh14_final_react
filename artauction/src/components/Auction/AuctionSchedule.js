@@ -38,8 +38,7 @@ const AuctionSchedule = () => {
     const loadAuctionScheduleList = useCallback(async ()=>{
         const resp = await axios.post("http://localhost:8080/auctionSchedule/", row);
         setAuctionScheduleList(resp.data.auctionScheduleList);
-    }, [auctionScheduleList]);
-
+    }, [auctionScheduleList, auctionScheduleList]);
 
     // 경매 일정 등록 모달
     const insertModal = useRef();
