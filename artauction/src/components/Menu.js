@@ -17,8 +17,8 @@ const Menu = () => {
         setMemberId("");
         setMemberRank("");
         delete axios.defaults.headers.common["Authorization"];
-        window.localStorage.removeItem("refreshToken");
-        window.sessionStorage.removeItem("refreshToken");
+        window.localStorage.removeItem("refreshToken1");
+        window.sessionStorage.removeItem("refreshToken1");
         navigate("/");
     }, [navigate, setMemberId, setMemberRank]);
 
@@ -30,7 +30,9 @@ const Menu = () => {
                     <div className="collapse navbar-collapse" id="top-menu">
                         <ul className="navbar-nav me-auto">
                             { }
-
+                            <li className="nav-item">
+                                <NavLink className="nav-link" to="/">홈으로</NavLink>
+                            </li>
                             {login ? (<>
                                 <li className="nav-item">
                                     <NavLink className="nav-link" to="/member/mypage">
@@ -40,10 +42,17 @@ const Menu = () => {
                                 </li>
                                 {memberRank === '관리자' && (
                                     <li className="nav-item">
-                                        <NavLink className="nav-link" to="/member/search">
+                                        <NavLink className="nav-link" to="admin/member/list">
                                             회원조회
                                         </NavLink>
                                     </li>
+                                )}
+                                {memberRank === '관리자' && (
+                                <li className="nav-item">
+                                    <NavLink className="nav-link" to="/websocket/memberchatlist">
+                                        1:1 채팅방
+                                    </NavLink>
+                                </li>
                                 )}
                                 <li className="nav-item">
                                     <NavLink className="nav-link" to="/"
@@ -64,6 +73,7 @@ const Menu = () => {
                                 </li>
                             </>)}
 
+                           
                             <li className="nav-item">
                                 <NavLink className="nav-link" to="/artist">작가</NavLink>
                             </li>
@@ -86,6 +96,12 @@ const Menu = () => {
                             </li>
                             <li className="nav-item">
                                 <NavLink className="nav-link" to="/charge">포인트 충전하기</NavLink>
+                            </li>
+                            <li className="nav-item">
+                                <NavLink className="nav-link" to="/payment">결제하기</NavLink>
+                            </li>
+                            <li className="nav-item">
+                                <NavLink className="nav-link" to="/randomBox">랜덤박스</NavLink>
                             </li>
                         </ul>
 

@@ -39,7 +39,7 @@ const AuctionScheduleDetail = ()=>{
         auctionHighPrice: "",
         auctionConsigner: "",
         auctionConsignmentFee: "",
-        auctionNetProceeds: ""
+        auctionNetProceeds: "",
     });
 
     const [auctionList, setAuctionList] =useState([]);
@@ -282,8 +282,7 @@ const AuctionScheduleDetail = ()=>{
                                         <h5 className="card-title">LOT {auction.auctionLot}</h5>
                                         <p className="card-text">{auction.workTitle}</p>
                                         <p className="card-text">{auction.workMaterials}</p>
-                                        <p className="card-text">{auction.workCategory}</p>
-                                        <button type="button" className="btn btn-danger card-text mx-2" onClick={e => deleteLot(auction)}>삭제</button>
+                                        <p className="card-text">{auction.workCategory}</p><button type="button" className="btn btn-danger card-text mx-2" onClick={e => deleteLot(auction)}>삭제</button>
                                         <button type="button" className="btn btn-success card-text mx-2" onClick={e => uncancelLot(auction)}>등록</button>
                                     </div>
                                 </div>
@@ -296,6 +295,7 @@ const AuctionScheduleDetail = ()=>{
                                         <p className="card-text">{auction.workTitle}</p>
                                         <p className="card-text">{auction.workMaterials}</p>
                                         <p className="card-text">{auction.workCategory}</p>
+                                        <p className="card-text" onClick={e=>navigate(`/auction/detail/${auction.auctionNo}`)}>경매 입장</p>
                                         <button type="button" className="btn btn-danger card-text mx-2" onClick={e => deleteLot(auction)}>삭제</button>
                                         <button type="button" className="btn btn-warning card-text mx-2" onClick={e => cancelLot(auction)}>취소</button>
                                     </div>
@@ -319,6 +319,7 @@ const AuctionScheduleDetail = ()=>{
                     aria-label="Close"
                     onClick={closePresentModal}></button>
                 </div>
+
                 <div className="modal-body">
                 <div className="row">
                     <div className="col">
@@ -331,6 +332,7 @@ const AuctionScheduleDetail = ()=>{
                         placeholder="작품 번호"
                         autoComplete="off"/>
                     </div>
+
                 </div>
                 <div className="row">
                     <div className="col">

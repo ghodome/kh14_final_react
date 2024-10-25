@@ -11,7 +11,7 @@ const App = () => {
 
  //recoil state
  const [memberId, setMemberId] = useRecoilState(memberIdState);
- const [memberLevel, setMemberRank] = useRecoilState(memberRankState);
+ const [memberRank, setMemberRank] = useRecoilState(memberRankState);
  const [memberLoading, setMemberLoading] = useRecoilState(memberLoadingState);
 
  //최초 1회 실행
@@ -22,9 +22,9 @@ const App = () => {
  //callback
  const refreshLogin = useCallback(async ()=>{
    //[1] sessionStorage에 refreshToken이라는 이름의 값이 있는지 확인
-   const sessionToken = window.sessionStorage.getItem("refreshToken");
+   const sessionToken = window.sessionStorage.getItem("refreshToken1");
    //[2] localStorage에 refreshToken이라는 이름의 값이 있는지 확인
-   const localToken = window.localStorage.getItem("refreshToken");
+   const localToken = window.localStorage.getItem("refreshToken1");
    //[3] 둘다 없으면 차단
    if(sessionToken === null && localToken === null) {
      setMemberLoading(true);
@@ -43,11 +43,11 @@ const App = () => {
    setMemberId(resp.data.memberId);
    setMemberRank(resp.data.memberRank);
    axios.defaults.headers.common["Authorization"] = "Bearer " + resp.data.accessToken;
-   if(window.localStorage.getItem("refreshToken") !== null) {
-     window.localStorage.setItem("refreshToken", resp.data.refreshToken);
+   if(window.localStorage.getItem("refreshToken1") !== null) {
+     window.localStorage.setItem("refreshToken1", resp.data.refreshToken);
    }
    else {
-     window.sessionStorage.setItem("refreshToken", resp.data.refreshToken);
+     window.sessionStorage.setItem("refreshToken1", resp.data.refreshToken);
    }
 
    setMemberLoading(true);
