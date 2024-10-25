@@ -38,7 +38,7 @@ const AuctionScheduleDetail = ()=>{
         auctionHighPrice: "",
         auctionConsigner: "",
         auctionConsignmentFee: "",
-        auctionNetProceeds: ""
+        auctionNetProceeds: "",
     });
 
     const [auctionList, setAuctionList] =useState([]);
