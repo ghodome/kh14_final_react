@@ -10,13 +10,13 @@ import moment from "moment";
 import styles from './auction.module.css';
 import { GiPayMoney } from "react-icons/gi";
 import { TbZoomMoney } from "react-icons/tb";
-import { Modal } from "bootstrap";
 import { MdOutlineQuestionMark } from "react-icons/md";
+import { Modal } from "bootstrap";
 
 const Auction = () => {
-      //ref
-      const bidModal=useRef();
-      const loading = useRef(false);
+    //ref
+    const bidModal=useRef();
+    const loading = useRef(false);
     //params
     const { auctionNo } = useParams();
     //navigate
@@ -70,7 +70,7 @@ const Auction = () => {
                 bid:{
                     hammerPrice:auctionAndWork.auctionHammerPrice!==null?auctionAndWork.auctionHammerPrice:auctionAndWork.auctionStartPrice,
                     bidPrice:auctionAndWork.auctionBidPrice>0?auctionAndWork.auctionBidPrice:auctionAndWork.auctionStartPrice,
-                    bidIncrement:auctionAndWork.auctionBidIncrement,
+                    bidIncrement:bidIncrement,
                 },
             });
         }
@@ -162,13 +162,16 @@ const Auction = () => {
             return;
         }
         else{
-            console.log(json);
             const bidResp=await axios.post("http://localhost:8080/auctionws/"+auctionNo,json.content);
 
             if(bidResp.data.success){
-                window.alert("성공 ")
                 client.publish(message);
-                setInput("");
+                setInput({...input,
+                    bid:{...input.bid,
+                        bidPrice:bidResp.data.content.bidPrice,
+                        bidIncrement:bidResp.data.content.bidIncrement,
+                    }
+                });
             }
             else{
                 window.alert("실패 : "+bidResp.data.message);
@@ -202,6 +205,16 @@ const Auction = () => {
             disconnectToServer(client);
         };
     }, [login]); 
+    const openBidIncrementModal = useCallback(() => {
+        console.log(bidModal.current);
+        const tag = Modal.getOrCreateInstance(bidModal.current);
+        tag.show();
+    },[bidModal]);
+    const closeBidIncrementModal = useCallback(() => {
+        const tag = Modal.getInstance(bidModal.current);
+        tag.hide();
+    },[bidModal]);
+
     const openBidIncrementModal = useCallback(() => {
         console.log(bidModal.current);
         const tag = Modal.getOrCreateInstance(bidModal.current);
@@ -352,7 +365,7 @@ const Auction = () => {
                                     <div className=" input-group w-100">
                                         <button type="button" className="btn btn-success"
                                             onClick={increaseBidIncrement} disabled={!login||!input.bid.bidPrice}><GiPayMoney /></button>
-                                            <button type="button" className="btn btn-danger"
+                                        <button type="button" className="btn btn-danger"
                                             onClick={decreaseBidIncrement} disabled={!login||!input.bid.bidPrice}><GiPayMoney /></button>
                                         <input 
                                             type="text" 

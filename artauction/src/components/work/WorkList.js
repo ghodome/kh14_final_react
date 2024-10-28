@@ -38,10 +38,10 @@ const WorkList = () => {
     const [image,setImage]=useState();
 
     
-    const loadArtistList = useCallback(async () => {
-        const resp = await axios.get("http://localhost:8080/artist/");
-        setArtistList(resp.data);
-    }, [artistList]);
+    // const loadArtistList = useCallback(async () => {
+    //     const resp = await axios.post("http://localhost:8080/artist/");
+    //     setArtistList(resp.data);
+    // }, [artistList]);
 
     const changeKeyword = useCallback(e => {
         setKeyword(e.target.value);
@@ -297,13 +297,10 @@ const WorkList = () => {
 
     // },[]);
 
-    useEffect(() => {
-        loadArtistList();
-        // loadImageWork();
-    }, []);
-
-
-
+    // useEffect(() => {
+    //     loadArtistList();
+    //     // loadImageWork();
+    // }, []);
 
     //view
     return (<>
@@ -385,13 +382,16 @@ const WorkList = () => {
                     </div>
                     {/* 모달 본문 */}
                     <div className="modal-body">
-                    {/* {workList.map(work => (  */}
-                        <div className="row mt-2">
-                            <div className="col d-flex justify-content-center">
-                            {/* <img src={`http://localhost:8080/attach/download/${work.attachment}`} style={{ width: 200 }} /> */}
-                            </div>
-                        </div>
-                    {/* ))} */}
+                    <div className="row mt-2">
+                    <div className="col d-flex justify-content-center">
+                        {target.attachment ? (
+                            <img src={`http://localhost:8080/attach/download/${target.attachment}`} style={{ width: 200 }} />
+                                                                                                                                                                    // onClick={editImage}
+                        ) : (
+                            <div style={{ width: 200, height: 200, backgroundColor: "#f0f0f0" }}>이미지 없음</div>
+                        )}
+                    </div>
+                </div>
 
                         <div className="row mt-2">
                             <div className="col">

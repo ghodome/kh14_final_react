@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Jumbotron from "../Jumbotron";
 import axios from "axios";
 import { PiTildeBold } from "react-icons/pi";
@@ -14,6 +14,8 @@ const MemberSearch = () => {
         keyword: "",
         column: "member_id"
     });
+    
+
     const [searchColumn, setSearchColumn] = useState("member_id");
     const [input, setInput] = useState({
         memberId: "",
@@ -27,6 +29,7 @@ const MemberSearch = () => {
         beginMemberJoinDate: "",
         endMemberJoinDate: "",
         orderList: [],
+        isBlocked: false,
     });
 
     const [result, setResult] = useState({
@@ -61,9 +64,10 @@ const MemberSearch = () => {
             beginMemberJoinDate: "",
             endMemberJoinDate: "",
             orderList: [],
+            isBlocked: false,
         });
 
-        setPage(1); 
+        setPage(1);
         await sendRequest();
     };
 
@@ -72,7 +76,6 @@ const MemberSearch = () => {
     };
 
     useEffect(() => {
-        
         sendRequest();
     }, [input, page]);
 
@@ -104,11 +107,14 @@ const MemberSearch = () => {
         const resp = await axios.post("http://localhost:8080/member/search", {
             basicKeyword: basicSearch.keyword,
             searchColumn: searchColumn,
+            isBlocked: input.isBlocked,
             ...input,
             beginRow: (page - 1) * size,
             endRow: page * size - 1,
         });
-        const filteredMemberList = resp.data.memberList.filter(member => member.memberRank !== '관리자');
+
+        const allMembers = resp.data.memberList;
+        const filteredMemberList = allMembers.filter(member => member.memberRank !== '관리자');
 
         setResult({
             last: resp.data.last,
@@ -123,7 +129,7 @@ const MemberSearch = () => {
             keyword: "",
             column: "member_id"
         });
-        setPage(1); 
+        setPage(1);
         await sendRequest();
         closeModal();
     };
@@ -167,9 +173,10 @@ const MemberSearch = () => {
             <button className="btn btn-primary" onClick={openModal}>
                 복합 검색
             </button>
-            <Modal isOpen={modalIsOpen} onRequestClose={closeModal}>
+
+            <Modal isOpen={modalIsOpen} onRequestClose={closeModal} contentLabel="복합 검색">
                 <h2>복합검색</h2>
-                <form>
+                <form onSubmit={handleComplexSearch}>
                     <div className="row mt-4">
                         <label className="col-sm-3 col-form-label">아이디</label>
                         <div className="col-sm-9">
@@ -239,6 +246,20 @@ const MemberSearch = () => {
                         </div>
                     </div>
                     <div className="row mt-4">
+                        <label className="col-sm-3 col-form-label">차단 여부</label>
+                        <div className="col-sm-9">
+                            <input
+                                type="checkbox"
+                                className="form-check-input"
+                                name="isBlocked"
+                                checked={input.isBlocked}
+                                onChange={e => setInput({ ...input, isBlocked: e.target.checked })}
+                            />
+                            <span className="ms-1">차단된 회원만 보기</span>
+                        </div>
+                    </div>
+
+                    <div className="row mt-4">
                         <label className="col-sm-3 col-form-label">정렬방식</label>
                         <div className="col-sm-9">
                             <div className="col-sm-9">
@@ -271,7 +292,7 @@ const MemberSearch = () => {
                     </div>
                     <div className="row mt-4">
                         <div className="col">
-                            <button className="btn btn-success" onClick={handleComplexSearch}>
+                            <button type="submit" className="btn btn-success">
                                 검색
                             </button>
                         </div>

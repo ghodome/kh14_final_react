@@ -23,6 +23,7 @@ const MemberChatList = () => {
         fetchChatRooms();
     }, []);
 
+    // 검색 만들 곳
     const handleSearch = () => {
         // console.log("검색어:", searchTerm);
     };
@@ -35,6 +36,7 @@ const MemberChatList = () => {
                 <input
                     type="text"
                     className="form-control border-0"
+                    // 검색
                     placeholder="검색"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -51,7 +53,7 @@ const MemberChatList = () => {
                     const isToday = createdAt.isSame(now, 'day');
 
                     return (
-                        <NavLink key={room.roomChatNo} className="nav-link" to="/websocket/memberchatroom">
+                        <NavLink to={`/websocket/memberchatroom/${room.roomChatNo}`}>
                             <div className="mb-3 border p-3">
                                 <h5>방번호: {room.roomChatNo}</h5>
                                 <span>아이디: {room.roomChatMemberId}</span>
