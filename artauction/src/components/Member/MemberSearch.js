@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Jumbotron from "../Jumbotron";
 import axios from "axios";
 import { PiTildeBold } from "react-icons/pi";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-// import Modal from "react-modal";
-import { Modal } from "bootstrap";
+import Modal from "react-modal";
 
-// Modal.setAppElement('#root');
+Modal.setAppElement('#root');
 
 const MemberSearch = () => {
     const navigate = useNavigate();
@@ -15,6 +14,8 @@ const MemberSearch = () => {
         keyword: "",
         column: "member_id"
     });
+    
+
     const [searchColumn, setSearchColumn] = useState("member_id");
     const [input, setInput] = useState({
         memberId: "",
@@ -75,7 +76,6 @@ const MemberSearch = () => {
     };
 
     useEffect(() => {
-
         sendRequest();
     }, [input, page]);
 
@@ -112,6 +112,7 @@ const MemberSearch = () => {
             beginRow: (page - 1) * size,
             endRow: page * size - 1,
         });
+
         const allMembers = resp.data.memberList;
         const filteredMemberList = allMembers.filter(member => member.memberRank !== '관리자');
 
@@ -172,9 +173,10 @@ const MemberSearch = () => {
             <button className="btn btn-primary" onClick={openModal}>
                 복합 검색
             </button>
-            <Modal isOpen={modalIsOpen} onRequestClose={closeModal}>
+
+            <Modal isOpen={modalIsOpen} onRequestClose={closeModal} contentLabel="복합 검색">
                 <h2>복합검색</h2>
-                <form>
+                <form onSubmit={handleComplexSearch}>
                     <div className="row mt-4">
                         <label className="col-sm-3 col-form-label">아이디</label>
                         <div className="col-sm-9">
@@ -290,7 +292,7 @@ const MemberSearch = () => {
                     </div>
                     <div className="row mt-4">
                         <div className="col">
-                            <button className="btn btn-success" onClick={handleComplexSearch}>
+                            <button type="submit" className="btn btn-success">
                                 검색
                             </button>
                         </div>
