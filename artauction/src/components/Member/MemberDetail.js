@@ -2,6 +2,8 @@ import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import Jumbotron from "../Jumbotron";
 import { useNavigate, useParams } from "react-router-dom";
+import { useRecoilState } from "recoil";
+import { blockedState } from "../../utils/recoil";
 
 const MemberDetail = () => {
     const { memberId } = useParams();
@@ -9,7 +11,7 @@ const MemberDetail = () => {
     const [member, setMember] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [blocked, setBlocked] = useState(false);
+    const [blocked, setBlocked] = useRecoilState(blockedState);
 
     useEffect(() => {
         loadMember();
@@ -19,10 +21,10 @@ const MemberDetail = () => {
         try {
             const resp = await axios.get(`http://localhost:8080/member/${memberId}`);
             setMember(resp.data);
-            setBlocked(resp.data.isBlocked);
+            setBlocked(resp.data.blocked);
         } catch (error) {
             setError("회원 정보를 불러오는 데 실패했습니다.");
-            navigate("/"); // 관리자 페이지로 리다이렉트
+            navigate("/");
         } finally {
             setLoading(false);
         }
@@ -66,6 +68,7 @@ const MemberDetail = () => {
             console.error("Failed to block member:", error);
             alert("차단에 실패했습니다. 다시 시도해 주세요.");
         }
+        
     }, [memberId]);
     const handleUnblock = useCallback(async () => {
         const confirmUnblock = window.confirm("정말 차단 해제하시겠습니까?");
@@ -129,6 +132,7 @@ const MemberDetail = () => {
                     {member.memberAddress1} {member.memberAddress2}
                 </div>
             </div>
+            
 
             <div className="row mt-4">
                 <div className="col">
