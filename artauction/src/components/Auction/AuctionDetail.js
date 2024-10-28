@@ -63,7 +63,6 @@ const Auction = () => {
     const loadAuctionAndWork=useCallback(async ()=>{
         const resp = await axios.get(`http://localhost:8080/auction/work/${auctionNo}`);
         setAuctionAndWork(resp.data);
-        console.log(resp.data)
         setBidIncrementByPrice(resp.data.auctionBidPrice>0?resp.data.auctionBidPrice:resp.data.auctionStartPrice);
         if(resp){
             setInput({
@@ -192,11 +191,10 @@ const Auction = () => {
         setInput({
             ...input,
             bid:{...input.bid,
-                bidIncrement:input.bid.bidIncrement>bidIncrement?input.bid.bidIncrement-bidIncrement:input.bid.bidIncrement}
+                bidIncrement:input.bid.bidIncrement>bidIncrement?
+                input.bid.bidIncrement-bidIncrement:input.bid.bidIncrement}
         })
     },[input,bidIncrement]);
-
-
 
 
     //effect
@@ -207,6 +205,15 @@ const Auction = () => {
             disconnectToServer(client);
         };
     }, [login]); 
+    const openBidIncrementModal = useCallback(() => {
+        console.log(bidModal.current);
+        const tag = Modal.getOrCreateInstance(bidModal.current);
+        tag.show();
+    },[bidModal]);
+    const closeBidIncrementModal = useCallback(() => {
+        const tag = Modal.getInstance(bidModal.current);
+        tag.hide();
+    },[bidModal]);
 
     const openBidIncrementModal = useCallback(() => {
         console.log(bidModal.current);
@@ -404,7 +411,7 @@ const Auction = () => {
                         </div>
                        <hr/>
                    </div>
-                        <div className="modal fade" ref={bidModal}>
+                   <div className="modal fade" ref={bidModal}>
                             <div className="modal-dialog">
                             <div className="modal-content">
                                 <div className="modal-header">

@@ -34,6 +34,8 @@ const AuctionScheduleDetail = ()=>{
 
     const [presentInput, setPresentInput]= useState({
         auctionScheduleNo: auctionScheduleNo,
+        auctionStartDate:"",
+        auctionEndDate:"",
         workNo: "",
         auctionLot: "",
         auctionStartPrice: "",
@@ -55,9 +57,17 @@ const AuctionScheduleDetail = ()=>{
     //callback
     const loadAuctionSchedule = useCallback(async ()=>{
         const resp = await axios.get("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
-        setAuctionSchedule(resp.data);
-        console.log(resp.data);
-    }, [auctionSchedule]);
+        setAuctionSchedule({
+            ...resp.data,
+            auctionScheduleStartDate:new Date(resp.data.auctionScheduleStartDate).toISOString().slice(0,16),
+            auctionScheduleEndDate:new Date(resp.data.auctionScheduleEndDate).toISOString().slice(0,16)
+        })
+        setPresentInput({
+            ...presentInput,
+            auctionStartDate:new Date(resp.data.auctionScheduleStartDate).toISOString().slice(0,16),
+            auctionEndDate:new Date(resp.data.auctionScheduleEndDate).toISOString().slice(0,16),
+        });
+    }, [auctionSchedule,presentInput]);
 
 
     //수정
@@ -198,7 +208,6 @@ const AuctionScheduleDetail = ()=>{
 
     const loadAuctionList=useCallback(async ()=>{
         const resp=await axios.get(`http://localhost:8080/auction/auctionList/${auctionScheduleNo}`);
-        console.log(resp.data);
         setAuctionList(resp.data);
     },[auctionList]);
 
