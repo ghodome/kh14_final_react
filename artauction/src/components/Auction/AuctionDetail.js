@@ -23,7 +23,6 @@ const Auction = () => {
     const navigate = useNavigate();
     // state
     const [auctionAndWork, setAuctionAndWork] = useState({
-        auctionHammerPrice:null,
         auctionStartPrice:0,
         auctionBidIncrement:0,
     });
@@ -32,13 +31,17 @@ const Auction = () => {
     const [connect, setConnect] = useState(false);
     const [bidIncrement,setBidIncrement]=useState();
     const [input, setInput]=useState({
-        type:"",
+        type:"bid",
         bid:{
-            hammerPrice:"",
+            workName:"",
+            auctionLot:"",
             bidPrice:"",
             bidIncrement:"",
         }
     });
+
+    const [lotMessageList, setLotMessageList]=useState([]);
+    const [scheduleMessageList, setScheduleMessageList]=useState([]);
 
     //recoil
     const login = useRecoilValue(loginState);
@@ -52,9 +55,9 @@ const Auction = () => {
     //callback
     const clearInput=(()=>{
         setInput({
-            type:"",
+            type:"bid",
             bid:{
-                hammerPrice:"",
+                auctionLot:"",
                 bidPrice:"",
                 bidIncrement:"",
             }
@@ -68,7 +71,8 @@ const Auction = () => {
             setInput({
                 type:"bid",
                 bid:{
-                    hammerPrice:auctionAndWork.auctionHammerPrice!==null?auctionAndWork.auctionHammerPrice:auctionAndWork.auctionStartPrice,
+                    workName:auctionAndWork.workTitle,
+                    auctionLot:auctionAndWork.auctionLot,
                     bidPrice:auctionAndWork.auctionBidPrice>0?auctionAndWork.auctionBidPrice:auctionAndWork.auctionStartPrice,
                     bidIncrement:bidIncrement,
                 },
@@ -153,31 +157,22 @@ const Auction = () => {
         const json={
             content:input
         }
-        const message={
-            destination:"/auctionws/message/"+auctionNo,
-            body:JSON.stringify(json),
-        }
-        if(client===null||connect===false||input.bid.bidPrice===0){
-            setInput("");
+        if(client===null||!connect){
+            loadAuctionAndWork();
             return;
         }
         else{
-            const bidResp=await axios.post("http://localhost:8080/auctionws/"+auctionNo,json.content);
+            const bidResp=await axios.patch("http://localhost:8080/auctionchat/"+auctionNo,json.content);
 
             if(bidResp.data.success){
-                client.publish(message);
-                setInput({...input,
-                    bid:{...input.bid,
-                        bidPrice:bidResp.data.content.bidPrice,
-                        bidIncrement:bidResp.data.content.bidIncrement,
-                    }
-                });
+                window.alert(`LOT ${json.content.bid.auctionLot} ${json.content.bid.bidPrice+json.content.bid.bidIncrement}원 응찰에 성공하셨습니다.`)
             }
             else{
-                window.alert("실패 : "+bidResp.data.message);
+                window.alert(`동일 가격 차순위 응찰하셨습니다.`)
             }
         }
-    },[input,client,connect]);
+        loadAuctionAndWork();
+    },[input,client,connect,auctionAndWork]);
 
     const increaseBidIncrement=useCallback(()=>{
         setInput({
@@ -196,24 +191,21 @@ const Auction = () => {
         })
     },[input,bidIncrement]);
 
+    const loadLotMessageList=useCallback(async ()=>{},[]);
+
+    const loadScheduleMessageList=useCallback(async ()=>{},[])
+
 
     //effect
     useEffect(() => {
         loadAuctionAndWork();
         connectToServer();
+        loadLotMessageList();
+        loadScheduleMessageList();
         return () => {
             disconnectToServer(client);
         };
     }, [login]); 
-    const openBidIncrementModal = useCallback(() => {
-        console.log(bidModal.current);
-        const tag = Modal.getOrCreateInstance(bidModal.current);
-        tag.show();
-    },[bidModal]);
-    const closeBidIncrementModal = useCallback(() => {
-        const tag = Modal.getInstance(bidModal.current);
-        tag.hide();
-    },[bidModal]);
 
     const openBidIncrementModal = useCallback(() => {
         console.log(bidModal.current);
@@ -229,9 +221,23 @@ const Auction = () => {
     return (
         <>
             <div className={styles.auctionContainer}>
-            {auctionAndWork ? ( // auction이 null이 아닐 때만 렌더링
+            <div className="mt-5 text-center">
+                {auctionAndWork&&(<h4>{auctionAndWork.auctionScheduleNo}주차 경매 현황</h4>)}
+                <ul className="list-group">
+                    {messageList.slice(-5).map((message, index) => (
+                        <div className="row" key={index}>
+                            <div className="col">
+                                <p>{message.content.contentForSchedule}</p>
+                                <p className="text-muted">
+                                    {(message.content.bidtime)}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                </ul>
+            </div>
+            {auctionAndWork&&login ? ( // auction이 null이 아닐 때만 렌더링
                 <>
-                    <Jumbotron title={`${auctionAndWork.auctionScheduleNo} 주차 경매`} />
                     <div className="row mt-4">
                         <div className="col-7">
                             {/* 작품 상세내용  */}
@@ -378,7 +384,8 @@ const Auction = () => {
                                                 bid:{...prev.content,
                                                         bidPrice:e.target.value>0?e.target.value:0,
                                                 }
-                                            }))} disabled={!login}
+                                            }))}
+                                             disabled={!login}
                                                 placeholder="응찰 가격을 입력하세요"></input>
                                         <button type="button" className="btn btn-success"
                                             onClick={sendMessage} disabled={!login||!input.bid.bidPrice}><TbZoomMoney /></button>
@@ -399,10 +406,9 @@ const Auction = () => {
                                 {messageList&&messageList.map((message,index)=>(
                                     <div className="row" key={index}>
                                         <div className="col">
-                                            <p>{message.senderMemberId}:{message.content.content}</p>
+                                            <p>{message.content.contentForLot}</p>
                                             <p className="text-muted">
-                                                {moment(message.content.bidtime).format("a h:mm")}
-                                                ({moment(message.content.bidtime).fromNow()})
+                                                {(message.content.bidTime)}
                                             </p>
                                         </div>
                                     </div>
