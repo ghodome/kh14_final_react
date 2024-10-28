@@ -38,10 +38,10 @@ const WorkList = () => {
     const [image,setImage]=useState();
 
     
-    const loadArtistList = useCallback(async () => {
-        const resp = await axios.get("http://localhost:8080/artist/");
-        setArtistList(resp.data);
-    }, [artistList]);
+    // const loadArtistList = useCallback(async () => {
+    //     const resp = await axios.post("http://localhost:8080/artist/");
+    //     setArtistList(resp.data);
+    // }, [artistList]);
 
     const changeKeyword = useCallback(e => {
         setKeyword(e.target.value);
@@ -297,13 +297,10 @@ const WorkList = () => {
 
     // },[]);
 
-    useEffect(() => {
-        loadArtistList();
-        // loadImageWork();
-    }, []);
-
-
-
+    // useEffect(() => {
+    //     loadArtistList();
+    //     // loadImageWork();
+    // }, []);
 
     //view
     return (<>
