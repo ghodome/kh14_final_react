@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Jumbotron from "../Jumbotron";
 import axios from "axios";
 import { Modal } from "bootstrap";
+import { NavLink } from "react-router-dom";
 
 const Items = () => {
     const [item, setItem] = useState([]);
@@ -43,10 +44,7 @@ const Items = () => {
     }, []);
     // 등록 state
     const [insert, setInsert] = useState({
-        itemName : "",
-        itemValue : "",
-        chance : "",
-        isWin : "Y"
+        auctionNo:""
     });
      const insertInput = useCallback(e=>{
         setInsert({
@@ -63,10 +61,7 @@ const Items = () => {
 
     const clearInsertInput = useCallback(()=>{
         setInsert({
-        itemName : "",
-        itemValue : "",
-        chance : "",
-        isWin : ""
+        auctionNo:""
         });
     }, [insert]);
      // 입력 모달
@@ -94,7 +89,7 @@ const Items = () => {
             <table className="table">
                 <thead>
                     <tr>
-                        <td>아이템 이름</td>
+                        <td>작품명</td>
                         <td>확률</td>
                         <td>가치</td>
                         
@@ -104,6 +99,7 @@ const Items = () => {
                     {item.map(item => (
                         <tr key={item.itemId}>
                             <td>{item.itemName}</td>
+                            
                             <td>{item.chance}%</td>
                             <td>약 {item.itemValue.toLocaleString()}원</td>
                         </tr>
@@ -120,9 +116,10 @@ const Items = () => {
             {result && (
                 <div>
                     <h2>결과:</h2>
-                    <p>아이템 이름: {result.itemName}</p>
+                    <p>작품명: {result.itemName}</p>
                     <p>아이템 가치: {result.itemValue}</p>
                     <p>당첨 여부: {result.isWin === 'Y' ? '당첨' : '다음 기회에...'}</p>
+                    {result.isWin ==='Y' && (<NavLink className="nav-link" to="/member/mypage">마이 페이지로 이동</NavLink>)}
                 </div>
             )}
 
@@ -149,20 +146,11 @@ const Items = () => {
                                     {/* 랜덤박스 등록 */}
                                     <div className="row mt-4">
                                         <div className="col">
-                                            <label>아이템 이름</label>
+                                            <label>옥션 번호</label>
                                             <input type="text" className="form-control mb-4" 
-                                                    name="itemName" value={insert.itemName} 
+                                                    name="auctionNo" value={insert.auctionNo} 
                                                     onChange={insertInput}/>
-                                            
-                                            <label>아이템 가격</label>
-                                            <input type="number" className="form-control mb-4" 
-                                                    name="itemValue" value={insert.itemValue} 
-                                                    onChange={insertInput}/>
-
-                                          <label>확률</label>
-                                            <input type="number" className="form-control mb-4" 
-                                                    name="chance" value={insert.chance} 
-                                                    onChange={insertInput}/>
+                                          
                                         </div>
                                     </div>
                                 </div>
