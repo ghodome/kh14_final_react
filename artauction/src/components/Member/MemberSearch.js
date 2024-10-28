@@ -14,7 +14,7 @@ const MemberSearch = () => {
         keyword: "",
         column: "member_id"
     });
-    
+
 
     const [searchColumn, setSearchColumn] = useState("member_id");
     const [input, setInput] = useState({
@@ -104,6 +104,14 @@ const MemberSearch = () => {
     };
 
     const sendRequest = useCallback(async () => {
+        console.log("Sending request with:", { 
+            basicKeyword: basicSearch.keyword,
+            searchColumn: searchColumn,
+            isBlocked: input.isBlocked,
+            ...input,
+            beginRow: (page - 1) * size,
+            endRow: page * size - 1,
+        });
         const resp = await axios.post("http://localhost:8080/member/search", {
             basicKeyword: basicSearch.keyword,
             searchColumn: searchColumn,
