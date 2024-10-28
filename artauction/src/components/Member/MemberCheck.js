@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Modal from "react-modal";
+// import Modal from "react-modal";
+import { Modal } from "bootstrap";
 import Jumbotron from "../Jumbotron";
 
 const MemberCheck = () => {
