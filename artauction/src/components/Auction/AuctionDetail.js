@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Jumbotron from "../Jumbotron";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
@@ -10,8 +10,13 @@ import moment from "moment";
 import styles from './auction.module.css';
 import { GiPayMoney } from "react-icons/gi";
 import { TbZoomMoney } from "react-icons/tb";
+import { Modal } from "bootstrap";
+import { MdOutlineQuestionMark } from "react-icons/md";
 
 const Auction = () => {
+      //ref
+      const bidModal=useRef();
+      const loading = useRef(false);
     //params
     const { auctionNo } = useParams();
     //navigate
@@ -58,6 +63,7 @@ const Auction = () => {
     const loadAuctionAndWork=useCallback(async ()=>{
         const resp = await axios.get(`http://localhost:8080/auction/work/${auctionNo}`);
         setAuctionAndWork(resp.data);
+        setBidIncrementByPrice(resp.data.auctionBidPrice>0?resp.data.auctionBidPrice:resp.data.auctionStartPrice);
         if(resp){
             setInput({
                 type:"bid",
@@ -68,7 +74,40 @@ const Auction = () => {
                 },
             });
         }
-    },[auctionAndWork,input,auctionNo]);
+    },[auctionAndWork,input,auctionNo,bidIncrement]);
+
+    const setBidIncrementByPrice = useCallback((price) => {
+        let increment;
+        switch (true) {
+            case ( price < 1000000):
+                increment = 50000;
+                break;
+            case (price >= 1000000 && price < 3000000):
+                increment = 100000;
+                break;
+            case (price >= 3000000 && price < 5000000):
+                increment = 200000;
+                break;
+            case (price >= 5000000 && price < 10000000):
+                increment = 500000;
+                break;
+            case (price >= 10000000 && price < 30000000):
+                increment = 1000000;
+                break;
+            case (price >= 30000000 && price < 50000000):
+                increment = 2000000;
+                break;
+            case (price >= 50000000 && price < 200000000):
+                increment = 5000000;
+                break;
+            case (price >= 200000000 && price < 500000000):
+                increment = 10000000;
+                break;
+            default:
+                increment = 50000; // 기준에 맞지 않는 경우 기본값 설정
+        }
+        setBidIncrement(increment); // 설정한 호가 단위를 업데이트
+    },[bidIncrement]);
 
     const connectToServer= useCallback(()=>{
         const socket = new SockJS("http://localhost:8080/ws");
@@ -138,14 +177,21 @@ const Auction = () => {
     },[input,client,connect]);
 
     const increaseBidIncrement=useCallback(()=>{
-        const bidIncrement=
         setInput({
             ...input,
             bid:{...input.bid,
                 bidIncrement:input.bid.bidIncrement+bidIncrement}
         })
-    },[input])
+    },[input,bidIncrement])
 
+    const decreaseBidIncrement = useCallback(()=>{
+        setInput({
+            ...input,
+            bid:{...input.bid,
+                bidIncrement:input.bid.bidIncrement>bidIncrement?
+                input.bid.bidIncrement-bidIncrement:input.bid.bidIncrement}
+        })
+    },[input,bidIncrement]);
 
 
     //effect
@@ -156,6 +202,15 @@ const Auction = () => {
             disconnectToServer(client);
         };
     }, [login]); 
+    const openBidIncrementModal = useCallback(() => {
+        console.log(bidModal.current);
+        const tag = Modal.getOrCreateInstance(bidModal.current);
+        tag.show();
+    },[bidModal]);
+    const closeBidIncrementModal = useCallback(() => {
+        const tag = Modal.getInstance(bidModal.current);
+        tag.hide();
+    },[bidModal]);
 
     // view
     return (
@@ -275,6 +330,20 @@ const Auction = () => {
                                             </td>
                                         </tr>
                                         )}
+                                        <tr>
+                                            <td>
+                                                <div className="row">
+                                                    <div className="col-5">현재 호가 단위</div>
+                                                    <div className="col-4">{bidIncrement}원</div>
+                                                    <div className="col-3">
+                                                        <button type="button" 
+                                                        className="btn btn-default" 
+                                                        onClick={e=>openBidIncrementModal()}>
+                                                            <MdOutlineQuestionMark /></button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
                                 </tbody>
                             </table>
                             {login?(
@@ -283,6 +352,8 @@ const Auction = () => {
                                     <div className=" input-group w-100">
                                         <button type="button" className="btn btn-success"
                                             onClick={increaseBidIncrement} disabled={!login||!input.bid.bidPrice}><GiPayMoney /></button>
+                                            <button type="button" className="btn btn-danger"
+                                            onClick={decreaseBidIncrement} disabled={!login||!input.bid.bidPrice}><GiPayMoney /></button>
                                         <input 
                                             type="text" 
                                             className="form-control"
@@ -304,8 +375,10 @@ const Auction = () => {
                             ):(
                                 <div className="row mt-3">
                                     <div className="col-md-10 affset-md-1">
-                                        <button type="button" className="btn btn-primary"
-                                        onClick={e=>navigate("/login")}>로그인 후 응찰이 가능합니다</button>
+                                    {loading === true &&(
+                                            <button type="button" className="btn btn-primary"
+                                            onClick={e=>navigate("/login")}>로그인 후 응찰이 가능합니다</button>
+                                        )}
                                     </div>
                                 </div>
                             )}
@@ -325,6 +398,41 @@ const Auction = () => {
                         </div>
                        <hr/>
                    </div>
+                   <div className="modal fade" ref={bidModal}>
+                            <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">호가 단위 안내</h5>
+                                    <button
+                                        type="button" 
+                                        className="btn-close"
+                                        aria-label="Close"
+                                        onClick={closeBidIncrementModal}>
+                                    </button>
+                                </div>
+                                    <div className="modal-body">
+                                        <table className="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>현재가</th>
+                                                    <th>호가 단위</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr><td>300,000~999,999원</td><td>50,000원</td></tr>
+                                                <tr><td>1,000,000~2,999,999원</td><td>100,000원</td></tr>
+                                                <tr><td>3,000,000~4,999,999원</td><td>200,000원</td></tr>
+                                                <tr><td>5,000,000~9,999,999원</td><td>500,000원</td></tr>
+                                                <tr><td>10,000,000~29,999,999원</td><td>1,000,000원</td></tr>
+                                                <tr><td>30,000,000~49,999,999원</td><td>2,000,000원</td></tr>
+                                                <tr><td>50,000,000~199,999,999원</td><td>5,000,000원</td></tr>
+                                                <tr><td>200,000,000~499,999,999원</td><td>10,000,000원</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                 </>
             ) : (
                 <h1>로딩 중...</h1>
