@@ -318,24 +318,24 @@ const Auction = () => {
                                     <tr>
                                         <td>
                                             <div className="row">
-                                                <div className="col-5">최저 추정가</div>
-                                                <div className="col-7">{auctionAndWork.auctionLowPrice}원</div>
+                                                <div className="col-4">추정가</div>
+                                                <div className="col-8">{auctionAndWork.auctionLowPrice}원</div>
                                             </div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
                                             <div className="row">
-                                                <div className="col-5">최대 추정가</div>
-                                                <div className="col-7">{auctionAndWork.auctionHighPrice}원</div>
+                                                <div className="col-4">~</div>
+                                                <div className="col-8">{auctionAndWork.auctionHighPrice}원</div>
                                             </div>
                                         </td>
                                     </tr>
                                         <tr>
                                             <td>
                                                 <div className="row">
-                                                    <div className="col-5">시작가</div>
-                                                    <div className="col-7">{auctionAndWork.auctionStartPrice}원</div>
+                                                    <div className="col-4">시작가</div>
+                                                    <div className="col-8">{auctionAndWork.auctionStartPrice}원</div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -343,8 +343,9 @@ const Auction = () => {
                                         <tr>
                                             <td>
                                                 <div className="row">
-                                                    <div className="col-5">현재가</div>
-                                                    <div className="col-7">{input.bid.bidPrice}원</div>
+                                                    <div className="col-4">현재가</div>
+                                                    <div className="col-5">{input.bid.bidPrice}원</div>
+                                                    <div className="col-3">{auctionAndWork.auctionBidCnt}회</div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -352,13 +353,11 @@ const Auction = () => {
                                         <tr>
                                             <td>
                                                 <div className="row">
-                                                    <div className="col-5">현재 호가 단위</div>
-                                                    <div className="col-4">{bidIncrement}원</div>
+                                                    <div className="col-4">호가 단위</div>
+                                                    <div className="col-5">{bidIncrement}원</div>
                                                     <div className="col-3">
-                                                        <button type="button" 
-                                                        className="btn btn-default" 
-                                                        onClick={e=>openBidIncrementModal()}>
-                                                            <MdOutlineQuestionMark /></button>
+                                                        <p onClick={e=>openBidIncrementModal()}>
+                                                            <MdOutlineQuestionMark /></p>
                                                     </div>
                                                 </div>
                                             </td>
