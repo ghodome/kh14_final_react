@@ -215,16 +215,6 @@ const Auction = () => {
         tag.hide();
     },[bidModal]);
 
-    const openBidIncrementModal = useCallback(() => {
-        console.log(bidModal.current);
-        const tag = Modal.getOrCreateInstance(bidModal.current);
-        tag.show();
-    },[bidModal]);
-    const closeBidIncrementModal = useCallback(() => {
-        const tag = Modal.getInstance(bidModal.current);
-        tag.hide();
-    },[bidModal]);
-
     // view
     return (
         <>
