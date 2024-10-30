@@ -99,15 +99,6 @@ const MemberEdit = () => {
                 <div className="col-md-6 offset-md-3">
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3">
-                            <input type="password"
-                                name="memberPw"
-                                value={member.memberPw || ""}
-                                onChange={changeInput}
-                                placeholder="비밀번호"
-                                className="form-control"
-                            />
-                        </div>
-                        <div className="mb-3">
                             <input type="text"
                                 name="memberName"
                                 value={member.memberName}

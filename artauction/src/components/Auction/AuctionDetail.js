@@ -216,8 +216,6 @@ const Auction = () => {
     },[bidModal]);
 
 
-   
-
     // view
     return (
         <>

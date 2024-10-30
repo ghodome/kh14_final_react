@@ -109,6 +109,9 @@ const Mypage = () => {
                     <button type="button" className="btn btn-primary" onClick={() => navigate("/member/update")}>
                         수정하기
                     </button>
+                    <button type="button" className="btn btn-secondary ms-5" onClick={() => navigate("/member/pwChange")}>
+                        비밀번호 변경
+                    </button>
                     <button type="button" className="btn btn-danger ms-5" onClick={handleDelete}>
                         탈퇴하기
                     </button>

@@ -7,6 +7,7 @@ const MemberUpdate = () => {
     const navigate = useNavigate();
 
     const [member, setMember] = useState({
+        memberId: "",
         memberPw: "",
         memberName: "",
         memberEmail: "",
@@ -15,6 +16,9 @@ const MemberUpdate = () => {
         memberAddress1: "",
         memberAddress2: ""
     });
+    
+    const [currentPw, setCurrentPw] = useState(""); // 현재 비밀번호 상태 추가
+    const [isPwValid, setIsPwValid] = useState(true); // 비밀번호 유효성 상태 추가
 
     useEffect(() => {
         loadMember();
@@ -25,15 +29,13 @@ const MemberUpdate = () => {
         const script = document.createElement("script");
         script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
         script.async = true;
-        script.onload = () => console.log("Daum Postcode API 로드 완료");
-        script.onerror = () => console.error("Daum Postcode API 로드 실패");
         document.body.appendChild(script);
     };
 
     const loadMember = useCallback(async () => {
         try {
             const resp = await axios.get("http://localhost:8080/member/find");
-            setMember(resp.data);
+            setMember(resp.data[0]);
         } catch (error) {
             console.error("Failed to load member data:", error);
             navigate("/login"); // 로그인 페이지로 리다이렉트
@@ -48,23 +50,46 @@ const MemberUpdate = () => {
         }));
     }, []);
 
+    const handleCurrentPwChange = useCallback(e => {
+        setCurrentPw(e.target.value);
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const updateMember = {
-            memberId: member.memberId,
-            memberPw: member.memberPw || undefined,
-            memberName: member.memberName || undefined,
-            memberEmail: member.memberEmail || undefined,
-            memberContact: member.memberContact || undefined,
-            memberPost: member.memberPost || undefined,
-            memberAddress1: member.memberAddress1 || undefined,
-            memberAddress2: member.memberAddress2 || undefined,
-        };
+        // 비밀번호 검증 요청
+        try {
+            const resp = await axios.post("http://localhost:8080/member/verfiyPw", null, {
+                params: {
+                    memberId: member.memberId,
+                    memberPw: currentPw
+                }
+            });
+
+            if (!resp.data) {
+                setIsPwValid(false);
+                alert("현재 비밀번호가 일치하지 않습니다.");
+                return;
+            }
+
+            const updateMember = {
+                memberId: member.memberId,
+                memberPw: member.memberPw || undefined,
+                memberName: member.memberName || undefined,
+                memberEmail: member.memberEmail || undefined,
+                memberContact: member.memberContact || undefined,
+                memberPost: member.memberPost || undefined,
+                memberAddress1: member.memberAddress1 || undefined,
+                memberAddress2: member.memberAddress2 || undefined,
+            };
 
             await axios.patch("http://localhost:8080/member/update", updateMember);
             alert("회원 정보가 수정되었습니다.");
             navigate("/member/mypage");
+        } catch (error) {
+            console.error("비밀번호 검증 오류:", error);
+            alert("비밀번호 검증 중 오류가 발생했습니다.");
+        }
     };
 
     const sample6_execDaumPostcode = () => {
@@ -92,18 +117,19 @@ const MemberUpdate = () => {
 
     return (
         <>
-            <Jumbotron title={`${member.memberName} 님의 정보수정`} />
+            <Jumbotron title= {`${member.memberName} 님의 정보수정`} />
             <div className="row mt-4">
                 <div className="col-md-6 offset-md-3">
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3">
                             <input type="password"
-                                name="memberPw"
-                                value={member.memberPw || ""}
-                                onChange={changeInput}
-                                placeholder="비밀번호"
-                                className="form-control"
+                                name="currentPw"
+                                value={currentPw}
+                                onChange={handleCurrentPwChange}
+                                placeholder="현재 비밀번호"
+                                className={`form-control ${!isPwValid ? "is-invalid" : ""}`}
                             />
+                            {!isPwValid && <div className="invalid-feedback">비밀번호가 일치하지 않습니다.</div>}
                         </div>
                         <div className="mb-3">
                             <input type="text"
@@ -165,7 +191,6 @@ const MemberUpdate = () => {
                         <button type="button" className="btn btn-secondary" onClick={() => navigate(`/member/mypage`)}>
                             취소
                         </button>
-
                     </form>
                 </div>
             </div>
