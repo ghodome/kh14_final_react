@@ -12,6 +12,7 @@ const MemberDetail = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [blocked, setBlocked] = useRecoilState(blockedState);
+    const [blockReason, setBlockReason] = useState(null);
 
     useEffect(() => {
         loadMember();
@@ -33,9 +34,8 @@ const MemberDetail = () => {
     const handleDelete = useCallback(async () => {
         const confirmDelete = window.confirm("정말 삭제하시겠습니까?");
         if (!confirmDelete) {
-            return; 
+            return;
         }
-    
         try {
             await axios.delete(`http://localhost:8080/member/delete/${memberId}`);
             navigate("/admin/member/list"); // 삭제 후 관리자 페이지로 리다이렉트
@@ -46,36 +46,36 @@ const MemberDetail = () => {
     }, [memberId, navigate]);
 
     const handleBlock = useCallback(async () => {
-        const blockReason = prompt("차단 사유를 입력하세요:");
-        if (!blockReason) {
+        const blockReasonInput = prompt("차단 사유를 입력하세요:");
+        if (!blockReasonInput) {
             alert("차단 사유를 입력해야 합니다.");
             return;
         }
         const confirmBlock = window.confirm("정말 차단하시겠습니까?");
         if (!confirmBlock) {
-            return; 
+            return;
         }
         try {
             await axios.post(`http://localhost:8080/member/block`, {
                 blockMemberId: memberId,
-                blockReason: blockReason, // 입력받은 차단 사유
+                blockReason: blockReasonInput,
                 blockType: "차단",
                 blockTime: new Date().toISOString(),
             });
-            setBlocked(true); // 차단 상태 업데이트
+            setBlocked(true);
+            setBlockReason(blockReasonInput); // 차단 사유 저장
             alert("회원이 차단되었습니다.");
         } catch (error) {
             console.error("Failed to block member:", error);
             alert("차단에 실패했습니다. 다시 시도해 주세요.");
         }
-        
     }, [memberId]);
     const handleUnblock = useCallback(async () => {
         const confirmUnblock = window.confirm("정말 차단 해제하시겠습니까?");
         if (!confirmUnblock) {
-            return; 
+            return;
         }
-    
+
         try {
             await axios.delete(`http://localhost:8080/member/unblock/${memberId}`); // 차단 해제 API 호출
             setBlocked(false); // 차단 상태 업데이트
@@ -132,7 +132,13 @@ const MemberDetail = () => {
                     {member.memberAddress1} {member.memberAddress2}
                 </div>
             </div>
-            
+
+            {blocked && blockReason && (
+                <div className="row mt-4">
+                    <div className="col-3">차단 사유</div>
+                    <div className="col-3">{blockReason}</div>
+                </div>
+            )}
 
             <div className="row mt-4">
                 <div className="col">
