@@ -13,7 +13,6 @@ import NoticeDetail from "./Notice/NoticeDetail";
 import { Routes, Route } from 'react-router-dom';
 import Mypage from "./Member/Mypage";
 import MemberUpdate from "./Member/MemberUpdate";
-import WebSocket from "./websocket/WebSocket";
 import { useRecoilValue } from "recoil";
 import { loginState } from "../utils/recoil";
 
@@ -33,10 +32,10 @@ import AdminRoute from "./router/AdminRoute";
 import MemberDetail from "./Member/MemberDetail";
 
 import MemberChatList from "./websocket/MemberChatList";
-import MemberChatRoom from "./websocket/MemberChatRoom";
 
 import MemberEdit from "./Member/MemberEdit";
 import MemberCheck from "./Member/MemberCheck";
+import RoomChat from "./websocket/RoomChat";
 
 
 
@@ -73,12 +72,9 @@ const Container = () => {
                         <Route path="/payment/success/:partnerOrderId" element={<PaymentSuccess />} />
                         <Route path="/charge" element={<Charge />} />
                         <Route path="/charge/success/:partnerOrderId" element={<ChargeSuccess />} />
-                        <Route path="/websocket" element={<WebSocket />} />
-
                         <Route path="/websocket/memberchatlist" element={<MemberChatList />} />
-                        <Route path="/websocket/memberchatroom/:roomChatNo" element={<MemberChatRoom />} />
-
                         <Route path="/randomBox" element={<Items/>}/>
+                        <Route path="/roomchat/:roomNo" element={<PrivateRoute element={<RoomChat/>}/>}/>
 
 
                     </Routes>
