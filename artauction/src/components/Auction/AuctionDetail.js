@@ -215,6 +215,7 @@ const Auction = () => {
         tag.hide();
     },[bidModal]);
 
+
     // view
     return (
         <>
