@@ -11,7 +11,7 @@ const Artist = () => {
     artistHistory: "",
     artistBirth: "",
     artistDeath: "",
-    attachList:[]
+    attachList: []
   });
   const [artistList, setArtistList] = useState([]);
   const [images, setImages] = useState([]);
@@ -22,14 +22,14 @@ const Artist = () => {
     artistBirth: "",
     artistDeath: "",
   });
-  const clearInput = useCallback(()=>{
+  const clearInput = useCallback(() => {
     setInput({
       artistName: "",
       artistDescription: "",
       artistHistory: "",
       artistBirth: "",
       artistDeath: "",
-      attachList:[]
+      attachList: []
     });
   }, []);
   const [inputKeyword, setInputKeyword] = useState({
@@ -39,14 +39,31 @@ const Artist = () => {
     endRow: ""
   });
 
-  const [updateInput, setUpdateInput] = useState({});
+  const [updateInput, setUpdateInput] = useState({
+    artistName: "",
+    artistDescription: "",
+    artistHistory: "",
+    artistBirth: "",
+    artistDeath: "",
+  });
   const [updateStatus, setUpdateStatus] = useState({});
   //이미지
   const inputFileRef = useRef(null);
+  const [loadImages, setLoadImages] = useState([]);
 
   // 모달 관련
   const modal = useRef();
   const detailModal = useRef();
+
+  //페이지
+  const sortedArtistList = [...artistList].sort();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
+  const totalPage = Math.ceil(sortedArtistList.length / pageSize);
+
+  const pageClick = useCallback((pageNumber) => {
+    setPage(pageNumber);
+  }, []);
 
   const openModal = useCallback(() => {
     if (modal.current) {
@@ -61,6 +78,14 @@ const Artist = () => {
         artistNo: artist.artistNo
       })
       setDetailArtist({ ...artist });
+      setUpdateInput({
+        artistNo: artist.artistNo,
+        artistName: artist.artistName,
+        artistDescription: artist.artistDescription,
+        artistHistory: artist.artistHistory,
+        artistBirth: artist.artistBirth,
+        artistDeath: artist.artistDeath
+      });
       const tag = Modal.getOrCreateInstance(detailModal.current);
       tag.show();
     }
@@ -119,14 +144,14 @@ const Artist = () => {
   const loadArtistList = useCallback(async () => {
     const resp = await axios.post("http://localhost:8080/artist/", inputKeyword);
     setArtistList(resp.data.artistList);
-  }, [artistList,inputKeyword]);
+  }, [artistList, inputKeyword]);
 
   const registInput = useCallback(async () => {
     const formData = new FormData();
 
     const fileList = inputFileRef.current.files;
 
-    for(let i=0; i< fileList.length; i++){
+    for (let i = 0; i < fileList.length; i++) {
       formData.append("attachList", fileList[i]);
     }
 
@@ -136,12 +161,13 @@ const Artist = () => {
     formData.append("artistBirth", input.artistBirth);
     formData.append("artistDeath", input.artistDeath);
 
-    await axios.post("http://localhost:8080/artist/", formData,{
+    await axios.post("http://localhost:8080/artist/", formData, {
       headers: {
-        'Content-Type' : 'multipart/form-data',
+        'Content-Type': 'multipart/form-data',
       },
     });
-    inputFileRef.current.value=""
+
+    inputFileRef.current.value = ""
     closeModal();
     loadArtistList();
     setImages([]);
@@ -153,6 +179,7 @@ const Artist = () => {
     loadArtistList();
     closeDetailModal();
   }, [])
+
   const changeStatus = useCallback((e) => {
     setUpdateStatus({
       ...updateStatus,
@@ -165,6 +192,7 @@ const Artist = () => {
       })
     }
   }, [updateStatus, updateInput]);
+
   const changeUpdateInput = useCallback((e) => {
     setUpdateInput({
       ...updateInput,
@@ -174,15 +202,47 @@ const Artist = () => {
 
 
   const updateArtist = useCallback(async () => {
-    const resp = await axios.patch("http://localhost:8080/artist/", updateInput);
+    const formData = new FormData();
+    const fileList = inputFileRef.current.files;
+
+    for(let i =0; i<fileList.length; i++) {
+      formData.append("attachList", fileList[i]);
+    }
+    formData.append("artistNo" , updateArtist.artistNo);
+    formData.append("artistName", updateInput.artistName);
+    formData.append("artistDescription", updateInput.artistDescription);
+    formData.append("artistHistory", updateInput.artistHistory);
+    formData.append("artistBirth", updateInput.artistBirth);
+    formData.append("artistDeath", updateInput.artistDeath);
+
+    formData.append("originList", loadImages);
+
+    
+    const resp = await axios.post("http://localhost:8080/artist/edit", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    setImages(loadImages);
+
     loadArtistList();
     closeDetailModal();
-  }, [updateInput])
+  }, [updateInput, loadImages])
 
   //effect
   useEffect(() => {
     loadArtistList();
-  }, [loadArtistList]);
+  }, []);
+
+  const pageArtist = useCallback(() => {
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+
+    return sortedArtistList.slice(startIndex, endIndex);
+  }, [sortedArtistList]);
+
+
 
   return (
     <>
@@ -299,7 +359,7 @@ const Artist = () => {
 
       <div className="row mt-3 mx-3">
         <div className="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
-          {artistList.length > 0 && artistList.map((artist) => (
+          {artistList.length > 0 && pageArtist().map((artist) => (
             <div className="mb-3 shadow-sm" key={artist.artistNo}>
               <div className="row g-0">
                 <div className="col-md-2 d-flex">
@@ -314,7 +374,7 @@ const Artist = () => {
                 </div>
                 <div className="col-md-5 d-flex">
                   <div className="list-group-item">
-                    {artist.artistBirth} ~ {artist.artistDeath}
+                    {artist.artistBirth} ~ {new Date(artist.artistDeath) <= new Date() && artist.artistDeath}
                   </div>
                 </div>
                 <div className="col-md-2 d-flex">
@@ -326,6 +386,40 @@ const Artist = () => {
               </div>
             </div>
           ))}
+          <div className="row mt-4">
+            <div className="col text-center">
+              {/* 이전 버튼: 첫 번째 페이지가 아닐 때만 표시 */}
+              {/* {page > 1 && (
+                <button
+                  className="btn btn-outline-primary"
+                  onClick={() => setPage(page - 1)}
+                >
+                  이전
+                </button>
+              )} */}
+
+              {/* 페이지 번호 표시 */}
+              {[...Array(totalPage)].map((_, index) => (
+                <button
+                  key={index}
+                  className={`btn btn-outline-secondary mx-1 ${page === index + 1 ? 'active' : ''}`}
+                  onClick={() => pageClick(index + 1)}
+                >
+                  {index + 1}
+                </button>
+              ))}
+
+              {/* 다음 버튼: 마지막 페이지가 아닐 때만 표시 */}
+              {/* {page < totalPage && (
+                <button
+                  className="btn btn-outline-primary"
+                  onClick={() => setPage(page + 1)}
+                >
+                  다음
+                </button>
+              )} */}
+            </div>
+          </div>
         </div>
       </div>
       {/* 작가 상세 모달 */}
@@ -344,9 +438,9 @@ const Artist = () => {
               <div className="row text-center">
                 <div className="col">
                   {detailArtist.attachment ? (
-                    <img src={`http://localhost:8080/attach/download/${detailArtist.attachment}`} style={{width: 200 }} />
+                    <img src={`http://localhost:8080/attach/download/${detailArtist.attachment}`} style={{ width: 200 }} />
                   ) : (
-                    <div style={{ width: 200, height: 200, backgroundColor: "#f0f0f0" }}>이미지 없음</div>
+                    <img src="https://placeholder.com/200" style={{ width: 200 }} />
                   )}
                 </div>
               </div>
@@ -356,7 +450,7 @@ const Artist = () => {
                 <div className="col">
                   <label>작가명</label>
                   <div className="row">
-                    <div className="col-10">
+                    <div className="col">
                       {updateStatus.artistName == true ? (<>
                         <input type="text" name="artistName"
                           value={updateInput.artistName}
@@ -364,10 +458,10 @@ const Artist = () => {
                           onChange={e => changeUpdateInput(e)}></input>
                       </>) : (<p>{detailArtist.artistName}</p>)}
                     </div>
-                    <div className="col-2">
+                    {/* <div className="col-2">
                       <input type="checkbox" name="artistName"
                         onChange={e => changeStatus(e)}></input>
-                    </div>
+                    </div> */}
                   </div>
 
                 </div>
@@ -376,7 +470,7 @@ const Artist = () => {
                 <div className="col">
                   <label>작가설명</label>
                   <div className="row">
-                    <div className="col-10">
+                    <div className="col">
                       {updateStatus.artistDescription == true ? (<>
                         <input type="text" name="artistDescription"
                           value={updateInput.artistDescription}
@@ -384,10 +478,10 @@ const Artist = () => {
                           onChange={e => changeUpdateInput(e)}></input>
                       </>) : (<p>{detailArtist.artistDescription}</p>)}
                     </div>
-                    <div className="col-2">
+                    {/* <div className="col-2">
                       <input type="checkbox" name="artistDescription"
                         onChange={e => changeStatus(e)}></input>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
@@ -395,7 +489,7 @@ const Artist = () => {
                 <div className="col">
                   <label>작가기록</label>
                   <div className="row">
-                    <div className="col-10">
+                    <div className="col">
                       {updateStatus.artistHistory == true ? (<>
                         <input type="text" name="artistHistory"
                           value={updateInput.artistHistory}
@@ -403,10 +497,10 @@ const Artist = () => {
                           onChange={e => changeUpdateInput(e)}></input>
                       </>) : (<p>{detailArtist.artistHistory}</p>)}
                     </div>
-                    <div className="col-2">
+                    {/* <div className="col-2">
                       <input type="checkbox" name='artistHistory'
                         onChange={e => changeStatus(e)}></input>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
@@ -414,7 +508,7 @@ const Artist = () => {
                 <div className="col">
                   <label>탄생</label>
                   <div className="row">
-                    <div className="col-10">
+                    <div className="col">
                       {updateStatus.artistBirth == true ? (<>
                         <input type="date" name="artistBirth"
                           value={updateInput.artistBirth}
@@ -422,10 +516,10 @@ const Artist = () => {
                           onChange={e => changeUpdateInput(e)}></input>
                       </>) : (<p>{detailArtist.artistBirth}</p>)}
                     </div>
-                    <div className="col-2">
+                    {/* <div className="col-2">
                       <input type="checkbox" name='artistBirth'
                         onChange={e => changeStatus(e)}></input>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
@@ -433,18 +527,18 @@ const Artist = () => {
                 <div className="col">
                   <label>사망</label>
                   <div className="row">
-                    <div className="col-10">
+                    <div className="col">
                       {updateStatus.artistDeath == true ? (<>
                         <input type="date" name="artistDeath"
                           value={updateInput.artistDeath}
                           className="form-control"
                           onChange={e => changeUpdateInput(e)}></input>
-                      </>) : (<p>{detailArtist.artistDeath}</p>)}
+                      </>) : (<p>{detailArtist.artistDeath}</p>)}{ }
                     </div>
-                    <div className="col-2">
+                    {/* <div className="col-2">
                       <input type="checkbox" name='artistDeath'
                         onChange={e => changeStatus(e)}></input>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
