@@ -1,12 +1,12 @@
-import { useCallback, useRef, useState, useEffect } from 'react';
+import { useCallback, useRef, useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Modal } from 'bootstrap';
 import moment from 'moment';
 import 'moment/locale/ko';
 import Jumbotron from '../Jumbotron';
+moment.locale('ko');
 
-moment.locale('ko'); // 한국어 설정
 
 const AuctionSchedule = () => {
     //navigator 
@@ -14,9 +14,12 @@ const AuctionSchedule = () => {
 
     //state
     const [auctionScheduleList, setAuctionScheduleList] = useState([]); 
-
-    const [images, setImages] = useState([]); // 이미지 미리보기 URL 목록
-
+    const [allAuctionScheduleList, setAllAuctionScheduleList] = useState([]); 
+    const [filterAuctionScheduleList, setfilterAuctionScheduleList] = useState([]); 
+    const [auctionState, setAuctionState] = useState('');
+    const [images, setImages] = useState([]);
+    const [page, setPage] = useState(1);
+    const [row, setRow] = useState({});
     const [insert, setInsert] = useState({  //등록
         auctionScheduleTitle: '',
         auctionScheduleStartDate: '',
@@ -25,28 +28,47 @@ const AuctionSchedule = () => {
         auctionScheduleNotice: '',
         attachList: []
     });
-    const [row, setRow] = useState({
-        beginRow : "",
-        endRow : ""
-    });
 
     useEffect(() => {
         loadAuctionScheduleList();
-    }, []);
+    }, []);    
 
     // 경매 일정 목록 불러오기
-    const loadAuctionScheduleList = useCallback(async ()=>{
+    const loadAuctionScheduleList = useCallback(async()=>{
         const resp = await axios.post("http://localhost:8080/auctionSchedule/", row);
-        setAuctionScheduleList(resp.data.auctionScheduleList);
-    }, [auctionScheduleList, auctionScheduleList]);
+        const list = resp.data.auctionScheduleList;
 
+        setAllAuctionScheduleList(list);
+        setfilterAuctionScheduleList(list, auctionState);
+    }, [row, auctionScheduleList]);
+
+    const filterSchedule = (schedule, state)=>{
+        const filtered = state ? schedule.filter(e =>
+            e.auctionScheduleState === state) : schedule;
+        setfilterAuctionScheduleList(filtered)
+    };
+
+    useEffect(()=>{
+        filterSchedule(allAuctionScheduleList, auctionState);
+    }, [auctionState, allAuctionScheduleList]);
+
+    useEffect(() => {
+        setRow({ 
+            beginRow: (page - 1) * 10 + 1, 
+            endRow: page * 10 });
+    }, [page]);
+
+    const handlePagination = (pageNumber)=>{
+        setPage(pageNumber); 
+    };
+
+    
     // 경매 일정 등록 모달
     const insertModal = useRef();
 
     const openInsertModal = useCallback(()=>{
         const tag = Modal.getOrCreateInstance(insertModal.current);
         tag.show();
-        // setImages([]); // 이미지 초기화
     }, [insertModal]);
 
     const closeInsertModal = useCallback(()=>{
@@ -121,7 +143,6 @@ const AuctionSchedule = () => {
             { 
                 headers:  { 
                     "Content-Type": "multipart/form-data",
-                    // "Authorization": "Bearer YOUR_TOKEN_HERE"
                 },
             });
         
@@ -139,18 +160,22 @@ const AuctionSchedule = () => {
             <div className="row mt-4">
                 <div className="col">
                     <div className="d-flex flex-row mt-2 mb-2">
-                        <button className="btn btn-outline-info me-2">진행경매</button>
-                        <button className="btn btn-outline-info me-2">예정경매</button>
-                        <button className="btn btn-outline-info me-2">종료경매</button>
+                        <button className="btn btn-outline-info me-2"
+                            onClick={e=>{setAuctionState(""); setPage(1);}}>전체일정</button>
+                        <button className="btn btn-outline-info me-2"
+                            onClick={e=>{setAuctionState("진행경매"); setPage(1);}}>진행경매</button>
+                        <button className="btn btn-outline-info me-2" 
+                            onClick={e=>{setAuctionState("예정경매"); setPage(1);}}>예정경매</button>
+                        <button className="btn btn-outline-info me-2" 
+                            onClick={e=>{setAuctionState("종료경매"); setPage(1);}}>종료경매</button>
 
                         <button className="btn btn-outline-primary ms-auto"
-                                onClick={openInsertModal}>
-                            경매등록
+                                onClick={openInsertModal}>경매등록
                         </button>
                     </div>
 
                     {/* 경매 일정 목록 */}
-                    {auctionScheduleList && auctionScheduleList.map((schedule) => (
+                    {filterAuctionScheduleList.slice(row.beginRow - 1, row.endRow).map((schedule) => (
                         <div className="row" key={schedule.auctionScheduleNo}>
                              <div className="col-9 p-4 d-flex flex-column position-static">
                                 <div className="d-flex flex-row mb-2">
@@ -180,27 +205,54 @@ const AuctionSchedule = () => {
                                 </div>
 
                                 <div className="d-flex flex-row mt-2 mb-2">
-                                {schedule.auctionScheduleState === '진행경매' &&(
+                                {/* {schedule.auctionScheduleState === '진행경매' &&(
                                     <button className="btn btn-outline-secondary mt-2 col-3"
                                         onClick={e=>navigate("/auctionList/"+schedule.auctionScheduleNo)}>상세보기</button>
                                 )}
                                 {schedule.auctionScheduleState !== '진행경매' &&(
                                     <button className="btn btn-outline-secondary mt-2 col-3"
                                             onClick={e=>navigate("/auctionschedule/detail/"+schedule.auctionScheduleNo)}>상세보기</button>
-                                )}
-                                {/* <button className="btn btn-outline-secondary mt-2 col-3"
-                                        onClick={e=>navigate("/auctionschedule/detail/"+schedule.auctionScheduleNo)}>상세보기</button> */}
+                                )} */}
+                                <button className="btn btn-outline-secondary mt-2 col-3"
+                                        onClick={e=>navigate("/auctionschedule/detail/"+schedule.auctionScheduleNo)}>상세보기</button>
+                                <button className="btn btn-outline-secondary mt-2 col-3 ms-2"
+                                        onClick={e=>navigate("/auctionList/"+schedule.auctionScheduleNo)}>경매보기(임시버튼)</button>
                                 </div>
                                      
                             </div>
                             
-                            <div className="col-3 p-4">
-                                <img src={`http://localhost:8080/attach/download/${schedule.attachment}`} className="img-thumbnail" alt=""/>
-                            </div>
+                            {schedule.attachment === null ? (
+                                <div className="col-3 p-4">
+                                    <img src="https://placehold.co/300x200"
+                                            className="img-thumbnail" alt=""/>
+                                </div>
+                            ) : (
+                                <div className="col-3 p-4">
+                                    <img src={`http://localhost:8080/attach/download/${schedule.attachment}`} 
+                                            className="img-thumbnail" alt="이미지 정보 없음"/>
+                                </div>
+                            )}
 
                             <hr />
+
                         </div>
                     ))}
+                    
+                    <div className="row">
+                        <div className="col text-center">
+                            <div className="d-flex justify-content-center">
+                                {Array.from({ length: Math.ceil(filterAuctionScheduleList.length / 10) }, (_, i) => (
+                                    <button key={i + 1} className={`btn ${page === i + 1 ? 'btn-secondary' : 'btn-outline-secondary'} me-2`} 
+                                        onClick={e=>handlePagination(i + 1)}>{i + 1}
+                                    </button>
+                                ))}
+                                {/* <button className="btn btn-secondary" name="buttonLeft"
+                                    onClick={()=>setPage(prev=>prev - 1)}><FaAngleLeft/> </button>       
+                                <button className="btn btn-secondary" name="buttonRight"
+                                    onClick={()=>setPage(prev=>prev + 1)}><FaAngleRight /> </button> */}
+                            </div>
+                        </div>
+                    </div>
 
                     {/* 경매 일정 등록 모달 */}
                     <div className="modal fade" ref={insertModal} tabIndex="-1" data-bs-backdrop="static">
@@ -243,7 +295,7 @@ const AuctionSchedule = () => {
                                     
                                     <label className="mt-2">사진첨부</label>
                                     <input type="file" className="form-control" name="attachList" multiple accept="image/*"
-                                           onChange={insertInput} ref={inputFileRef} />
+                                           onChange={insertInput} ref={inputFileRef}/>
                                     {images.map((image, index) => (
                                         <img key={index} src={image} alt={`미리보기 ${index + 1}`} style={{ maxWidth: '100px', margin: '5px' }} />
                                     ))}
@@ -255,16 +307,12 @@ const AuctionSchedule = () => {
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </>
     );
+
 };
 
 export default AuctionSchedule;
-
-// // 상태에 따라 뱃지 색상 결정
-// const getBadgeColor = (state) => {
-//     switch (state) {
-//         case '진행경매': return 'success';
-//         case '예정경매':

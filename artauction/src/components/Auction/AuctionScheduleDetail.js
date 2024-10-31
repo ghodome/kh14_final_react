@@ -29,6 +29,7 @@ const AuctionScheduleDetail = ()=>{
         auctionScheduleEndDate : "",
         auctionScheduleState : "",
         auctionScheduleNotice : "",
+        attachment : "",
         attachList: []
     });
 
@@ -69,15 +70,6 @@ const AuctionScheduleDetail = ()=>{
         });
     }, [auctionSchedule,presentInput]);
 
-
-    //수정
-    // const changeTarget = useCallback(e=>{
-    //     setTarget({
-    //         ...target,
-    //         [e.target.name] : e.target.value
-    //     });
-    // }, [target]);
-
     //수정내용 작성
     const changeTarget = useCallback(e=>{
         if (e.target.type === "file") {
@@ -86,27 +78,26 @@ const AuctionScheduleDetail = ()=>{
                 ...target, 
                 attachList: files 
             });
-            //이미지 미리보기
-            const imageUrls = files.map(file => {
-                    const reader = new FileReader();
+            const imagePromises = files.map((file) => {
+                const reader = new FileReader();
+                return new Promise((resolve) => {
+                    reader.onloadend = () => resolve(reader.result);
                     reader.readAsDataURL(file);
-                    return new Promise((resolve) => {
-                        reader.onloadend = () => {
-                            resolve(reader.result);
-                        };
-                    });
-                })
-            Promise.all(imageUrls).then(urls => {
-                setImages(urls);
-            })
-        } 
-        else {
+                });
+            });
+            Promise.all(imagePromises).then((urls) => 
+                setImages(urls));
+            console.log(imagePromises);
+            console.log(images[0]);
+        } else {
             setTarget({ 
                 ...target, 
                 [e.target.name]: e.target.value 
             });
         }
     }, [target]);
+
+    const inputFileRef = useRef(null);
 
     const clearTarget = useCallback(e=>{
         setTarget({
@@ -116,6 +107,7 @@ const AuctionScheduleDetail = ()=>{
             auctionScheduleEndDate : "",
             auctionScheduleState : "",
             auctionScheduleNotice : "",
+            attachment : "",
             attachList: []
         })
     }, [target])
@@ -127,17 +119,39 @@ const AuctionScheduleDetail = ()=>{
         })
     },[presentInput])
 
-    const editAuctionSchedule = useCallback(async ()=>{
-        await axios.put("http://localhost:8080/auctionSchedule/", target);
-        changeTarget();
-        loadAuctionSchedule();
-    }, [auctionSchedule, target]);
-
+    // 수정내용 저장
     const saveTarget = useCallback(async ()=>{
-        const resp = await axios.put("http://localhost:8080/auctionSchedule/", target);
-        loadAuctionSchedule(resp.data);
+        const formData = new FormData();
+        const fileList = inputFileRef.current.files;
+    
+        for (let i = 0; i < fileList.length; i++) {
+            formData.append("attachList", fileList[i]);
+        }
+
+        console.log(fileList);
+        
+        formData.append("auctionScheduleTitle", target.auctionScheduleTitle);
+        formData.append("auctionScheduleStartDate", target.auctionScheduleStartDate);
+        formData.append("auctionScheduleEndDate", target.auctionScheduleEndDate);
+        formData.append("auctionScheduleState", target.auctionScheduleState);
+        formData.append("auctionScheduleNotice", target.auctionScheduleNotice);
+        formData.append("attachment", target.attachment);
+
+        console.log("attachment :" , target.attachList);
+
+        await axios.put("http://localhost:8080/auctionSchedule/", formData,
+            { 
+                headers:  { 
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+        
+        inputFileRef.current.value = ""
+        clearTarget();
+        loadAuctionSchedule();
         closeEditModal();
-    }, [target]);
+        setImages([]);
+    }, [auctionSchedule, target]);
 
     //삭제
     const deleteAuctionSchedule = useCallback(async ()=>{
@@ -155,8 +169,11 @@ const AuctionScheduleDetail = ()=>{
         const tag = Modal.getOrCreateInstance(editModal.current);
         tag.show();
         setTarget({
-            ...auctionSchedule
+            ...auctionSchedule, 
         });
+        setImages([
+            `http://localhost:8080/attach/download/${auctionSchedule.attachment}`
+        ]);
     }, [editModal]);
 
     const closeEditModal = useCallback(()=>{
@@ -308,6 +325,7 @@ const AuctionScheduleDetail = ()=>{
                                 onClick={e=>deleteAuctionSchedule(auctionSchedule)}>삭제하기</button>
             </div>
         </div>
+        
         {/* 출품 목록 (카드) */}
         <div className="row mt-5">
             <div className="col">
@@ -526,8 +544,13 @@ const AuctionScheduleDetail = ()=>{
                                     name="auctionScheduleNotice" value={target.auctionScheduleNotice} 
                                     onChange={changeTarget}/>
 
-                                <label>이미지 첨부</label>
-                                <input type="file" id="input" multiple />
+                                <label>사진 첨부</label><br/>
+                                {/* <input type="file" id="input" multiple /> */}
+                                    <input type="file" className="form-control" name="attachList" multiple accept="image/*"
+                                           onChange={changeTarget} ref={inputFileRef} />
+                                    {images.map((image, index) => (
+                                        <img key={index} src={image} alt={`미리보기 ${index + 1}`} style={{ maxWidth: '100px', margin: '5px' }} />
+                                    ))}
 
                             </div>
                         </div>
