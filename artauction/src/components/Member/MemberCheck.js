@@ -4,6 +4,7 @@ import Modal from "react-modal";
 import { Modal } from 'bootstrap';
 import Jumbotron from "../Jumbotron";
 
+
 const MemberCheck = () => {
     const navigate = useNavigate();
     const [agreed, setAgreed] = useState({

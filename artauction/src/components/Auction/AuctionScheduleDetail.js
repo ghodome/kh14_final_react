@@ -35,6 +35,8 @@ const AuctionScheduleDetail = ()=>{
 
     const [presentInput, setPresentInput]= useState({
         auctionScheduleNo: auctionScheduleNo,
+        auctionStartDate:"",
+        auctionEndDate:"",
         workNo: "",
         auctionLot: "",
         auctionStartPrice: "",
@@ -56,8 +58,17 @@ const AuctionScheduleDetail = ()=>{
     //callback
     const loadAuctionSchedule = useCallback(async ()=>{
         const resp = await axios.get("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
-        setAuctionSchedule(resp.data);
-    }, [auctionSchedule]);
+        setAuctionSchedule({
+            ...resp.data,
+            auctionScheduleStartDate:new Date(resp.data.auctionScheduleStartDate).toISOString().slice(0,16),
+            auctionScheduleEndDate:new Date(resp.data.auctionScheduleEndDate).toISOString().slice(0,16)
+        })
+        setPresentInput({
+            ...presentInput,
+            auctionStartDate:new Date(resp.data.auctionScheduleStartDate),
+            auctionEndDate:new Date(resp.data.auctionScheduleEndDate),
+        });
+    }, [auctionSchedule,presentInput]);
 
     //수정내용 작성
     const changeTarget = useCallback(e=>{
@@ -179,7 +190,6 @@ const AuctionScheduleDetail = ()=>{
             window.alert("등록이완료되었습니다.");
         closePresentModal();
         loadAuctionList();
-        clearPresentModal();
     },[presentInput])
 
     const openPresentModal=useCallback(()=>{
@@ -214,7 +224,6 @@ const AuctionScheduleDetail = ()=>{
 
     const loadAuctionList=useCallback(async ()=>{
         const resp=await axios.get(`http://localhost:8080/auction/auctionList/${auctionScheduleNo}`);
-        // console.log(resp.data);
         setAuctionList(resp.data);
     },[auctionList]);
 
@@ -275,19 +284,19 @@ const AuctionScheduleDetail = ()=>{
             </div>
 
             <div className="row mt-4">
-                <div className="col-sm-3">
+                <div className="col-sm-4">
                     시작일
                 </div>
-                <div className="col-sm-9">
+                <div className="col-sm-8">
                     {moment(auctionSchedule.auctionScheduleStartDate).format("yyyy/MM/DD (dd) a hh:mm")}
                 </div>
             </div>
 
             <div className="row mt-4">
-                <div className="col-sm-3">
-                    종료일
+                <div className="col-sm-4">
+                    종료 시작일
                 </div>
-                <div className="col-sm-9">
+                <div className="col-sm-8">
                     {moment(auctionSchedule.auctionScheduleEndDate).format("yyyy/MM/DD (dd) a hh:mm")}
                 </div>
             </div>

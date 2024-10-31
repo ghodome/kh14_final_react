@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Jumbotron from "../Jumbotron";
 import axios from "axios";
 import { PiTildeBold } from "react-icons/pi";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-// import Modal from "react-modal";
-import { Modal } from "bootstrap";
+import Modal from "react-modal";
 
-// Modal.setAppElement('#root');
+Modal.setAppElement('#root');
 
 const MemberSearch = () => {
     const navigate = useNavigate();
@@ -15,6 +14,7 @@ const MemberSearch = () => {
         keyword: "",
         column: "member_id"
     });
+
     const [searchColumn, setSearchColumn] = useState("member_id");
     const [input, setInput] = useState({
         memberId: "",
@@ -75,9 +75,8 @@ const MemberSearch = () => {
     };
 
     useEffect(() => {
-
         sendRequest();
-    }, [input, page]);
+    }, [input, page]); // page 추가
 
     const changeInputString = useCallback(e => {
         setInput({
@@ -112,6 +111,7 @@ const MemberSearch = () => {
             beginRow: (page - 1) * size,
             endRow: page * size - 1,
         });
+
         const allMembers = resp.data.memberList;
         const filteredMemberList = allMembers.filter(member => member.memberRank !== '관리자');
 
@@ -135,11 +135,17 @@ const MemberSearch = () => {
 
     const handlePageClick = (pageNumber) => {
         setPage(pageNumber);
+        sendRequest(); // API 요청 추가
     };
 
     const handleMemberClick = (memberId) => {
         navigate(`/admin/member/detail/${memberId}`);
     };
+
+    // 총 페이지 수 계산
+    const totalPages = Math.ceil(result.count / size);
+    const startPage = Math.max(1, page - 2);
+    const endPage = Math.min(totalPages, page + 4);
 
     return (
         <>
@@ -172,9 +178,11 @@ const MemberSearch = () => {
             <button className="btn btn-primary" onClick={openModal}>
                 복합 검색
             </button>
-            <Modal isOpen={modalIsOpen} onRequestClose={closeModal}>
+
+            <Modal isOpen={modalIsOpen} onRequestClose={closeModal} contentLabel="복합 검색">
                 <h2>복합검색</h2>
-                <form>
+                <form onSubmit={handleComplexSearch}>
+                // 복합 검색 필드들
                     <div className="row mt-4">
                         <label className="col-sm-3 col-form-label">아이디</label>
                         <div className="col-sm-9">
@@ -288,9 +296,10 @@ const MemberSearch = () => {
                             </div>
                         </div>
                     </div>
+
                     <div className="row mt-4">
                         <div className="col">
-                            <button className="btn btn-success" onClick={handleComplexSearch}>
+                            <button type="submit" className="btn btn-success">
                                 검색
                             </button>
                         </div>
@@ -317,18 +326,25 @@ const MemberSearch = () => {
                     </ul>
                 </div>
             </div>
-            {modalIsOpen ? null : (
+            {result.memberList.length > 0 && !modalIsOpen && (
                 <div className="row mt-4">
                     <div className="col">
                         <nav>
                             <ul className="pagination justify-content-center">
-                                {[...Array(Math.ceil(result.count / size)).keys()].map(num => (
-                                    <li className={`page-item ${page === num + 1 ? 'active' : ''}`} key={num}>
-                                        <button className="page-link" onClick={() => handlePageClick(num + 1)}>
-                                            {num + 1}
-                                        </button>
-                                    </li>
-                                ))}
+                                <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                                    <button className="page-link" onClick={() => handlePageClick(page - 1)}>이전</button>
+                                </li>
+                                {Array.from({ length: endPage - startPage + 1 }).map((_, index) => {
+                                    const pageNum = startPage + index;
+                                    return (
+                                        <li className={`page-item ${page === pageNum ? 'active' : ''}`} key={pageNum}>
+                                            <button className="page-link" onClick={() => handlePageClick(pageNum)}>{pageNum}</button>
+                                        </li>
+                                    );
+                                })}
+                                <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                                    <button className="page-link" onClick={() => handlePageClick(page + 1)}>다음</button>
+                                </li>
                             </ul>
                         </nav>
                     </div>

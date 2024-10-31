@@ -27,6 +27,11 @@ const memberRankState = atom({
     default:""
 });
 
+const blockedState = atom({
+    key: 'blockedState',
+    default: false,
+});
+
 
 const loginState = selector({
     key: "loginState",//식별자
@@ -40,7 +45,7 @@ const loginState = selector({
         return memberId.length > 0 && memberRank.length > 0;
     }
 });
-export {memberIdState, memberRankState, loginState};
+export {memberIdState, memberRankState, loginState, blockedState};
 
 //로그인 처리 완료 여부
 const memberLoadingState = atom({

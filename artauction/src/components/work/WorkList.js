@@ -3,6 +3,9 @@ import axios from "axios";
 import { Modal } from "bootstrap";
 import { useNavigate } from "react-router-dom";
 import * as hangul from 'hangul-js';
+import Artist from './../Artist/Artist';
+import { MdCancel } from "react-icons/md";
+import Jumbotron from "../Jumbotron";
 
 const WorkList = () => {
 
@@ -18,14 +21,25 @@ const WorkList = () => {
         workMaterials: "",
         workSize: "",
         workCategory: "",
-        attachList:[],
+        // attachList: [],
+        attachment: ""
     });
     const [inputKeyword, setInputKeyword] = useState({
-        column : "",
-        keyword : "",
-        beginRow : "",
-        endRow : ""
-      });
+        column: "",
+        keyword: "",
+        beginRow: "",
+        endRow: ""
+    });
+    const [collapse, setCollapse] = useState({
+        work: false,
+        modern: false,
+        art: false,
+        ancient: false,
+        workButton: "btn",
+        modernButton: "btn",
+        artButton: "btn",
+        ancientButton: "btn"
+    });
 
     //navigate
     const navigate = useNavigate();
@@ -35,13 +49,19 @@ const WorkList = () => {
     ]);
     const [keyword, setKeyword] = useState("");
     const [open, setOpen] = useState(false);
-    const [image,setImage]=useState();
+    const [image, setImage] = useState();
+    //페이지
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
 
-    
-    const loadArtistList = useCallback(async () => {
-        const resp = await axios.get("http://localhost:8080/artist/");
-        setArtistList(resp.data);
-    }, [artistList]);
+    const [modernList, setModernList] = useState([]);
+    const [artList, setArtList] = useState([]);
+    const [ancientList, setAncientList] = useState([]);
+
+    // const loadArtistList = useCallback(async () => {
+    //     const resp = await axios.post("http://localhost:8080/artist");
+    //     setArtistList(resp.data);
+    // }, [artistList]);
 
     const changeKeyword = useCallback(e => {
         setKeyword(e.target.value);
@@ -66,7 +86,10 @@ const WorkList = () => {
         });
     }, [keyword, artistList]);
 
-    // ----------------------- 등록 -----------------------------
+    // useEffect(()=>{
+    //     loadArtistList();
+    // }, []);
+
     const clearInput = useCallback(() => {
         setInput({
             workTitle: "",
@@ -75,7 +98,7 @@ const WorkList = () => {
             workMaterials: "",
             workSize: "",
             workCategory: "",
-            attachList:[]
+            attachList: []
         });
     }, []);
     const [input, setInput] = useState({
@@ -85,16 +108,16 @@ const WorkList = () => {
         workMaterials: "",
         workSize: "",
         workCategory: "",
-        attachList:[]
+        attachList: []
     });
 
     //callback
-    const changeInput = useCallback(e=>{
+    const changeInput = useCallback(e => {
         if (e.target.type === "file") {
             const files = Array.from(e.target.files);
             setInput({
                 ...input,
-                attachList : files
+                attachList: files
             });
             // 이미지 미리보기
             const imageUrls = files.map(file => {
@@ -105,31 +128,31 @@ const WorkList = () => {
                         resolve(reader.result); // 파일 읽기가 끝난 후 URL을 불러오기
                     };
                 });
-            });    
+            });
             Promise.all(imageUrls).then(urls => {
                 setImages(urls); // 모든 이미지 URL을 상태에 저장
             });
         }
-        else{
+        else {
             setInput({
                 ...input,
-                [e.target.name] : e.target.value
+                [e.target.name]: e.target.value
             });
         }
-    },[input]);
+    }, [input]);
 
     const inputFileRef = useRef(null);
 
 
-    const insertWork = useCallback(async() =>{
+    const insertWork = useCallback(async () => {
         const formData = new FormData();
-    
+
         const fileList = inputFileRef.current.files;
 
-        for(let i =0; i < fileList.length; i++) {
+        for (let i = 0; i < fileList.length; i++) {
             formData.append("attachList", fileList[i]);
         }
-        
+
         formData.append("workTitle", input.workTitle);
         formData.append("artistNo", input.artistNo);
         formData.append("workDescription", input.workDescription);
@@ -140,9 +163,9 @@ const WorkList = () => {
         // 실제로 어떤 값이 전송되는지 로그 확인
         console.log("attachment:", input.attachList);
 
-        await axios.post("http://localhost:8080/work/", formData,{
+        await axios.post("http://localhost:8080/work/", formData, {
             headers: {
-              'Content-Type': 'multipart/form-data',
+                'Content-Type': 'multipart/form-data',
             },
         });
         inputFileRef.current.value = ""
@@ -173,15 +196,38 @@ const WorkList = () => {
         loadWorkList();
     }, []);
 
+    useEffect(() => {
+        setCollapse({
+            work: true,
+            modern: false,
+            art: false,
+            ancient: false,
+            workButton: "btn border-warning text-warning",
+            modernButton: "btn",
+            artButton: "btn",
+            ancientButton: "btn"
+        });
+    }, []);
+
     const loadWorkList = useCallback(async () => {
-        const resp = await axios.post("http://localhost:8080/work/",inputKeyword);
-        console.log(resp.data);
+        const resp = await axios.post("http://localhost:8080/work/", inputKeyword);
         setWorkList(resp.data.workList);
-    }, [workList,inputKeyword]);
+
+        setModernList(
+            (resp.data.workList).filter(work => work.workCategory === '근현대')
+        );
+        setArtList(
+            (resp.data.workList).filter(work => work.workCategory === '아트')
+        );
+        setAncientList(
+            (resp.data.workList).filter(work => work.workCategory === '고미술')
+        );
+    }, [workList, inputKeyword]);
 
     const editModal = useRef();
     const openEditModal = useCallback((work) => {
         setTarget({ ...work });
+
         setIsEditing(false); // 모달이 열릴 때는 편집 모드 해제
         const tag = Modal.getOrCreateInstance(editModal.current);
         tag.show();
@@ -240,9 +286,6 @@ const WorkList = () => {
                     workCategory: findWork.workCategory
                 }));
             }
-        } else {
-            // 작가 번호가 맞지 않으면 경고 메시지
-            window.alert("해당 작가 번호를 찾을 수 없습니다.");
         }
     }, [artistList, workList, target.artistNo, target.workTitle]);
 
@@ -272,15 +315,67 @@ const WorkList = () => {
         }
     }, [target, artistList]);
 
-    
+    //기존 수정(이미지X)
+    // const saveTarget = useCallback(async () => {
+    //     const copy = { ...target };
+    //     await axios.patch("http://localhost:8080/work/", copy);
+
+    //     loadWorkList();
+    //     closeEditModal();
+    // }, [target]);
+    const [loadImages, setLoadImages] = useState([]);
+    const [deleteList, setDeleteList] = useState([]);
+    const [attachImages, setAttachImages] = useState([]);//보낼 추가첨부사진이미지
+    const [workFileClass, setWorkFileClass] = useState("");
+    const [workFileValid, setWorkFileValid] = useState(true);
+
     const saveTarget = useCallback(async () => {
-        const copy = { ...target };
-        await axios.patch("http://localhost:8080/work/", copy);
-        
+        const formData = new FormData();
+        const fileList = inputFileRef.current.files;
+
+        for (let i = 0; i < fileList.length; i++) {
+            formData.append("attachList", fileList[i]);
+        }
+
+        formData.append("workTitle", target.workTitle);
+        formData.append("artistNo", target.artistNo);
+        formData.append("workDescription", target.workDescription);
+        formData.append("workMaterials", target.workMaterials);
+        formData.append("workSize", target.workSize);
+        formData.append("workCategory", target.workCategory);
+        formData.append("workNo", target.workNo);
+
+        formData.append("originList", target.attachment); // 삭제 하지 않을 그림들의 첨부파일번호(attachmentNo)
+
+        await axios.post("http://localhost:8080/work/edit", formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        setImage(loadImages);
+
         loadWorkList();
         closeEditModal();
+    }, [target, loadImages]);
+
+    const deleteImage = useCallback((img) => {
+        setDeleteList(img);
+        setLoadImages(image => image.filter(image => image !== img));
+    }, [deleteList, loadImages]);
+
+    const deleteAttachImage = useCallback((target) => {
+        //이미지 미리보기에서 삭제
+        setAttachImages(prevImages => prevImages.filter(image => image !== target));
+    }, []);
+
+    const checkWorkFile = useCallback(() => {
+        const valid = target.attachList > 0;
+        setWorkFileValid(valid);
+        if (target.attachList === 0) setWorkFileClass("");
+        else setWorkFileClass(valid ? "is-valid" : "is-invalid");
     }, [target]);
-    
+
     const toggleEditMode = () => {
         if (isEditing) {
             saveTarget();
@@ -288,26 +383,79 @@ const WorkList = () => {
         setIsEditing(!isEditing);
     };
 
-    // const loadImageWork=useCallback(async ()=>{
-    //     const resp=await axios.get("http://localhost:8080/180",{
-    //         responseType: 'blob' // 이미지 데이터를 Blob으로 받기 위해 responseType 설정
-    //     });
-    //     const imageUrl = URL.createObjectURL(new Blob([resp.data])); // Blob 데이터를 이미지 URL로 변환
-    //     setImage(imageUrl); // 변환한 URL을 state에 저장하여 렌더링
-
-    // },[]);
-
-    useEffect(() => {
-        loadArtistList();
-        // loadImageWork();
+    const pageClick = useCallback((pageNumber) => {
+        setPage(pageNumber);
     }, []);
 
+    const sortedWorkList = [...workList].sort();
+    const sortedModernList = [...modernList].sort();
+    const sortedArtList = [...artList].sort();
+    const sortedAncientList = [...ancientList].sort();
 
+    const totalWork = Math.ceil(sortedWorkList.length / pageSize);
+    const totalModern = Math.ceil(sortedModernList.length / pageSize);
+    const totalArt = Math.ceil(sortedArtList.length / pageSize);
+    const totalAcient = Math.ceil(sortedAncientList.length / pageSize);
+
+    //작품 페이지
+    const pageWork = useCallback(() => {
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+
+        return sortedWorkList.slice(startIndex, endIndex);
+    }, [sortedWorkList, collapse]);
+
+    //근현대 페이지
+    const pageModern = useCallback(() => {
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+
+        return sortedModernList.slice(startIndex, endIndex);
+    }, [sortedModernList, collapse]);
+
+    //아트 페이지
+    const pageArt = useCallback(() => {
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+
+        return sortedArtList.slice(startIndex, endIndex);
+    }, [sortedArtList, collapse]);
+
+    //고미술 페이지
+    const pageAncient = useCallback(() => {
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+
+        return sortedAncientList.slice(startIndex, endIndex);
+    }, [sortedAncientList, collapse]);
+
+    //카테고리
+    const clearCollapse = useCallback(() => {
+        setCollapse({
+            work: false,
+            modern: false,
+            art: false,
+            ancient: false,
+            workButton: "btn",
+            modernButton: "btn",
+            artButton: "btn",
+            ancientButton: "btn"
+        });
+    }, [collapse]);
+
+    const changeCollapse = useCallback((e) => {
+        clearCollapse();
+        setCollapse({
+            ...collapse,
+            [e.target.name]: true,
+            [e.target.name + "Button"]: "btn border-warning text-warning"
+        })
+    }, []);
 
 
     //view
     return (<>
-        <div className="row mt-5">
+        {/* <div className="row mt-5">
             <div className="col">
                 <div className="form-group">
                     <input type="text" className="form-control"
@@ -331,14 +479,25 @@ const WorkList = () => {
                     )}
                 </div>
             </div>
-        </div>
+        </div> */}
+        <Jumbotron title="작품 리스트" />
 
-
-        <div className="row mt-4">
-            <div className="col text-end">
-                <button className="btn btn-primary" onClick={openInsertModal}>등록</button>
+        <div className="row mt-4 text-center">
+            <div className="col-2 offset-2">
+                <button className={collapse.workButton} name="work" onClick={changeCollapse}>전체</button>
+            </div>
+            <div className="col-2">
+                <button className={collapse.modernButton} name="modern" onClick={changeCollapse}>근현대</button>
+            </div>
+            <div className="col-2">
+                <button className={collapse.artButton} name="art" onClick={changeCollapse}>아트</button>
+            </div>
+            <div className="col-2">
+                <button className={collapse.ancientButton} name="ancient" onClick={changeCollapse}>고미술</button>
             </div>
         </div>
+
+
 
         <div className="row mt-2">
             <div className="col">
@@ -346,33 +505,278 @@ const WorkList = () => {
             </div>
         </div>
 
-        <div className="row mt-4">
-            <div className="col-md-10 offset-md-1">
-                <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-5">
-                    {/* 카드 */}
-                    {loadWorkList&&workList.map(work => (
-                        <div className="col mb-3" key={work.workNo}>
-                            <div className="card">
-                                <h3 className="card-header">
-                                <img src={`http://localhost:8080/attach/download/${work.attachment}`} className="card-img-top" />
-                                </h3>
-                                <div className="card-body">
-                                    <h5 className="card-title">{work.workTitle}</h5>
-                                    <h6 className="card-subtitle text-muted">{work.artistName}</h6>
-                                    <div className="card-text text-muted mt-3">{work.workMaterials}</div>
-                                    <div className="card-text text-muted">{work.workSize}</div>
-                                </div>
-                                <div className="card-body text-end">
-                                    <button className="btn btn-outline-secondary" onClick={e => openEditModal(work)}>
-                                        상세
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+        <div className="row mt-1">
+            <div className="col text-start">
+
+            </div>
+            <div className="col text-end">
+                <button className="btn btn-primary" onClick={openInsertModal}>등록</button>
             </div>
         </div>
+
+
+        {collapse.work === true && (<>
+            <div className="row text-end fw-bold">
+                <div className="col-10 offset-1">
+                    <div>검색결과 ({workList.length})</div>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col-md-10 offset-md-1">
+                    <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-5">
+                        {/* 카드 */}
+                        {loadWorkList && pageWork().map(work => (
+                            <div className="col mb-3" key={work.workNo}>
+                                <div className="card h-100 d-flex flex-column">
+                                    <h3 className="card-header" style={{ height: '200px', overflow: 'hidden' }}>
+                                        <img src={`http://localhost:8080/attach/download/${work.attachment}`}
+                                            className="card-img-top"
+                                            style={{ height: '100%', width: '100%', objectFit: 'cover' }} />
+                                    </h3>
+                                    <div className="card-body flex-grow-1">
+                                        <h5 className="card-title">{work.workTitle}</h5>
+                                        <h6 className="card-subtitle text-muted">{work.artistName}</h6>
+                                        <div className="card-text text-muted mt-3">{work.workMaterials}</div>
+                                        <div className="card-text text-muted">{work.workSize}</div>
+                                    </div>
+                                    <div className="card-body text-end">
+                                        <button className="btn btn-outline-secondary" onClick={e => openEditModal(work)}>
+                                            상세
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            <div className="row mt-5">
+                <div className="col">
+                    <hr />
+                </div>
+            </div>
+
+            {/* 페이지네이션 버튼 추가 */}
+            <div className="row mt-4">
+                <div className="col text-center">
+
+                    {/* 페이지 번호 표시 */}
+                    {[...Array(totalWork)].map((_, index) => (
+                        <button
+                            key={index}
+                            className={`btn btn-outline-secondary mx-1 ${page === index + 1 ? 'active' : ''}`}
+                            onClick={() => pageClick(index + 1)}
+                        >
+                            {index + 1}
+                        </button>
+                    ))}
+
+                </div>
+            </div>
+        </>)}
+
+        {collapse.modern === true && (<>
+            <div className="row text-end fw-bold">
+                <div className="col-10 offset-1">
+                    <div>검색결과 ({modernList.length})</div>
+                </div>
+            </div>
+            <div className="row mt-4">
+                <div className="col-md-10 offset-md-1">
+                    <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-5">
+                        {/* 카드 */}
+                        {pageModern().map(work => (
+                            <div className="col mb-3" key={work.workNo}>
+                                <div className="card h-100 d-flex flex-column">
+                                    <h3 className="card-header" style={{ height: '200px', overflow: 'hidden' }}>
+                                        <img src={`http://localhost:8080/attach/download/${work.attachment}`}
+                                            className="card-img-top"
+                                            style={{ height: '100%', width: '100%', objectFit: 'cover' }} />
+                                    </h3>
+                                    <div className="card-body flex-grow-1">
+                                        <h5 className="card-title">{work.workTitle}</h5>
+                                        <h6 className="card-subtitle text-muted">{work.artistName}</h6>
+                                        <div className="card-text text-muted mt-3">{work.workMaterials}</div>
+                                        <div className="card-text text-muted">{work.workSize}</div>
+                                    </div>
+                                    <div className="card-body text-end">
+                                        <button className="btn btn-outline-secondary" onClick={e => openEditModal(work)}>
+                                            상세
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            <div className="row mt-5">
+                <div className="col">
+                    <hr />
+                </div>
+            </div>
+
+            {/* 페이지네이션 버튼 추가 */}
+            <div className="row mt-4">
+                <div className="col text-center">
+
+                    {/* 페이지 번호 표시 */}
+                    {[...Array(totalModern)].map((_, index) => (
+                        <button
+                            key={index}
+                            className={`btn btn-outline-secondary mx-1 ${page === index + 1 ? 'active' : ''}`}
+                            onClick={() => pageClick(index + 1)}
+                        >
+                            {index + 1}
+                        </button>
+                    ))}
+
+                </div>
+            </div>
+        </>)}
+
+        {collapse.art === true && (<>
+            <div className="row text-end fw-bold">
+                <div className="col-10 offset-1">
+                    <div>검색결과 ({artList.length})</div>
+                </div>
+            </div>
+            <div className="row mt-4">
+                <div className="col-md-10 offset-md-1">
+                    <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-5">
+                        {/* 카드 */}
+                        {pageArt().map(work => (
+                            <div className="col mb-3" key={work.workNo}>
+                                <div className="card h-100 d-flex flex-column">
+                                    <h3 className="card-header" style={{ height: '200px', overflow: 'hidden' }}>
+                                        <img src={`http://localhost:8080/attach/download/${work.attachment}`}
+                                            className="card-img-top"
+                                            style={{ height: '100%', width: '100%', objectFit: 'cover' }} />
+                                    </h3>
+                                    <div className="card-body flex-grow-1">
+                                        <h5 className="card-title">{work.workTitle}</h5>
+                                        <h6 className="card-subtitle text-muted">{work.artistName}</h6>
+                                        <div className="card-text text-muted mt-3">{work.workMaterials}</div>
+                                        <div className="card-text text-muted">{work.workSize}</div>
+                                    </div>
+                                    <div className="card-body text-end">
+                                        <button className="btn btn-outline-secondary" onClick={e => openEditModal(work)}>
+                                            상세
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            <div className="row mt-5">
+                <div className="col">
+                    <hr />
+                </div>
+            </div>
+
+            {/* 페이지네이션 버튼 추가 */}
+            <div className="row mt-4">
+                <div className="col text-center">
+
+                    {/* 페이지 번호 표시 */}
+                    {[...Array(totalArt)].map((_, index) => (
+                        <button
+                            key={index}
+                            className={`btn btn-outline-secondary mx-1 ${page === index + 1 ? 'active' : ''}`}
+                            onClick={() => pageClick(index + 1)}
+                        >
+                            {index + 1}
+                        </button>
+                    ))}
+
+                </div>
+            </div>
+        </>)}
+
+        {collapse.ancient === true && (<>
+            <div className="row text-end fw-bold">
+                <div className="col-10 offset-1">
+                    <div>검색결과 ({ancientList.length})</div>
+                </div>
+            </div>
+            <div className="row mt-4">
+                <div className="col-md-10 offset-md-1">
+                    <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-5">
+                        {/* 카드 */}
+                        {pageAncient().map(work => (
+                            <div className="col mb-3" key={work.workNo}>
+                                <div className="card h-100 d-flex flex-column">
+                                    <h3 className="card-header" style={{ height: '200px', overflow: 'hidden' }}>
+                                        <img src={`http://localhost:8080/attach/download/${work.attachment}`}
+                                            className="card-img-top"
+                                            style={{ height: '100%', width: '100%', objectFit: 'cover' }} />
+                                    </h3>
+                                    <div className="card-body flex-grow-1">
+                                        <h5 className="card-title">{work.workTitle}</h5>
+                                        <h6 className="card-subtitle text-muted">{work.artistName}</h6>
+                                        <div className="card-text text-muted mt-3">{work.workMaterials}</div>
+                                        <div className="card-text text-muted">{work.workSize}</div>
+                                    </div>
+                                    <div className="card-body text-end">
+                                        <button className="btn btn-outline-secondary" onClick={e => openEditModal(work)}>
+                                            상세
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            <div className="row mt-5">
+                <div className="col">
+                    <hr />
+                </div>
+            </div>
+
+            {/* 페이지네이션 버튼 추가 */}
+            <div className="row mt-4">
+                <div className="col text-center">
+                    {/* 이전 버튼: 첫 번째 페이지가 아닐 때만 표시 */}
+                    {/* {page > 1 && (
+                    <button
+                        className="btn btn-outline-primary"
+                        onClick={() => setPage(page - 1)}
+                    >
+                        이전
+                    </button>
+                    )} */}
+
+                    {/* 페이지 번호 표시 */}
+                    {[...Array(totalAcient)].map((_, index) => (
+                        <button
+                            key={index}
+                            className={`btn btn-outline-secondary mx-1 ${page === index + 1 ? 'active' : ''}`}
+                            onClick={() => pageClick(index + 1)}
+                        >
+                            {index + 1}
+                        </button>
+                    ))}
+
+                    {/* 다음 버튼: 마지막 페이지가 아닐 때만 표시
+                    // {page < totalPages && (
+                    // <button
+                    //     className="btn btn-outline-primary"
+                    //     onClick={() => setPage(page + 1)}
+                    // >
+                    //     다음
+                    // </button>
+                    // )} */}
+
+                </div>
+            </div>
+        </>)}
 
         {/* 모달 */}
         <div className="modal fade" tabIndex="-1" ref={editModal}>
@@ -385,16 +789,27 @@ const WorkList = () => {
                     </div>
                     {/* 모달 본문 */}
                     <div className="modal-body">
-                    <div className="row mt-2">
-                    <div className="col d-flex justify-content-center">
-                        {target.attachment ? (
-                            <img src={`http://localhost:8080/attach/download/${target.attachment}`} style={{ width: 200 }} />
-                                                                                                                                                                    // onClick={editImage}
-                        ) : (
-                            <div style={{ width: 200, height: 200, backgroundColor: "#f0f0f0" }}>이미지 없음</div>
+                        <div className="row mt-2">
+                            <div className="col d-flex justify-content-center">
+                                {target.attachment ? (<>
+                                    <img src={`http://localhost:8080/attach/download/${target.attachment}`} style={{ width: 200 }} />
+                                </>) : (
+                                    <img src="https://placeholder.com/200" style={{ width: 200 }} />
+                                )}
+                            </div>
+                        </div>
+
+                        
+
+                        {isEditing && (
+                            <div className="row mt-2">
+                                <div className="col">
+                                    <label>이미지 수정</label>
+                                    <input type="file" className="form-control" name="attachList" multiple
+                                        accept="image/*"  onChange={changeInput} ref={inputFileRef}/>
+                                </div>
+                            </div>
                         )}
-                    </div>
-                </div>
 
                         <div className="row mt-2">
                             <div className="col">
@@ -467,26 +882,17 @@ const WorkList = () => {
                     <div className="modal-footer">
                         <div className="row">
                             <div className="col">
-                                <button
-                                    type="button"
-                                    className="btn btn-danger"
-                                    onClick={e => deleteWork(target.workNo)}>
+                                <button type="button" className="btn btn-danger" onClick={e => deleteWork(target.workNo)}>
                                     삭제
                                 </button>
                             </div>
                             <div className="col">
-                                <button
-                                    type="button"
-                                    className="btn btn-success"
-                                    onClick={toggleEditMode}>
-                                    {isEditing ? "수정완료" : "수정"}
+                                <button type="button" className="btn btn-success" onClick={toggleEditMode}>
+                                    {isEditing ? "완료" : "수정"}
                                 </button>
                             </div>
                             <div className="col">
-                                <button
-                                    type="button"
-                                    className="btn btn-secondary"
-                                    onClick={closeEditModal}>
+                                <button type="button" className="btn btn-secondary" onClick={closeEditModal}>
                                     확인
                                 </button>
                             </div>
@@ -509,9 +915,9 @@ const WorkList = () => {
                     <div className="modal-body">
                         <div className="row mt-2">
                             <div className="col">
-                            <label className="form-label">파일</label>
+                                <label className="form-label">파일</label>
                                 {/*  multiple accept -> 어떤 형식 받을건가*/}
-                                <input type="file" className="form-control" name="attachList" multiple accept="image/*" onChange={changeInput} ref={inputFileRef}/>
+                                <input type="file" className="form-control" name="attachList" multiple accept="image/*" onChange={changeInput} ref={inputFileRef} />
                                 {images.map((image, index) => (
                                     <img key={index} src={image} alt={`미리보기 ${index + 1}`} style={{ maxWidth: '100px', margin: '5px' }} />
                                 ))}
