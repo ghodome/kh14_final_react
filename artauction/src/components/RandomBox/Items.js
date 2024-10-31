@@ -117,7 +117,7 @@ const Items = () => {
                 <div>
                     <h2>결과:</h2>
                     <p>작품명: {result.itemName}</p>
-                    <p>아이템 가치: {result.itemValue}</p>
+                    <p>아이템 가치: {result.itemValue.toLocaleString()}원</p>
                     <p>당첨 여부: {result.isWin === 'Y' ? '당첨' : '다음 기회에...'}</p>
                     {result.isWin ==='Y' && (<NavLink className="nav-link" to="/member/mypage">마이 페이지로 이동</NavLink>)}
                 </div>
