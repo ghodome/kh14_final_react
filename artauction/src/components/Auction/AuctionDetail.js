@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import Jumbotron from "../Jumbotron";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { loginState, memberIdState, memberRankState } from "../../utils/recoil";
@@ -10,7 +9,7 @@ import moment from "moment";
 import styles from './auction.module.css';
 import { GiPayMoney } from "react-icons/gi";
 import { TbZoomMoney } from "react-icons/tb";
-import { MdOutlineQuestionMark } from "react-icons/md";
+import { IoMdInformationCircleOutline } from "react-icons/io";
 import { Modal } from "bootstrap";
 
 const Auction = () => {
@@ -23,7 +22,6 @@ const Auction = () => {
     const navigate = useNavigate();
     // state
     const [auctionAndWork, setAuctionAndWork] = useState({
-        auctionHammerPrice:null,
         auctionStartPrice:0,
         auctionBidIncrement:0,
     });
@@ -32,13 +30,16 @@ const Auction = () => {
     const [connect, setConnect] = useState(false);
     const [bidIncrement,setBidIncrement]=useState();
     const [input, setInput]=useState({
-        type:"",
+        type:"bid",
         bid:{
-            hammerPrice:"",
+            workName:"",
+            auctionLot:"",
             bidPrice:"",
             bidIncrement:"",
         }
     });
+
+    const [wholeMessageList, setWholeMessageList]=useState([]);
 
     //recoil
     const login = useRecoilValue(loginState);
@@ -52,9 +53,9 @@ const Auction = () => {
     //callback
     const clearInput=(()=>{
         setInput({
-            type:"",
+            type:"bid",
             bid:{
-                hammerPrice:"",
+                auctionLot:"",
                 bidPrice:"",
                 bidIncrement:"",
             }
@@ -68,7 +69,8 @@ const Auction = () => {
             setInput({
                 type:"bid",
                 bid:{
-                    hammerPrice:auctionAndWork.auctionHammerPrice!==null?auctionAndWork.auctionHammerPrice:auctionAndWork.auctionStartPrice,
+                    workName:auctionAndWork.workTitle,
+                    auctionLot:auctionAndWork.auctionLot,
                     bidPrice:auctionAndWork.auctionBidPrice>0?auctionAndWork.auctionBidPrice:auctionAndWork.auctionStartPrice,
                     bidIncrement:bidIncrement,
                 },
@@ -100,13 +102,10 @@ const Auction = () => {
             case (price >= 50000000 && price < 200000000):
                 increment = 5000000;
                 break;
-            case (price >= 200000000 && price < 500000000):
-                increment = 10000000;
-                break;
             default:
-                increment = 50000; // 기준에 맞지 않는 경우 기본값 설정
+                increment = 10000000;
         }
-        setBidIncrement(increment); // 설정한 호가 단위를 업데이트
+        setBidIncrement(increment); 
     },[bidIncrement]);
 
     const connectToServer= useCallback(()=>{
@@ -149,35 +148,25 @@ const Auction = () => {
         }
     },[client]);
 
-    const sendMessage=useCallback(async ()=>{
-        const json={
-            content:input
-        }
-        const message={
-            destination:"/auctionws/message/"+auctionNo,
-            body:JSON.stringify(json),
-        }
-        if(client===null||connect===false||input.bid.bidPrice===0){
-            setInput("");
+    const sendMessage = useCallback(async () => {
+        const json = { content: input };
+    
+        if (client === null || !connect) {
+            loadAuctionAndWork();
             return;
-        }
-        else{
-            const bidResp=await axios.post("http://localhost:8080/auctionws/"+auctionNo,json.content);
-
-            if(bidResp.data.success){
-                client.publish(message);
-                setInput({...input,
-                    bid:{...input.bid,
-                        bidPrice:bidResp.data.content.bidPrice,
-                        bidIncrement:bidResp.data.content.bidIncrement,
-                    }
-                });
-            }
-            else{
-                window.alert("실패 : "+bidResp.data.message);
+        } else {
+            const bidResp = await axios.patch(`http://localhost:8080/auctionchat/${auctionNo}`, json.content);
+    
+            if (bidResp.data.success) {
+                window.alert(`LOT ${json.content.bid.auctionLot} ${json.content.bid.bidPrice + json.content.bid.bidIncrement}원 응찰에 성공하셨습니다.`);
+            } else {
+                window.alert(`동일 가격 차순위 응찰되었습니다.`);
             }
         }
-    },[input,client,connect]);
+    
+        // 응찰 성공 후 새 bidPrice 업데이트를 위해 loadAuctionAndWork 호출
+        loadAuctionAndWork();
+    }, [input, client, connect, auctionAndWork]);
 
     const increaseBidIncrement=useCallback(()=>{
         setInput({
@@ -196,17 +185,12 @@ const Auction = () => {
         })
     },[input,bidIncrement]);
 
+    const loadMessageList=useCallback(async ()=>{
+        const resp=await axios.get(`http://localhost:8080/bid/bidMessageList/${auctionNo}`);
+        setWholeMessageList(resp.data);
+    },[wholeMessageList]);
 
-    //effect
-    useEffect(() => {
-        loadAuctionAndWork();
-        connectToServer();
-        return () => {
-            disconnectToServer(client);
-        };
-    }, [login]); 
     const openBidIncrementModal = useCallback(() => {
-        console.log(bidModal.current);
         const tag = Modal.getOrCreateInstance(bidModal.current);
         tag.show();
     },[bidModal]);
@@ -215,14 +199,51 @@ const Auction = () => {
         tag.hide();
     },[bidModal]);
 
-
+    //effect
+    useEffect(()=>{
+        loadAuctionAndWork();
+        connectToServer();
+        loadMessageList();
+        return () => {
+            disconnectToServer(client);
+        };
+    },[])
+    useEffect(() => {
+        if (auctionAndWork) {
+            setInput((prev) => ({
+                ...prev,
+                bid: {
+                    ...prev.bid,
+                    workName: auctionAndWork.workTitle,
+                    auctionLot: auctionAndWork.auctionLot,
+                    bidPrice: auctionAndWork.auctionBidPrice > 0 ? auctionAndWork.auctionBidPrice : auctionAndWork.auctionStartPrice,
+                    bidIncrement: bidIncrement,
+                },
+            }));
+        }
+    }, [auctionAndWork, bidIncrement]);
+    
     // view
     return (
         <>
             <div className={styles.auctionContainer}>
-            {auctionAndWork ? ( // auction이 null이 아닐 때만 렌더링
+            <div className="mt-5 text-center">
+                {auctionAndWork&&(<h4>{auctionAndWork.auctionScheduleNo}주차 경매 현황</h4>)}
+                <ul className="list-group">
+                    {messageList.slice(-5).map((message, index) => (
+                        <div className="row" key={index}>
+                            <div className="col">
+                                <p>{message.content.contentForSchedule}</p>
+                                <p className="text-muted">
+                                    {(message.content.bidtime)}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                </ul>
+            </div>
+            {auctionAndWork? ( 
                 <>
-                    <Jumbotron title={`${auctionAndWork.auctionScheduleNo} 주차 경매`} />
                     <div className="row mt-4">
                         <div className="col-7">
                             {/* 작품 상세내용  */}
@@ -303,24 +324,24 @@ const Auction = () => {
                                     <tr>
                                         <td>
                                             <div className="row">
-                                                <div className="col-5">최저 추정가</div>
-                                                <div className="col-7">{auctionAndWork.auctionLowPrice}원</div>
+                                                <div className="col-4">추정가</div>
+                                                <div className="col-8">{auctionAndWork.auctionLowPrice}원</div>
                                             </div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
                                             <div className="row">
-                                                <div className="col-5">최대 추정가</div>
-                                                <div className="col-7">{auctionAndWork.auctionHighPrice}원</div>
+                                                <div className="col-4">~</div>
+                                                <div className="col-8">{auctionAndWork.auctionHighPrice}원</div>
                                             </div>
                                         </td>
                                     </tr>
                                         <tr>
                                             <td>
                                                 <div className="row">
-                                                    <div className="col-5">시작가</div>
-                                                    <div className="col-7">{auctionAndWork.auctionStartPrice}원</div>
+                                                    <div className="col-4">시작가</div>
+                                                    <div className="col-8">{auctionAndWork.auctionStartPrice}원</div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -328,8 +349,9 @@ const Auction = () => {
                                         <tr>
                                             <td>
                                                 <div className="row">
-                                                    <div className="col-5">현재가</div>
-                                                    <div className="col-7">{input.bid.bidPrice}원</div>
+                                                    <div className="col-4">현재가</div>
+                                                    <div className="col-5">{input.bid.bidPrice}원</div>
+                                                    <div className="col-3">{auctionAndWork.auctionBidCnt}회</div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -337,13 +359,11 @@ const Auction = () => {
                                         <tr>
                                             <td>
                                                 <div className="row">
-                                                    <div className="col-5">현재 호가 단위</div>
-                                                    <div className="col-4">{bidIncrement}원</div>
+                                                    <div className="col-4">호가 단위</div>
+                                                    <div className="col-5">{bidIncrement}원</div>
                                                     <div className="col-3">
-                                                        <button type="button" 
-                                                        className="btn btn-default" 
-                                                        onClick={e=>openBidIncrementModal()}>
-                                                            <MdOutlineQuestionMark /></button>
+                                                        <div onClick={e=>openBidIncrementModal()}>
+                                                        <IoMdInformationCircleOutline /></div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -355,9 +375,9 @@ const Auction = () => {
                                 <div className="col-md-10 affset-md-1">
                                     <div className=" input-group w-100">
                                         <button type="button" className="btn btn-success"
-                                            onClick={increaseBidIncrement} disabled={!login||!input.bid.bidPrice}><GiPayMoney /></button>
+                                            onClick={increaseBidIncrement}><GiPayMoney /></button>
                                         <button type="button" className="btn btn-danger"
-                                            onClick={decreaseBidIncrement} disabled={!login||!input.bid.bidPrice}><GiPayMoney /></button>
+                                            onClick={decreaseBidIncrement}><GiPayMoney /></button>
                                         <input 
                                             type="text" 
                                             className="form-control"
@@ -369,36 +389,44 @@ const Auction = () => {
                                                 bid:{...prev.content,
                                                         bidPrice:e.target.value>0?e.target.value:0,
                                                 }
-                                            }))} disabled={!login}
+                                            }))}
+                                            
                                                 placeholder="응찰 가격을 입력하세요"></input>
                                         <button type="button" className="btn btn-success"
-                                            onClick={sendMessage} disabled={!login||!input.bid.bidPrice}><TbZoomMoney /></button>
+                                            onClick={sendMessage}><TbZoomMoney /></button>
                                     </div>
                                 </div>
                             </div>
                             ):(
                                 <div className="row mt-3">
                                     <div className="col-md-10 affset-md-1">
-                                    {loading === true &&(
-                                            <button type="button" className="btn btn-primary"
-                                            onClick={e=>navigate("/login")}>로그인 후 응찰이 가능합니다</button>
-                                        )}
+                                        <button type="button" className="btn btn-primary"
+                                        onClick={e=>navigate("/login")}>로그인 후 응찰이 가능합니다.</button>
                                     </div>
                                 </div>
                             )}
                             <ul className="list-group">
-                                {messageList&&messageList.map((message,index)=>(
+                                {messageList && messageList.slice().reverse().map((message, index) => (
                                     <div className="row" key={index}>
                                         <div className="col">
-                                            <p>{message.senderMemberId}:{message.content.content}</p>
+                                            <p>{message.content.contentForLot}</p>
                                             <p className="text-muted">
-                                                {moment(message.content.bidtime).format("a h:mm")}
-                                                ({moment(message.content.bidtime).fromNow()})
+                                                {moment(message.bidTime).format('HH:mm:ss')}
                                             </p>
                                         </div>
                                     </div>
                                 ))}
                             </ul>
+                                {wholeMessageList && wholeMessageList.slice().reverse().map((message, index) => (
+                                    <div className="row" key={index}>
+                                        <div className="col">
+                                            <p>{message.content.contentForLot}</p>
+                                            <p className="text-muted">
+                                                {moment(message.time).format('HH:mm:ss')}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
                         </div>
                        <hr/>
                    </div>
