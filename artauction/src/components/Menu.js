@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { loginState, memberIdState, memberRankState } from "../utils/recoil";
@@ -9,6 +9,7 @@ const Menu = () => {
     const [memberId, setMemberId] = useRecoilState(memberIdState);
     const [memberRank, setMemberRank] = useRecoilState(memberRankState);
     const login = useRecoilValue(loginState);
+    const [roomNo, setRoomNo] = useState(null); // roomNo 상태 추가
 
     const logout = useCallback(() => {
         setMemberId("");
@@ -18,13 +19,24 @@ const Menu = () => {
         window.sessionStorage.removeItem("refreshToken1");
         navigate("/");
     }, [navigate, setMemberId, setMemberRank]);
-    
-    //채팅방 함수
-    const createRoom = useCallback(async () => {
-        const roomName = `${memberId}의 채팅방`; 
-        const resp = await axios.post("http://localhost:8080/room/", { roomName });
-        navigate("/roomchat/" + resp.data.roomNo); 
-    }, [memberId, navigate]);
+
+    // 문의하기를 클릭했을 때 방으로 이동
+    const goToInquiry = useCallback(async () => {
+        if (login) {
+            try {
+                const response = await axios.get(`http://localhost:8080/room?memberId=${memberId}`);
+                const roomData = response.data;
+
+                if (roomData && roomData.roomNo) {
+                    navigate(`/roomchat/${roomData.roomNo}`);
+                } else {
+                    console.error("No room number found for the member.");
+                }
+            } catch (error) {
+                console.error("Failed to fetch room number:", error);
+            }
+        }
+    }, [login, memberId, navigate]);
 
     return (
         <>
@@ -51,7 +63,7 @@ const Menu = () => {
                                     )}
                                     {memberRank === '관리자' && (
                                         <li className="nav-item">
-                                            <NavLink className="nav-link" to="/websocket/memberchatlist">
+                                            <NavLink className="nav-link" to="/room">
                                                 1:1 채팅방
                                             </NavLink>
                                         </li>
@@ -103,9 +115,7 @@ const Menu = () => {
                             </li>
                             {login && (
                                 <li className="nav-item">
-                                    <button className="nav-link btn" onClick={createRoom}>
-                                        방 생성
-                                    </button>
+                                   <button className="nav-link btn" onClick={goToInquiry}>문의하기</button>
                                 </li>
                             )}
                         </ul>
