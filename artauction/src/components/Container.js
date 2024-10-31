@@ -37,6 +37,7 @@ import MemberCheck from "./Member/MemberCheck";
 import MemberPwChange from "./Member/MemberPwChange";
 import RoomChat from "./websocket/RoomChat";
 import Room from "./websocket/Room";
+import Giveup from "./Payment/Giveup";
 
 
 
@@ -77,6 +78,7 @@ const Container = () => {
                         <Route path="/room" element={<PrivateRoute element={<Room/>}/>}/>
                         <Route path="/randomBox" element={<Items/>}/>
                         <Route path="/roomchat/:roomNo" element={<PrivateRoute element={<RoomChat/>}/>}/>
+                        <Route path="/giveup" element={<PrivateRoute element={<Giveup/>}/>}/>
 
 
                     </Routes>

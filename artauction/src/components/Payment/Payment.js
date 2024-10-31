@@ -91,7 +91,9 @@ const Payment = () => {
                         <th>선택</th>
                         <th>제목</th>
                         <th>저자</th>
-                        <th>가격</th>
+                        <th>총 가격</th>
+                        <th>포인트로 결제한 가격</th>
+                        <th>결제 가격</th>
                         <th>낙찰 일자</th>
                         {/* <th>남은 일수</th> */}
                         <th></th>
@@ -110,6 +112,8 @@ const Payment = () => {
                             <td>{deal.workTitle}</td>
                             <td>{deal.artistName}</td>
                             <td>{deal?.dealPrice.toLocaleString() || ''}원</td>
+                            <td>{(deal?.dealPrice*0.3).toLocaleString() || ''}원</td>
+                            <td>{(deal?.dealPrice*0.7).toLocaleString() || ''}원</td>
                             <td>{deal.dealTime}</td>
                             {/* <td>{deal.dealTime}</td> */}
                             <td>
@@ -127,10 +131,11 @@ const Payment = () => {
 
             <div className="row mt-4">
                 <div className="col">
-                    <h3>총 가격은 : {checkedDealTotal?.toLocaleString() || ''}원</h3>
+                    <h3>총 가격은 : {(checkedDealTotal*0.7)?.toLocaleString() || ''}원</h3>
                     <button className="btn btn-success w-100" onClick={() => sendPurchaseRequest(checkedDealList)}>결제하기</button>
                 </div>
             </div>
+            
         </>
     );
 };
