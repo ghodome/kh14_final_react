@@ -118,7 +118,7 @@ const Mypage = () => {
             <div className="row mt-2">
                 <div className="col-3"></div>
                 <div className="col-6">
-                    <h4>당첨된 아이템 목록</h4>
+                    <h4>당첨된 랜덤박스 아이템 목록</h4>
                     <table className="table">
                         <thead>
                             <tr>
