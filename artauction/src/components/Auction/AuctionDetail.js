@@ -60,7 +60,7 @@ const Auction = () => {
                 bidIncrement:"",
             }
         });
-    },[input])
+    },[])
     const loadAuctionAndWork=useCallback(async ()=>{
         const resp = await axios.get(`http://localhost:8080/auction/work/${auctionNo}`);
         setAuctionAndWork(resp.data);
@@ -76,7 +76,7 @@ const Auction = () => {
                 },
             });
         }
-    },[auctionAndWork,input,auctionNo,bidIncrement]);
+    },[auctionNo,bidIncrement]);
 
     const setBidIncrementByPrice = useCallback((price) => {
         let increment;
@@ -156,14 +156,14 @@ const Auction = () => {
             return;
         } else {
             const bidResp = await axios.patch(`http://localhost:8080/auctionchat/${auctionNo}`, json.content);
-    
+            
             if (bidResp.data.success) {
                 window.alert(`LOT ${json.content.bid.auctionLot} ${json.content.bid.bidPrice + json.content.bid.bidIncrement}원 응찰에 성공하셨습니다.`);
             } else {
                 window.alert(`동일 가격 차순위 응찰되었습니다.`);
             }
         }
-    
+        
         // 응찰 성공 후 새 bidPrice 업데이트를 위해 loadAuctionAndWork 호출
         loadAuctionAndWork();
     }, [input, client, connect, auctionAndWork]);
@@ -174,7 +174,7 @@ const Auction = () => {
             bid:{...input.bid,
                 bidIncrement:input.bid.bidIncrement+bidIncrement}
         })
-    },[input,bidIncrement])
+    },[bidIncrement])
 
     const decreaseBidIncrement = useCallback(()=>{
         setInput({
@@ -183,7 +183,7 @@ const Auction = () => {
                 bidIncrement:input.bid.bidIncrement>bidIncrement?
                 input.bid.bidIncrement-bidIncrement:input.bid.bidIncrement}
         })
-    },[input,bidIncrement]);
+    },[bidIncrement]);
 
     const loadMessageList=useCallback(async ()=>{
         const resp=await axios.get(`http://localhost:8080/bid/bidMessageList/${auctionNo}`);
@@ -221,7 +221,7 @@ const Auction = () => {
                 },
             }));
         }
-    }, [auctionAndWork, bidIncrement]);
+    }, [auctionAndWork,bidIncrement]);
     
     // view
     return (
@@ -368,6 +368,16 @@ const Auction = () => {
                                                 </div>
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <td>
+                                                <div className="row">
+                                                    <div className="col-4">마감 시간</div>
+                                                    <div className="col-5">{moment(auctionAndWork.auctionEndDate).format('yyyy-MM-DD H:mm:ss')}</div>
+                                                    <div className="col-3">
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
                                 </tbody>
                             </table>
                             {login?(
@@ -411,7 +421,7 @@ const Auction = () => {
                                         <div className="col">
                                             <p>{message.content.contentForLot}</p>
                                             <p className="text-muted">
-                                                {moment(message.bidTime).format('HH:mm:ss')}
+                                                {moment(message.content.bidTime).format('HH:mm:ss:SSS')}
                                             </p>
                                         </div>
                                     </div>
@@ -422,7 +432,7 @@ const Auction = () => {
                                         <div className="col">
                                             <p>{message.content.contentForLot}</p>
                                             <p className="text-muted">
-                                                {moment(message.time).format('HH:mm:ss')}
+                                                {moment(message.time).format('HH:mm:ss:SSS')}
                                             </p>
                                         </div>
                                     </div>
