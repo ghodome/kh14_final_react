@@ -31,12 +31,12 @@ import Items from "./RandomBox/Items";
 import AdminRoute from "./router/AdminRoute";
 import MemberDetail from "./Member/MemberDetail";
 
-import MemberChatList from "./websocket/MemberChatList";
 
 import MemberEdit from "./Member/MemberEdit";
 import MemberCheck from "./Member/MemberCheck";
 import MemberPwChange from "./Member/MemberPwChange";
 import RoomChat from "./websocket/RoomChat";
+import Room from "./websocket/Room";
 
 
 
@@ -74,7 +74,7 @@ const Container = () => {
                         <Route path="/payment/success/:partnerOrderId" element={<PaymentSuccess />} />
                         <Route path="/charge" element={<Charge />} />
                         <Route path="/charge/success/:partnerOrderId" element={<ChargeSuccess />} />
-                        <Route path="/websocket/memberchatlist" element={<MemberChatList />} />
+                        <Route path="/room" element={<PrivateRoute element={<Room/>}/>}/>
                         <Route path="/randomBox" element={<Items/>}/>
                         <Route path="/roomchat/:roomNo" element={<PrivateRoute element={<RoomChat/>}/>}/>
 
