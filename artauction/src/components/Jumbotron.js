@@ -2,10 +2,10 @@ const Jumbotron =(props)=>{
     return (<>
             <div className="row">
                 <div className="col">
-                    <div className="bg-dark p-3 rounded">
-                        <h2 className=" text-light">{props.title}</h2>
+                    <div className="bg-secondary p-3 rounded-0">
+                        <h2 className=" text-dark">{props.title}</h2>
                         
-                        <p className=" text-light">{props.content}</p>
+                        <p className=" text-dark">{props.content}</p>
                         
                     </div>
                 </div>

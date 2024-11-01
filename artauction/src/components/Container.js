@@ -77,8 +77,6 @@ const Container = () => {
                         <Route path="/room" element={<PrivateRoute element={<Room/>}/>}/>
                         <Route path="/randomBox" element={<Items/>}/>
                         <Route path="/roomchat/:roomNo" element={<PrivateRoute element={<RoomChat/>}/>}/>
-
-
                     </Routes>
                 </div>
             </div>

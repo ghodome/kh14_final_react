@@ -11,6 +11,7 @@ import { GiPayMoney } from "react-icons/gi";
 import { TbZoomMoney } from "react-icons/tb";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { Modal } from "bootstrap";
+import Time from "../time/Time";
 
 const Auction = () => {
     //ref
@@ -21,6 +22,7 @@ const Auction = () => {
     //navigate
     const navigate = useNavigate();
     // state
+    const [transferTime, setTranferTime]=useState();
     const [auctionAndWork, setAuctionAndWork] = useState({
         auctionStartPrice:0,
         auctionBidIncrement:0,
@@ -64,6 +66,7 @@ const Auction = () => {
     const loadAuctionAndWork=useCallback(async ()=>{
         const resp = await axios.get(`http://localhost:8080/auction/work/${auctionNo}`);
         setAuctionAndWork(resp.data);
+        setTranferTime(resp.data.auctionEndDate);
         setBidIncrementByPrice(resp.data.auctionBidPrice>0?resp.data.auctionBidPrice:resp.data.auctionStartPrice);
         if(resp){
             setInput({
@@ -76,7 +79,7 @@ const Auction = () => {
                 },
             });
         }
-    },[auctionNo,bidIncrement]);
+    },[auctionNo,bidIncrement,auctionAndWork,transferTime]);
 
     const setBidIncrementByPrice = useCallback((price) => {
         let increment;
@@ -325,7 +328,7 @@ const Auction = () => {
                                         <td>
                                             <div className="row">
                                                 <div className="col-4">추정가</div>
-                                                <div className="col-8">{auctionAndWork.auctionLowPrice}원</div>
+                                                <div className="col-8 text-end">{auctionAndWork.auctionLowPrice}원</div>
                                             </div>
                                         </td>
                                     </tr>
@@ -333,7 +336,7 @@ const Auction = () => {
                                         <td>
                                             <div className="row">
                                                 <div className="col-4">~</div>
-                                                <div className="col-8">{auctionAndWork.auctionHighPrice}원</div>
+                                                <div className="col-8 text-end">{auctionAndWork.auctionHighPrice}원</div>
                                             </div>
                                         </td>
                                     </tr>
@@ -341,30 +344,31 @@ const Auction = () => {
                                             <td>
                                                 <div className="row">
                                                     <div className="col-4">시작가</div>
-                                                    <div className="col-8">{auctionAndWork.auctionStartPrice}원</div>
+                                                    <div className="col-8 text-end">{auctionAndWork.auctionStartPrice}원</div>
                                                 </div>
                                             </td>
                                         </tr>
-                                        {input.bid.bidPrice>0&&(
+                                        {/* {input.bid.bidPrice>0&&( */}
                                         <tr>
                                             <td>
                                                 <div className="row">
                                                     <div className="col-4">현재가</div>
-                                                    <div className="col-5">{input.bid.bidPrice}원</div>
                                                     <div className="col-3">{auctionAndWork.auctionBidCnt}회</div>
+                                                    <div className="col-5 text-end">
+                                                        {input.bid.bidPrice}원</div>
                                                 </div>
                                             </td>
                                         </tr>
-                                        )}
+                                        {/* )} */}
                                         <tr>
                                             <td>
                                                 <div className="row">
                                                     <div className="col-4">호가 단위</div>
-                                                    <div className="col-5">{bidIncrement}원</div>
                                                     <div className="col-3">
                                                         <div onClick={e=>openBidIncrementModal()}>
                                                         <IoMdInformationCircleOutline /></div>
                                                     </div>
+                                                    <div className="col-5 text-end">{bidIncrement}원</div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -372,9 +376,15 @@ const Auction = () => {
                                             <td>
                                                 <div className="row">
                                                     <div className="col-4">마감 시간</div>
-                                                    <div className="col-5">{moment(auctionAndWork.auctionEndDate).format('yyyy-MM-DD H:mm:ss')}</div>
-                                                    <div className="col-3">
-                                                    </div>
+                                                    <div className="col-8 text-end">{moment(auctionAndWork.auctionEndDate).format('yyyy년 MM월 DD일 H:mm:ss')}</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div className="row">
+                                                    <div className="col-4">남은 시간</div>
+                                                    <div className="col-8 text-end"><Time endDate={auctionAndWork.auctionEndDate}/></div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -416,6 +426,7 @@ const Auction = () => {
                                 </div>
                             )}
                             <ul className="list-group">
+                                
                                 {messageList && messageList.slice().reverse().map((message, index) => (
                                     <div className="row" key={index}>
                                         <div className="col">
