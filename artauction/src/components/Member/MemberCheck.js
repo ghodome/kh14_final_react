@@ -18,7 +18,7 @@ const MemberCheck = () => {
         본 서비스는 경매에 참여하는 사용자와 판매자 간의 거래를 중개하며, 사용자는 본 약관을 읽고 동의함으로써 서비스를 이용할 수 있습니다.<br />
         경매사이트의 모든 사용자는 본 약관의 내용을 충분히 이해하고 동의해야 하며, 동의하지 않을 경우 서비스 이용이 제한될 수 있습니다.
     `;
-    
+
     const privacyPolicyContent = `
         본 방침은 귀하의 개인정보를 어떻게 수집하고 사용하는지를 설명합니다.<br />
         1. **개인정보 수집 항목**: 이름, 이메일, 전화번호, 주소 등<br />
@@ -86,10 +86,14 @@ const MemberCheck = () => {
                             <input
                                 type='checkbox'
                                 name='serviceTerms'
+                                className="form-check-input"
                                 checked={agreed.serviceTerms}
                                 onChange={handleCheckboxChange}
                             />
-                            이용약관 동의 (필수)
+                            <span className="form-check-label ms-2">
+
+                                이용약관 동의 (필수)
+                            </span>
                         </label>
                     </div>
                     <div className="mb-3">
@@ -101,10 +105,13 @@ const MemberCheck = () => {
                             <input
                                 type='checkbox'
                                 name='privacyPolicy'
+                                className="form-check-input"
                                 checked={agreed.privacyPolicy}
                                 onChange={handleCheckboxChange}
                             />
-                            개인정보 처리방침 동의 (필수)
+                            <span className="form-check-label ms-2">
+                                개인정보 처리방침 동의 (필수)
+                            </span>
                         </label>
                     </div>
                     <div className="mb-3">
@@ -116,10 +123,13 @@ const MemberCheck = () => {
                             <input
                                 type='checkbox'
                                 name='marketingConsent'
+                                className="form-check-input"
                                 checked={agreed.marketingConsent}
                                 onChange={handleCheckboxChange}
                             />
-                            마케팅 정보 수신 동의 (필수)
+                            <span className="form-check-label ms-2">
+                                마케팅 정보 수신 동의 (필수)
+                            </span>
                         </label>
                     </div>
                     <div className="mb-3">
@@ -131,20 +141,26 @@ const MemberCheck = () => {
                             <input
                                 type='checkbox'
                                 name='promotionalConsent'
+                                className="form-check-input"
                                 checked={agreed.promotionalConsent}
                                 onChange={handleCheckboxChange}
                             />
-                            이벤트 및 프로모션 정보 수신 동의 (선택)
+                            <span className="form-check-label ms-2">
+                                이벤트 및 프로모션 정보 수신 동의 (선택)
+                            </span>
                         </label>
                     </div>
                     <div className="mb-4">
                         <label>
                             <input
                                 type='checkbox'
+                                className="form-check-input"
                                 checked={allAgreed}
                                 onChange={handleAllCheckboxChange}
                             />
-                            모든 항목 동의하기
+                            <span className="form-check-label ms-2">
+                                모든 항목 동의하기
+                            </span>
                         </label>
                     </div>
                     <button className="btn btn-primary w-100" onClick={handleSubmit}>
