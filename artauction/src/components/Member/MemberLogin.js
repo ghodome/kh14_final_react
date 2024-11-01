@@ -15,8 +15,7 @@ const MemberLogin = () => {
     });
     const [display, setDisplay] = useState(false);
     const [stay, setStay] = useState(false);
-
-    const [forgotPw, setForgotPw] = useState(false); 
+    const [errorMessage, setErrorMessage] = useState("");
 
     const [memberId, setMemberId] = useRecoilState(memberIdState);
     const [memberRank, setMemberRank] = useRecoilState(memberRankState);
@@ -26,9 +25,8 @@ const MemberLogin = () => {
         setInput({
             ...input,
             [e.target.name]: e.target.value
-            
-
         });
+        setErrorMessage("");
     }, [input]);
 
     const sendLoginRequest = useCallback(async () => {
@@ -50,7 +48,7 @@ const MemberLogin = () => {
            navigate("/");
        }
        catch(e){
-        console.log("아이디 없거나 비밀번호 틀림");
+        setErrorMessage("아이디 없거나 비밀번호 틀림");
        }
 
     }, [input, stay]);
@@ -110,6 +108,11 @@ const MemberLogin = () => {
                         </button>
                     </div>
                 </div>
+                {errorMessage && (
+                        <div className="alert alert-danger mt-3">
+                            {errorMessage}
+                        </div>
+                    )}
 
                 <div className="row mt-4">
                     <div className="col">
