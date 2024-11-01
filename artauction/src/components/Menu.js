@@ -1,14 +1,16 @@
 import axios from "axios";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { loginState, memberIdState, memberRankState } from "../utils/recoil";
+import { blockedState, loginState, memberIdState, memberRankState } from "../utils/recoil";
 
 const Menu = () => {
     const navigate = useNavigate();
+    const [member, setMember] = useState({});
     const [memberId, setMemberId] = useRecoilState(memberIdState);
     const [memberRank, setMemberRank] = useRecoilState(memberRankState);
     const login = useRecoilValue(loginState);
+    const [blocked, setBlocked] = useRecoilState(blockedState);
     const [roomNo, setRoomNo] = useState(null); // roomNo 상태 추가
 
     const logout = useCallback(() => {
@@ -19,6 +21,20 @@ const Menu = () => {
         window.sessionStorage.removeItem("refreshToken1");
         navigate("/");
     }, [navigate, setMemberId, setMemberRank]);
+    
+    useEffect(() => {
+        const loadMember = async () => {
+            try {
+                const resp = await axios.get(`http://localhost:8080/member/${memberId}`);
+                setMember(resp.data);
+                setBlocked(resp.data.blocked); // 여기서 blocked 값을 설정
+            } catch (error) {
+                console.error("Failed to load member:", error);
+            }
+        };
+    
+        loadMember();
+    }, [memberId]);
 
     // 문의하기를 클릭했을 때 방으로 이동
     const goToInquiry = useCallback(async () => {
@@ -51,7 +67,7 @@ const Menu = () => {
                                 <>
                                     <li className="nav-item">
                                         <NavLink className="nav-link" to="/member/mypage">
-                                            {memberId} ({memberRank})
+                                            {memberId} ({blocked ? '차단된 ' : ''}{memberRank})
                                         </NavLink>
                                     </li>
                                     {memberRank === '관리자' && (
