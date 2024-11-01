@@ -9,17 +9,17 @@ moment.locale("ko");  //moment에 한국어를 기본 언어로 설정
 
 
 const AuctionScheduleDetail = ()=>{
-    //ref
-    const presentModal=useRef();
+    
      //parameter
      const {auctionScheduleNo} = useParams();
 
      //navigator
      const navigate = useNavigate();
-
+     
      //state
      const [auctionSchedule, setAuctionSchedule] = useState({});
-
+     const [auctionList, setAuctionList] =useState([]);
+     
      const [images, setImages] = useState([]); // 이미지 미리보기 URL 목록
 
      const [target, setTarget] = useState({    //수정
@@ -33,21 +33,22 @@ const AuctionScheduleDetail = ()=>{
         attachList: []
     });
 
-    const [presentInput, setPresentInput]= useState({
+    const [presentInput, setPresentInput]= useState({   //출품작 등록
         auctionScheduleNo: auctionScheduleNo,
-        auctionStartDate:"",
-        auctionEndDate:"",
         workNo: "",
         auctionLot: "",
         auctionStartPrice: "",
         auctionLowPrice: "",
         auctionHighPrice: "",
+        auctionState: "예정경매",
         auctionConsigner: "",
         auctionConsignmentFee: "",
         auctionNetProceeds: "",
+        attachList: []
+        // auctionStartDate:"",
+        // auctionEndDate:"",
     });
 
-    const [auctionList, setAuctionList] =useState([]);
 
     //effect
     useEffect(()=>{
@@ -56,19 +57,24 @@ const AuctionScheduleDetail = ()=>{
     }, []);
 
     //callback
-    const loadAuctionSchedule = useCallback(async ()=>{
+    const loadAuctionSchedule = useCallback(async ()=>{ //일정 불러오기
         const resp = await axios.get("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
         setAuctionSchedule({
             ...resp.data,
-            auctionScheduleStartDate:new Date(resp.data.auctionScheduleStartDate).toISOString().slice(0,16),
-            auctionScheduleEndDate:new Date(resp.data.auctionScheduleEndDate).toISOString().slice(0,16)
+            // auctionScheduleStartDate:new Date(resp.data.auctionScheduleStartDate).toISOString().slice(0,16),
+            // auctionScheduleEndDate:new Date(resp.data.auctionScheduleEndDate).toISOString().slice(0,16)
         })
-        setPresentInput({
-            ...presentInput,
-            auctionStartDate:new Date(resp.data.auctionScheduleStartDate),
-            auctionEndDate:new Date(resp.data.auctionScheduleEndDate),
-        });
-    }, [auctionSchedule,presentInput]);
+    }, [auctionSchedule]);
+
+    const loadAuctionList=useCallback(async ()=>{   //출품작 불러오기
+        const resp=await axios.get(`http://localhost:8080/auction/auctionList/${auctionScheduleNo}`);
+        console.log(resp.data.auctionList);
+        setAuctionList([
+            ...resp.data
+        ]);
+    },[auctionList]);
+
+    const inputFileRef = useRef(null);
 
     //수정내용 작성
     const changeTarget = useCallback(e=>{
@@ -97,8 +103,6 @@ const AuctionScheduleDetail = ()=>{
         }
     }, [target]);
 
-    const inputFileRef = useRef(null);
-
     const clearTarget = useCallback(e=>{
         setTarget({
             auctionScheduleNo : "",
@@ -112,23 +116,15 @@ const AuctionScheduleDetail = ()=>{
         })
     }, [target])
 
-    const changePresentInput=useCallback((e)=>{
-        setPresentInput({
-            ...presentInput,
-            [e.target.name]:e.target.value
-        })
-    },[presentInput])
-
+    
     // 수정내용 저장
     const saveTarget = useCallback(async ()=>{
         const formData = new FormData();
         const fileList = inputFileRef.current.files;
-    
+        
         for (let i = 0; i < fileList.length; i++) {
             formData.append("attachList", fileList[i]);
         }
-
-        console.log(fileList);
         
         formData.append("auctionScheduleTitle", target.auctionScheduleTitle);
         formData.append("auctionScheduleStartDate", target.auctionScheduleStartDate);
@@ -136,35 +132,35 @@ const AuctionScheduleDetail = ()=>{
         formData.append("auctionScheduleState", target.auctionScheduleState);
         formData.append("auctionScheduleNotice", target.auctionScheduleNotice);
         formData.append("attachment", target.attachment);
-
-        console.log("attachment :" , target.attachList);
-
-        await axios.put("http://localhost:8080/auctionSchedule/", formData,
-            { 
-                headers:  { 
-                    "Content-Type": "multipart/form-data",
-                },
-            });
         
+        console.log("attachment :" , target.attachList);
+        
+        await axios.put("http://localhost:8080/auctionSchedule/", formData,
+        { 
+            headers:  { 
+                "Content-Type": "application/json",
+            },
+        });
+            
         inputFileRef.current.value = ""
         clearTarget();
         loadAuctionSchedule();
         closeEditModal();
         setImages([]);
     }, [auctionSchedule, target]);
-
-    //삭제
+        
+    //일정삭제
     const deleteAuctionSchedule = useCallback(async ()=>{
         const choice = window.confirm("정말 삭제하시겠습니까?");
         if(choice === false) return;
-
+        
         await axios.delete("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
         navigate("/auctionschedule");
     }, [auctionSchedule]);
-
-    //수정모달
+        
+    //일정수정 모달
     const editModal = useRef();
-
+        
     const openEditModal = useCallback((auctionSchedule)=>{
         const tag = Modal.getOrCreateInstance(editModal.current);
         tag.show();
@@ -175,22 +171,37 @@ const AuctionScheduleDetail = ()=>{
             `http://localhost:8080/attach/download/${auctionSchedule.attachment}`
         ]);
     }, [editModal]);
-
+        
     const closeEditModal = useCallback(()=>{
         const tag = Modal.getInstance(editModal.current);
         tag.hide();
         clearTarget(); 
     }, [editModal]);
-
+        
     //출품작 등록
-    const registPresentInput=useCallback(async ()=>{
-        const resp=await axios.post(`http://localhost:8080/auction/`,presentInput);
-        console.log(presentInput.auctionLot===null)
+    const presentModal=useRef();
+
+    const changePresentInput=useCallback((e)=>{
+        setPresentInput({
+            ...presentInput,
+            [e.target.name] : e.target.value 
+        });
+    },[presentInput])
+
+    const savePresentInput=useCallback(async ()=>{
+        const resp = await axios.post("http://localhost:8080/auction/", presentInput, {
+            headers:  { 
+                "Content-Type": "multipart/form-data",
+            },
+        });
+        // console.log(presentInput.auctionLot===null)
         if(resp.status===200) 
             window.alert("등록이완료되었습니다.");
+        
+        clearPresentModal();
         closePresentModal();
         loadAuctionList();
-    },[presentInput])
+    },[]);
 
     const openPresentModal=useCallback(()=>{
         if(presentModal.current){
@@ -203,35 +214,33 @@ const AuctionScheduleDetail = ()=>{
         if(presentModal.current){
         const tag = Modal.getInstance(presentModal.current);
         tag.hide();
+        clearPresentModal();
     }
-        
-    },[presentModal,registPresentInput]);
+    },[presentModal]);
 
     const clearPresentModal = useCallback(() => {
-        setPresentInput((prev) => ({
-            ...prev,
+        setPresentInput(() => ({
             auctionScheduleNo: auctionScheduleNo, 
-            workNo: '',
-            auctionStartPrice: '',
-            auctionLowPrice: '',
-            auctionHighPrice: '',
-            auctionState: '',
-            auctionConsigner: '',
-            auctionConsignmentFee: '',
-            auctionNetProceeds: '',
+            workNo: "",
+            auctionLot: "",
+            auctionStartPrice: "",
+            auctionLowPrice: "",
+            auctionHighPrice: "",
+            auctionState: "",
+            auctionConsigner: "",
+            auctionConsignmentFee: "",
+            auctionNetProceeds: "",
+            attachList: []
         }));
     }, [auctionScheduleNo]);
 
-    const loadAuctionList=useCallback(async ()=>{
-        const resp=await axios.get(`http://localhost:8080/auction/auctionList/${auctionScheduleNo}`);
-        setAuctionList(resp.data);
-    },[auctionList]);
-
     const deleteLot=useCallback(async (auction)=>{
-        const resp=await axios.delete("http://localhost:8080/auction/"+auction.auctionNo)
+        const resp=await axios.delete(`http://localhost:8080/auction/${auction.auctionNo}`);
+        const list = resp.data.auctionList;
         if(resp.status===200)
-        window.alert(`LOT : ${auction.auctionLot}, ${auction.workTitle}이(가) 삭제되었습니다`);
-        loadAuctionList();
+            window.alert(`LOT : ${auction.auctionLot}, ${auction.workTitle}이(가) 삭제되었습니다`);
+        setAuctionList(list);
+        loadAuctionList(list);
     },[auctionList]);
 
     const cancelLot=useCallback(async (auction)=>{
@@ -239,9 +248,10 @@ const AuctionScheduleDetail = ()=>{
             const resp=await axios.get("http://localhost:8080/auction/cancelPresent/"+auction.auctionNo);
             if(resp.status===200)
                 window.alert(`LOT : ${auction.auctionLot}, ${auction.workTitle}의 출품이 취소되었습니다`);
-            clearPresentModal();
-            loadAuctionList();
         }
+        clearPresentModal();
+        closePresentModal();
+        loadAuctionList();
     },[auctionList]);
 
     const uncancelLot=useCallback(async (auction)=>{
@@ -249,25 +259,27 @@ const AuctionScheduleDetail = ()=>{
             const resp=await axios.get("http://localhost:8080/auction/uncancelPresent/"+auction.auctionNo);
             if(resp.status===200)
                 window.alert(`LOT : ${auction.auctionLot}, ${auction.workTitle}의 출품이 등록되었습니다`);
-            loadAuctionList();
-            
         }
+        clearPresentModal();
+        closePresentModal();
+        setAuctionList();
+        loadAuctionList();
     },[auctionList]);
 
 
     //view
     return (<>
-        <Jumbotron title={auctionScheduleNo +"번 경매 일정 상세정보"}/>
+        <Jumbotron title={auctionSchedule.auctionScheduleTitle} content={auctionScheduleNo + " 번 경매 일정 상세정보"}/>
 
         <div className="container w-50">  
-
+            {/* 경매일정 이미지 */}
             <div className="row mt-4 text-center">
                 <div className="col my-4">
                         <img src={`http://localhost:8080/attach/download/${auctionSchedule.attachment}`} 
-                            className="img-thumbnail" alt="" height='300px' width='500px' />
+                                className="img-thumbnail" alt="" height='300px' width='500px' />
                 </div>
             </div>
-
+            {/* 경매일정 상세정보 */}
             <div className="row mt-4">
                 <div className="col">
                     {auctionSchedule.auctionScheduleState === '진행경매' &&(
@@ -285,53 +297,53 @@ const AuctionScheduleDetail = ()=>{
 
             <div className="row mt-4">
                 <div className="col-sm-4">
-                    시작일
+                    경매오픈
                 </div>
                 <div className="col-sm-8">
                     {moment(auctionSchedule.auctionScheduleStartDate).format("yyyy/MM/DD (dd) a hh:mm")}
                 </div>
             </div>
-
             <div className="row mt-4">
                 <div className="col-sm-4">
-                    종료 시작일
+                    경매마감
                 </div>
                 <div className="col-sm-8">
                     {moment(auctionSchedule.auctionScheduleEndDate).format("yyyy/MM/DD (dd) a hh:mm")}
                 </div>
             </div>
-            
             <div className="row mt-4">
-                <div className="col-sm-3">
-                    Notice
+                <div className="col-sm-4">
+                    안내사항
                 </div>
-                <div className="col-sm-9">
+                <div className="col-sm-8">
                     {auctionSchedule.auctionScheduleNotice}
                 </div>
             </div>
 
-        </div>
-
-        {/* 각종 버튼들 */}
-        <div className="row mt-4">
-            <div className="col text-end">
-                <button className="btn btn-success ms-2" 
-                                onClick={openPresentModal}>출품 등록</button>
-                <button className="btn btn-secondary ms-2" 
-                                onClick={e=>navigate("/auctionschedule")}>목록보기</button>
+            {/* 각종 버튼들 */}
+            <div className="row mt-4">
+                <div className="col text-end">
+                    <button className="btn btn-success ms-2"
+                                    onClick={e=>navigate("/auctionList/"+auctionScheduleNo)}>경매보기(임시)</button>
+                    <button className="btn btn-success ms-2" 
+                                    onClick={openPresentModal}>출품 등록</button>
+                    <button className="btn btn-secondary ms-2" 
+                                    onClick={e=>navigate("/auctionschedule")}>목록</button>
                     <button className="btn btn-warning ms-2" 
-                                onClick={e=>openEditModal(auctionSchedule)}>수정하기</button>
+                                onClick={e=>openEditModal(auctionSchedule)}>수정</button>
                     <button className="btn btn-danger ms-2" 
-                                onClick={e=>deleteAuctionSchedule(auctionSchedule)}>삭제하기</button>
+                                onClick={e=>deleteAuctionSchedule(auctionSchedule)}>삭제</button>
+                </div>
             </div>
+
         </div>
         
         {/* 출품 목록 (카드) */}
         <div className="row mt-5">
             <div className="col">
-                {auctionList.length > 0 && (<h3 className="text-center my-3">출품 목록</h3>)}
+                <h3 className="text-center my-3">출품 목록</h3>
                 <ul className="row mt-2">
-                    {auctionList.map((auction, index) => (
+                    {auctionList.length > 0 && auctionList.map((auction, index) => (
                         auction.auctionState === '출품취소' ? (
                             <div className="col-8 offset-2 col-sm-5 offset-sm-1 col-md-4 offset-md-0 mb-3 opacity-50 bg-secondary}" key={index}>
                                 <div className="card">
@@ -480,7 +492,7 @@ const AuctionScheduleDetail = ()=>{
                 <button
                     type="button"
                     className="btn btn-lg btn-success"
-                    onClick={registPresentInput}>
+                    onClick={savePresentInput}>
                     등록
                 </button>
                 <button
