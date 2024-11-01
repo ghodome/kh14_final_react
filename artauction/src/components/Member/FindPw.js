@@ -11,11 +11,12 @@ const FindPw = () => {
     const handleFindPw = useCallback(async () => {
         try {
             const resp = await axios.post('http://localhost:8080/member/findPw', { memberId, memberEmail });
-            setMessage(resp.data); // 서버에서 받은 메시지 표시
+            setMessage('비밀번호 재설정 이메일이 전송되었습니다.'); // 이메일 전송 성공
+
         } catch (error) {
-            setMessage('이메일 전송에 실패했습니다. 아이디와 이메일 주소를 확인하세요.');
+            setMessage('아이디와 이메일이 일치하지 않습니다.'); // 오류 처리
         }
-    });
+    }, [memberId, memberEmail]);
 
     return (<>
         <div className="row">
@@ -47,6 +48,13 @@ const FindPw = () => {
                         </button>
                     </div>
                 </div>
+                {message && (
+                    <div className="row mt-4">
+                        <div className="col">
+                            <div className="alert alert-info">{message}</div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     </>);
