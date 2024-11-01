@@ -26,6 +26,7 @@ const AuctionSchedule = () => {
         auctionScheduleEndDate: '',
         auctionScheduleState: '',
         auctionScheduleNotice: '',
+        attachment: '',
         attachList: []
     });
 
@@ -38,9 +39,10 @@ const AuctionSchedule = () => {
         const resp = await axios.post("http://localhost:8080/auctionSchedule/", row);
         const list = resp.data.auctionScheduleList;
 
+        setAuctionScheduleList();
         setAllAuctionScheduleList(list);
         setfilterAuctionScheduleList(list, auctionState);
-    }, [row, auctionScheduleList]);
+    }, [row]);
 
     const filterSchedule = (schedule, state)=>{
         const filtered = state ? schedule.filter(e =>
@@ -129,15 +131,17 @@ const AuctionSchedule = () => {
     
         for (let i = 0; i < fileList.length; i++) {
             formData.append("attachList", fileList[i]);
-        }
-    
+        };
+        
+        // const startDate = moment(insert.auctionScheduleStartDate).toISOString();
+        // const endDate = moment(insert.auctionScheduleEndDate).toISOString();
+
         formData.append("auctionScheduleTitle", insert.auctionScheduleTitle);
         formData.append("auctionScheduleStartDate", insert.auctionScheduleStartDate);
         formData.append("auctionScheduleEndDate", insert.auctionScheduleEndDate);
         formData.append("auctionScheduleState", insert.auctionScheduleState);
         formData.append("auctionScheduleNotice", insert.auctionScheduleNotice);
-
-        console.log("attachment :" , insert.attachList);
+        // formData.append("attachment :", insert.attachment);
 
         await axios.post("http://localhost:8080/auctionSchedule/", formData,
             { 
@@ -146,12 +150,12 @@ const AuctionSchedule = () => {
                 },
             });
         
-        inputFileRef.current.value = ""
+        inputFileRef.current.value = "";
         clearInsert();
-        loadAuctionScheduleList();
         closeInsertModal();
+        loadAuctionScheduleList();
         setImages([]);
-    });
+    }, []);
     
 
     return (<>
