@@ -87,8 +87,7 @@ const MemberUpdate = () => {
             alert("회원 정보가 수정되었습니다.");
             navigate("/member/mypage");
         } catch (error) {
-            console.error("비밀번호 검증 오류:", error);
-            alert("비밀번호 검증 중 오류가 발생했습니다.");
+            alert("비밀번호를 입력해주세요");
         }
     };
 
