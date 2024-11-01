@@ -109,7 +109,7 @@ const MemberSearch = () => {
             isBlocked: input.isBlocked,
             ...input,
             beginRow: (page - 1) * size,
-            endRow: page * size - 1,
+            endRow: (page === 1 ? page * size : (page * size) - 1),
         });
 
         const allMembers = resp.data.memberList;
@@ -144,7 +144,7 @@ const MemberSearch = () => {
 
     // 총 페이지 수 계산
     const totalPages = Math.ceil(result.count / size);
-    const startPage = Math.max(1, page - 2);
+    const startPage = Math.max(1, page - 4);
     const endPage = Math.min(totalPages, page + 4);
 
     return (

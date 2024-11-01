@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Jumbotron from "../Jumbotron";
 import axios from "axios";
 import { Modal } from "bootstrap";
+import { a } from "hangul-js";
+import { MdCancel } from "react-icons/md";
 
 const Artist = () => {
   //state
@@ -14,13 +16,14 @@ const Artist = () => {
     attachList: []
   });
   const [artistList, setArtistList] = useState([]);
-  const [images, setImages] = useState([]);
+  const [images,  setImages] = useState([]);
   const [detailArtist, setDetailArtist] = useState({
     artistName: "",
     artistDescription: "",
     artistHistory: "",
     artistBirth: "",
     artistDeath: "",
+    attachment: "",
   });
   const clearInput = useCallback(() => {
     setInput({
@@ -38,29 +41,34 @@ const Artist = () => {
     beginRow: "",
     endRow: ""
   });
-
+  
   const [updateInput, setUpdateInput] = useState({
+    artistNo: "",
     artistName: "",
     artistDescription: "",
     artistHistory: "",
     artistBirth: "",
     artistDeath: "",
+    // attachList: [],
+    attachment: "",
   });
   const [updateStatus, setUpdateStatus] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
   //이미지
   const inputFileRef = useRef(null);
   const [loadImages, setLoadImages] = useState([]);
-
+  const [attachImages, setAttachImages] = useState([]);//보낼 추가 첨부사진 이미지
+  
   // 모달 관련
   const modal = useRef();
   const detailModal = useRef();
-
+  
   //페이지
   const sortedArtistList = [...artistList].sort();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(15);
   const totalPage = Math.ceil(sortedArtistList.length / pageSize);
-
+  
   const pageClick = useCallback((pageNumber) => {
     setPage(pageNumber);
   }, []);
@@ -73,19 +81,18 @@ const Artist = () => {
   }, [modal]);
   const openDetailModal = useCallback((artist) => {
     if (detailModal.current) {
-      setUpdateInput({
-        ...updateInput,
-        artistNo: artist.artistNo
-      })
       setDetailArtist({ ...artist });
       setUpdateInput({
-        artistNo: artist.artistNo,
-        artistName: artist.artistName,
-        artistDescription: artist.artistDescription,
-        artistHistory: artist.artistHistory,
-        artistBirth: artist.artistBirth,
-        artistDeath: artist.artistDeath
+        // artistNo: artist.artistNo,
+        // artistName: artist.artistName,
+        // artistDescription: artist.artistDescription,
+        // artistHistory: artist.artistHistory,
+        // artistBirth: artist.artistBirth,
+        // artistDeath: artist.artistDeath,
+        // attachment:artist.attachment
+        ...artist
       });
+      setIsEditing(false); // 모달이 열릴 때는 편집 모드 해제
       const tag = Modal.getOrCreateInstance(detailModal.current);
       tag.show();
     }
@@ -194,6 +201,34 @@ const Artist = () => {
   }, [updateStatus, updateInput]);
 
   const changeUpdateInput = useCallback((e) => {
+    if (e.target.type === "file") {
+      const files = Array.from(e.target.files);
+      setInput(prevInput => ({
+        ...prevInput,
+        attachList: files
+      }));
+      const imageUrls = files.map(file => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        return new Promise((resolve) => {
+          reader.onloadend = () => {
+            resolve(reader.result);
+          };
+        });
+      });
+      Promise.all(imageUrls).then(urls => {
+        setAttachImages(urls);
+      });
+    }
+    else {
+      setInput(prevInput => ({
+        ...prevInput,
+        product: {
+          ...prevInput.work,
+          [e.target.name]: e.target.value
+        }
+      }));
+    }
     setUpdateInput({
       ...updateInput,
       [e.target.name]: e.target.value
@@ -205,20 +240,19 @@ const Artist = () => {
     const formData = new FormData();
     const fileList = inputFileRef.current.files;
 
-    for(let i =0; i<fileList.length; i++) {
+    for (let i = 0; i < fileList.length; i++) {
       formData.append("attachList", fileList[i]);
     }
-    formData.append("artistNo" , updateArtist.artistNo);
+    formData.append("artistNo", updateInput.artistNo);
     formData.append("artistName", updateInput.artistName);
     formData.append("artistDescription", updateInput.artistDescription);
     formData.append("artistHistory", updateInput.artistHistory);
     formData.append("artistBirth", updateInput.artistBirth);
     formData.append("artistDeath", updateInput.artistDeath);
 
-    formData.append("originList", loadImages);
+    formData.append("originList", updateInput.attachment); //updateInput.attachment /  loadImages
 
-    
-    const resp = await axios.post("http://localhost:8080/artist/edit", formData, {
+    await axios.post("http://localhost:8080/artist/edit", formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -229,6 +263,11 @@ const Artist = () => {
     loadArtistList();
     closeDetailModal();
   }, [updateInput, loadImages])
+
+  const deleteAttachImage = useCallback((img) => {
+    //이미지 미리보기에서 삭제
+    setAttachImages(prevImages => prevImages.filter(image => image !== img));
+  }, []);
 
   //effect
   useEffect(() => {
@@ -242,7 +281,12 @@ const Artist = () => {
     return sortedArtistList.slice(startIndex, endIndex);
   }, [sortedArtistList]);
 
-
+  const toggleEditMode = () => {
+    if (isEditing) {
+      updateArtist();
+    }
+    setIsEditing(!isEditing);
+  };
 
   return (
     <>
@@ -342,13 +386,13 @@ const Artist = () => {
             <div className="modal-footer">
               <button
                 type="button"
-                className="btn btn-lg btn-success"
+                className="btn btn-success"
                 onClick={registInput}>
                 등록
               </button>
               <button
                 type="button"
-                className="btn btn-lg btn-secondary"
+                className="btn btn-secondary"
                 onClick={closeModal}>
                 취소
               </button>
@@ -445,18 +489,41 @@ const Artist = () => {
                 </div>
               </div>
 
+              {/* 새로운 첨부 이미지 미리보기 */}
+              {attachImages.map((image, index) => (
+                <div key={index} style={{ position: "relative", display: "inline-block" }}>
+                  <img src={image} alt={`미리보기 ${index + 1}`} style={{ maxWidth: '100px', margin: '5px', display: "block" }} />
+                  <MdCancel
+                    style={{ position: "absolute", top: "10px", right: "10px", color: "red" }}
+                    size={20}
+                    onClick={() => deleteAttachImage(image)}
+                  />
+                </div>
+              ))}
+
+              {isEditing && (
+                <div className="row mt-2">
+                  <div className="col">
+                    <label>이미지 수정</label>
+                    <input type="file" className="form-control" name="attachList" multiple
+                      accept="image/*" onChange={e => changeUpdateInput(e)} ref={inputFileRef} />
+                  </div>
+                </div>
+              )}
+
 
               <div className="row mt-3">
                 <div className="col">
                   <label>작가명</label>
                   <div className="row">
                     <div className="col">
-                      {updateStatus.artistName == true ? (<>
-                        <input type="text" name="artistName"
-                          value={updateInput.artistName}
-                          className="form-control"
-                          onChange={e => changeUpdateInput(e)}></input>
-                      </>) : (<p>{detailArtist.artistName}</p>)}
+                      {/* {updateStatus.artistName == true ? (<> */}
+                      <input type="text" name="artistName"
+                        value={updateInput.artistName || ""}
+                        className="form-control"
+                        onChange={e => changeUpdateInput(e)}
+                        disabled={!isEditing}></input>
+                      {/* </>) : (<p>{detailArtist.artistName}</p>)} */}
                     </div>
                     {/* <div className="col-2">
                       <input type="checkbox" name="artistName"
@@ -471,12 +538,13 @@ const Artist = () => {
                   <label>작가설명</label>
                   <div className="row">
                     <div className="col">
-                      {updateStatus.artistDescription == true ? (<>
-                        <input type="text" name="artistDescription"
-                          value={updateInput.artistDescription}
-                          className="form-control"
-                          onChange={e => changeUpdateInput(e)}></input>
-                      </>) : (<p>{detailArtist.artistDescription}</p>)}
+                      {/* {updateStatus.artistDescription == true ? (<> */}
+                      <input type="text" name="artistDescription"
+                        value={updateInput.artistDescription || ""}
+                        className="form-control"
+                        onChange={e => changeUpdateInput(e)}
+                        disabled={!isEditing}></input>
+                      {/* </>) : (<p>{detailArtist.artistDescription}</p>)} */}
                     </div>
                     {/* <div className="col-2">
                       <input type="checkbox" name="artistDescription"
@@ -490,12 +558,13 @@ const Artist = () => {
                   <label>작가기록</label>
                   <div className="row">
                     <div className="col">
-                      {updateStatus.artistHistory == true ? (<>
-                        <input type="text" name="artistHistory"
-                          value={updateInput.artistHistory}
-                          className="form-control"
-                          onChange={e => changeUpdateInput(e)}></input>
-                      </>) : (<p>{detailArtist.artistHistory}</p>)}
+                      {/* {updateStatus.artistHistory == true ? (<> */}
+                      <input type="text" name="artistHistory"
+                        value={updateInput.artistHistory || ""}
+                        className="form-control"
+                        onChange={e => changeUpdateInput(e)}
+                        disabled={!isEditing}></input>
+                      {/* </>) : (<p>{detailArtist.artistHistory}</p>)} */}
                     </div>
                     {/* <div className="col-2">
                       <input type="checkbox" name='artistHistory'
@@ -509,12 +578,13 @@ const Artist = () => {
                   <label>탄생</label>
                   <div className="row">
                     <div className="col">
-                      {updateStatus.artistBirth == true ? (<>
-                        <input type="date" name="artistBirth"
-                          value={updateInput.artistBirth}
-                          className="form-control"
-                          onChange={e => changeUpdateInput(e)}></input>
-                      </>) : (<p>{detailArtist.artistBirth}</p>)}
+                      {/* {updateStatus.artistBirth == true ? (<> */}
+                      <input type="date" name="artistBirth"
+                        value={updateInput.artistBirth || ""}
+                        className="form-control"
+                        onChange={e => changeUpdateInput(e)}
+                        disabled={!isEditing}></input>
+                      {/* </>) : (<p>{detailArtist.artistBirth}</p>)} */}
                     </div>
                     {/* <div className="col-2">
                       <input type="checkbox" name='artistBirth'
@@ -528,12 +598,13 @@ const Artist = () => {
                   <label>사망</label>
                   <div className="row">
                     <div className="col">
-                      {updateStatus.artistDeath == true ? (<>
-                        <input type="date" name="artistDeath"
-                          value={updateInput.artistDeath}
-                          className="form-control"
-                          onChange={e => changeUpdateInput(e)}></input>
-                      </>) : (<p>{detailArtist.artistDeath}</p>)}{ }
+                      {/* {updateStatus.artistDeath == true ? (<> */}
+                      <input type="date" name="artistDeath"
+                        value={updateInput.artistDeath || ""}
+                        className="form-control"
+                        onChange={e => changeUpdateInput(e)}
+                        disabled={!isEditing}></input>
+                      {/* </>) : (<p>{detailArtist.artistDeath}</p>)}{ } */}
                     </div>
                     {/* <div className="col-2">
                       <input type="checkbox" name='artistDeath'
@@ -548,23 +619,20 @@ const Artist = () => {
                 <div className="col-4">
                   <button
                     type="button"
-                    className="btn btn-outline-danger"
+                    className="btn btn-danger"
                     onClick={e => deleteArtist(detailArtist.artistNo)}>
                     삭제
                   </button>
                 </div>
                 <div className="col-4">
-                  <button
-                    type="button"
-                    className="btn btn-outline-success"
-                    onClick={updateArtist}>
-                    변경
+                  <button type="button" className="btn btn-success" onClick={toggleEditMode}>
+                    {isEditing ? "완료" : "수정"}
                   </button>
                 </div>
                 <div className="col-4">
                   <button
                     type="button"
-                    className="btn btn-outline-secondary"
+                    className="btn btn-secondary"
                     onClick={closeDetailModal}>
                     확인
                   </button>

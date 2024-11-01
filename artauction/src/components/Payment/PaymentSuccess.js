@@ -21,10 +21,11 @@ const PaymentSuccess = () =>{
    //effect
    useEffect(()=>{
        if(login===true&&memberLoading===true){
-           sendApproveRequest();
-       }   
-   },[login,memberLoading]);
 
+           sendApproveRequest();
+        }   
+    },[login,memberLoading]);
+    
 
    //callback
    const sendApproveRequest = useCallback(async()=>{
@@ -76,7 +77,7 @@ const PaymentSuccess = () =>{
                     <tr key={deal.dealNo}>
                         <td>{deal.workTitle}</td>
                         <td>{deal.dealPrice}</td>
-                        <td>{deal.dealStatus}</td>
+                        <td>결제 완료</td>
                     </tr>
                     ))}
                 </tbody>

@@ -1,14 +1,19 @@
 import axios from "axios";
-import { useCallback } from "react";
+
+import { useCallback, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { loginState, memberIdState, memberRankState } from "../utils/recoil";
+import { blockedState, loginState, memberIdState, memberRankState } from "../utils/recoil";
 
 const Menu = () => {
     const navigate = useNavigate();
+    const [member, setMember] = useState({});
     const [memberId, setMemberId] = useRecoilState(memberIdState);
     const [memberRank, setMemberRank] = useRecoilState(memberRankState);
     const login = useRecoilValue(loginState);
+    const [blocked, setBlocked] = useRecoilState(blockedState);
+    const [roomNo, setRoomNo] = useState(null); // roomNo 상태 추가
+
 
     const logout = useCallback(() => {
         setMemberId("");
@@ -18,6 +23,23 @@ const Menu = () => {
         window.sessionStorage.removeItem("refreshToken1");
         navigate("/");
     }, [navigate, setMemberId, setMemberRank]);
+    
+    useEffect(() => {
+        const loadMember = async () => {
+            if (login) { // 로그인 상태일 때만 요청
+                try {
+                    const resp = await axios.get(`http://localhost:8080/member/${memberId}`);
+                    setMember(resp.data);
+                    setBlocked(resp.data.blocked);
+                } catch (error) {
+                    console.error("Failed to load member:", error);
+                }
+            }
+
+        };
+    
+        loadMember();
+    }, [memberId]);
 
     const createInquiryRoom = useCallback(async () => {
         if (!memberId) return; 
@@ -52,7 +74,7 @@ const Menu = () => {
                                 <>
                                     <li className="nav-item">
                                         <NavLink className="nav-link" to="/member/mypage">
-                                            {memberId} ({memberRank})
+                                            {memberId} ({blocked ? '차단된 ' : ''}{memberRank})
                                         </NavLink>
                                     </li>
                                     {memberRank === '관리자' && (
@@ -111,7 +133,12 @@ const Menu = () => {
                             <li className="nav-item">
                                 <NavLink className="nav-link" to="/randomBox">랜덤박스</NavLink>
                             </li>
+
                             {memberRank === '회원' && (
+                            <li className="nav-item">
+                                <NavLink className="nav-link" to="/giveup">관리자용 취소 물품 확인</NavLink>
+                            </li>
+                            {login && (
                                 <li className="nav-item">
                                     <button className="nav-link btn" onClick={createInquiryRoom}>
                                         문의하기
