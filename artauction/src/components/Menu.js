@@ -138,6 +138,7 @@ const Menu = () => {
                             <li className="nav-item">
                                 <NavLink className="nav-link" to="/giveup">관리자용 취소 물품 확인</NavLink>
                             </li>
+                             )}
                             {login && (
                                 <li className="nav-item">
                                     <button className="nav-link btn" onClick={createInquiryRoom}>
