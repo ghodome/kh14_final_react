@@ -109,7 +109,7 @@ const MemberSearch = () => {
             isBlocked: input.isBlocked,
             ...input,
             beginRow: (page - 1) * size,
-            endRow: page * size,
+            endRow: (page === 1 ? page * size : (page * size) - 1),
         });
 
         const allMembers = resp.data.memberList;
