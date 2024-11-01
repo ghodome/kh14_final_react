@@ -24,13 +24,16 @@ const Menu = () => {
     
     useEffect(() => {
         const loadMember = async () => {
-            try {
-                const resp = await axios.get(`http://localhost:8080/member/${memberId}`);
-                setMember(resp.data);
-                setBlocked(resp.data.blocked); // 여기서 blocked 값을 설정
-            } catch (error) {
-                console.error("Failed to load member:", error);
+            if (login) { // 로그인 상태일 때만 요청
+                try {
+                    const resp = await axios.get(`http://localhost:8080/member/${memberId}`);
+                    setMember(resp.data);
+                    setBlocked(resp.data.blocked);
+                } catch (error) {
+                    console.error("Failed to load member:", error);
+                }
             }
+
         };
     
         loadMember();
