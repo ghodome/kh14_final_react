@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { loginState, memberIdState, memberRankState } from "../utils/recoil";
@@ -9,7 +9,6 @@ const Menu = () => {
     const [memberId, setMemberId] = useRecoilState(memberIdState);
     const [memberRank, setMemberRank] = useRecoilState(memberRankState);
     const login = useRecoilValue(loginState);
-    const [roomNo, setRoomNo] = useState(null); // roomNo 상태 추가
 
     const logout = useCallback(() => {
         setMemberId("");
@@ -20,24 +19,26 @@ const Menu = () => {
         navigate("/");
     }, [navigate, setMemberId, setMemberRank]);
 
-    // 문의하기를 클릭했을 때 방으로 이동
-    const goToInquiry = useCallback(async () => {
-        if (login) {
-            try {
-                const response = await axios.get(`http://localhost:8080/room?memberId=${memberId}`);
-                const roomData = response.data;
-
-                if (roomData && roomData.roomNo) {
-                    navigate(`/roomchat/${roomData.roomNo}`);
-                } else {
-                    console.error("No room number found for the member.");
-                }
-            } catch (error) {
-                console.error("Failed to fetch room number:", error);
+    const createInquiryRoom = useCallback(async () => {
+        if (!memberId) return; 
+    
+        try {
+            const response = await axios.get("http://localhost:8080/room/"); 
+            const existingRoom = response.data.find(room => room.roomName === memberId);
+    
+            if (existingRoom) {
+                // 기존 방으로 이동
+                navigate(`/roomchat/${existingRoom.roomNo}`);
+            } else {
+                // 방 생성
+                const newRoomResponse = await axios.post("http://localhost:8080/room/", { roomName: memberId });
+                const roomNo = newRoomResponse.data.roomNo; 
+                navigate(`/roomchat/${roomNo}`); //RoomChat으로 이동
             }
+        } catch (error) {
+            console.error("방 생성 또는 이동 중 오류 발생:", error);
         }
-    }, [login, memberId, navigate]);
-
+    }, [memberId, navigate]);
     return (
         <>
             <nav className="navbar navbar-expand bg-light fixed-top" data-bs-theme="light">
@@ -102,9 +103,6 @@ const Menu = () => {
                                 <NavLink className="nav-link" to="/faq">FAQ</NavLink>
                             </li>
                             <li className="nav-item">
-                                <NavLink className="nav-link" to="/websocket">websocket</NavLink>
-                            </li>
-                            <li className="nav-item">
                                 <NavLink className="nav-link" to="/charge">포인트 충전하기</NavLink>
                             </li>
                             <li className="nav-item">
@@ -113,9 +111,11 @@ const Menu = () => {
                             <li className="nav-item">
                                 <NavLink className="nav-link" to="/randomBox">랜덤박스</NavLink>
                             </li>
-                            {login && (
+                            {memberRank === '회원' && (
                                 <li className="nav-item">
-                                   <button className="nav-link btn" onClick={goToInquiry}>문의하기</button>
+                                    <button className="nav-link btn" onClick={createInquiryRoom}>
+                                        문의하기
+                                    </button>
                                 </li>
                             )}
                         </ul>
