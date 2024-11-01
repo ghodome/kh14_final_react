@@ -40,12 +40,13 @@ const Auction = () => {
     });
 
     const [wholeMessageList, setWholeMessageList] = useState([]);
+    const [member, setMember] = useState({});
 
     //recoil
     const login = useRecoilValue(loginState);
     const memberId = useRecoilValue(memberIdState);
     const memberRank = useRecoilValue(memberRankState);
-    const blocked = useRecoilState(blockedState);
+    const [blocked, setBlocked] = useRecoilState(blockedState);
 
     //token
     const accessToken = axios.defaults.headers.common["Authorization"];
@@ -231,7 +232,23 @@ const Auction = () => {
             }));
         }
     }, [auctionAndWork, bidIncrement]);
+    
+    useEffect(() => {
+        const loadMember = async () => {
+            if (login) { // 로그인 상태일 때만 요청
+                try {
+                    const resp = await axios.get(`http://localhost:8080/member/${memberId}`);
+                    setMember(resp.data);
+                    setBlocked(resp.data.blocked);
+                } catch (error) {
+                    console.error("Failed to load member:", error);
+                }
+            }
 
+        };
+    
+        loadMember();
+    }, [memberId]);
     // view
     return (
         <>
