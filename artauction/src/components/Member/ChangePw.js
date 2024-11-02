@@ -19,7 +19,9 @@ const ChangePw = () => {
         }
     
         try {
-            const resp = await axios.post(`http://localhost:8080/member/changePw?token=${token}`, { newPw });
+            const resp = await axios.post(`http://localhost:8080/member/changePw?token=${token}`, { 
+                newPw : newPw 
+            });
             // 성공적으로 비밀번호가 변경된 후 리다이렉트
             if (resp.status === 200) {
                 navigate('/login'); // 로그인 페이지로 리다이렉트

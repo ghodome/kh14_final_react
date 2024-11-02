@@ -8,9 +8,10 @@ const Mypage = () => {
     const navigate = useNavigate();
     const [member, setMember] = useState([]);
     const [inventoryId, setinventoryId] = useState(null);
-
+    const [itemList,setItemList] = useState([]);
     useEffect(() => {
         loadMember();
+        loadInven();
     }, []);
 
     const loadMember = useCallback(async () => {
@@ -23,7 +24,10 @@ const Mypage = () => {
             navigate("/login"); // 로그인 페이지로 리다이렉트
         }
     }, [navigate]);
-
+    const loadInven = useCallback(async()=>{
+        const resp = await axios.get("http://localhost:8080/inventory/find");
+        setItemList(resp.data);
+    },[]);
     const handleDelete = useCallback(async () => {
         const confirmDelete = window.confirm("정말 탈퇴하시겠습니까?");
         if (!confirmDelete) {
@@ -69,6 +73,7 @@ const Mypage = () => {
     const clearInsertInput = useCallback(() => {
         setinventoryId(null); // 모달 닫힐 때 inventoryId 초기화
     }, []);
+   
     return (
         <>
             <Jumbotron title={`${member[0]?.memberName || ''} 님의 정보`} />
@@ -91,7 +96,7 @@ const Mypage = () => {
             </div>
             <div className="row mt-4">
                 <div className="col-3">포인트</div>
-                <div className="col-3">{member[0]?.memberPoint || ''}</div>
+                <div className="col-3">{member[0]?.memberPoint}</div>
             </div>
             <div className="row mt-4">
                 <div className="col-3">우편번호</div>
@@ -119,9 +124,35 @@ const Mypage = () => {
                 </div>
             </div>
             <div className="row mt-2">
-                <div className="col-3"></div>
                 <div className="col-6">
-                    <h4>당첨된 아이템 목록</h4>
+                    <h4>내 미술품 목록</h4>
+                    <table className="table">
+                        <thead><tr>
+                                <th>작품명</th>
+                                <th>작가</th>
+                                <th>낙찰가</th>
+                                <th>상태</th>
+                            </tr></thead>
+                        <tbody>
+                        {member.length > 0 && member[0].dealNo > 0 ? ( 
+                                member.map(deal => (
+                                    <tr key={deal.dealNo}>
+                                        <td>{deal.workTitle}</td>
+                                        <td>{deal.artistName}</td>
+                                        <td>{deal.dealPrice.toLocaleString()}원</td>
+                                        <td>{deal.dealStatus}</td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="3" className="text-center">미술품이 없습니다.</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+                <div className="col-6">
+                    <h4>당첨된 랜덤박스 아이템 목록</h4>
                     <table className="table">
                         <thead>
                             <tr>
@@ -131,8 +162,8 @@ const Mypage = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {member.length > 0 && member[0].itemId > 0 ? ( // member 배열이 비어있지 않고 첫 번째 아이템의 itemId가 0보다 큰 경우
-                                member.map(item => (
+                            {itemList.length > 0 &&itemList[0].itemId > 0 ? ( // member 배열이 비어있지 않고 첫 번째 아이템의 itemId가 0보다 큰 경우
+                                itemList.map((item)=> (
                                     <tr key={item.itemId}>
                                         <td>{item.itemName}</td>
                                         <td>{item.itemValue.toLocaleString()}원</td>

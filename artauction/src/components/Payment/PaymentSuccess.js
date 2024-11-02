@@ -8,7 +8,7 @@ import { loginState, memberLoadingState } from "../../utils/recoil";
 const PaymentSuccess = () =>{
     //partnerOrderId 수신
    const {partnerOrderId} = useParams();
-
+   const [dealList,setDealList] = useState([]);
    // 로그인 관련 상태
    const login = useRecoilValue(loginState); //리코일 생기면 이걸로 ㄱㄱ
     // const login = true;
@@ -21,16 +21,16 @@ const PaymentSuccess = () =>{
    //effect
    useEffect(()=>{
        if(login===true&&memberLoading===true){
-           sendApproveRequest();
-       }   
-   },[login,memberLoading]);
 
+           sendApproveRequest();
+        }   
+    },[login,memberLoading]);
+    
 
    //callback
    const sendApproveRequest = useCallback(async()=>{
     const query = new URLSearchParams(window.location.hash.split('?')[1]);
     const pgToken = query.get("pg_token");
-    console.log("pgToken = ",pgToken);
       try{
        const resp = await axios.post(
            "http://localhost:8080/payment/approve",
@@ -38,11 +38,12 @@ const PaymentSuccess = () =>{
                partnerOrderId : partnerOrderId,
                pgToken : pgToken,
                tid : window.sessionStorage.getItem("tid"),
+               dealList : JSON.parse(window.sessionStorage.getItem("checkedDealList"))
            }
            
        );
       
-       
+       setDealList(JSON.parse(window.sessionStorage.getItem("checkedDealList")))
        setResult(true);//성공
       }
       catch(e){
@@ -50,6 +51,7 @@ const PaymentSuccess = () =>{
       }
       finally{
        window.sessionStorage.removeItem("tid");
+       window.sessionStorage.removeItem("checkedDealList");
       }
    },[login,memberLoading]);
    if(result===null){
@@ -62,10 +64,25 @@ const PaymentSuccess = () =>{
        <Jumbotron title="경매 상품 구매 완료"/>
        <div className="row mt-4">
            <div className="col">
-              <h3>모나리자</h3>
-              <h3>1,000,000 결제 완료</h3>
-              <h3>상품 번호 :  1</h3>
-              <h3>상품 번호 :  1</h3>
+            <table className="table">
+                <thead>
+                    <tr>
+                        <th>작품명</th>
+                        <th>판매가</th>
+                        <th>상태</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {dealList.map(deal=>(
+                    <tr key={deal.dealNo}>
+                        <td>{deal.workTitle}</td>
+                        <td>{deal.dealPrice}</td>
+                        <td>결제 완료</td>
+                    </tr>
+                    ))}
+                </tbody>
+            </table>
+             
            </div>
        </div>
        
