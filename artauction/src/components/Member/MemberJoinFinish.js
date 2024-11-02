@@ -9,9 +9,7 @@ const MemberJoinFinish = () => {
         navigate("/");
     };
 
-    return (
-        <div className="row">
-            <div className="col-md-6 offset-md-3">
+    return (<>
                 <Jumbotron title="회원가입 완료" />
                 <div className="alert alert-success mt-4">
                     회원가입이 완료되었습니다! 이제 로그인할 수 있습니다.
@@ -23,8 +21,7 @@ const MemberJoinFinish = () => {
                         </button>
                     </div>
                 </div>
-            </div>
-        </div>
+    </>
     );
 };
 

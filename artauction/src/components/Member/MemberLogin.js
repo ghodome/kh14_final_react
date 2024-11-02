@@ -52,77 +52,75 @@ const MemberLogin = () => {
             }
             navigate("/");
         } catch (e) {
-            setErrorMessage("아이디 또는 비밀번호가 잘못되었습니다. 아이디와 비밀번호를 정확히 입력해 주세요.");
+            setErrorMessage("아이디 또는 비밀번호가 잘못되었습니다.");
         }
     }, [input, stay]);
 
     return (
         <>
-            <div className="row">
-                <div className="col-md-6 offset-md-3">
-                    <Jumbotron title="회원 로그인" />
 
-                    <div className="row mt-4">
-                        <div className="col">
-                            <input type="text" name="memberId" className="form-control"
-                                placeholder="아이디 입력"
-                                value={input.memberId} onChange={changeInput}
-                                onKeyUp={e => e.key === 'Enter' && sendLoginRequest()} />
-                        </div>
-                    </div>
+            <Jumbotron title="회원 로그인" />
 
-                    <div className="row mt-4">
-                        <div className="col">
-                            <input type={display ? "text" : "password"} name="memberPw" className="form-control"
-                                placeholder="비밀번호 입력"
-                                value={input.memberPw} onChange={changeInput}
-                                onKeyUp={e => e.key === 'Enter' && sendLoginRequest()} />
-                        </div>
-                    </div>
-
-                    <div className="row mt-4">
-                        <div className="col">
-                            <label>
-                                <input type="checkbox" className="form-check-input"
-                                    checked={display}
-                                    onChange={e => setDisplay(e.target.checked)} />
-                                <span className="form-check-label ms-2">비밀번호 표시</span>
-                            </label>
-
-                            <label className="ms-5">
-                                <input type="checkbox" className="form-check-input"
-                                    checked={stay}
-                                    onChange={e => setStay(e.target.checked)} />
-                                <span className="form-check-label ms-2">로그인 유지</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div className="row mt-4">
-                        <div className="col">
-                            <button className="btn btn-success w-100"
-                                onClick={sendLoginRequest}>
-                                <CgLogIn />
-                                <span className="ms-2">로그인</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    {errorMessage && (
-                        <div className="alert alert-danger mt-3">
-                            {errorMessage}
-                        </div>
-                    )}
-
-                    <div className="row mt-4">
-                        <div className="col">
-                            <button className="btn btn-link" onClick={() => navigate("/findPw")}>
-                                비밀번호 찾기
-                            </button>
-                        </div>
-                    </div>
+            <div className="row mt-4">
+                <div className="col">
+                    <input type="text" name="memberId" className="form-control rounded-0"
+                        placeholder="아이디 입력"
+                        value={input.memberId} onChange={changeInput}
+                        onKeyUp={e => e.key === 'Enter' && sendLoginRequest()} />
                 </div>
             </div>
+
+            <div className="row mt-4">
+                <div className="col">
+                    <input type={display ? "text" : "password"} name="memberPw" className="form-control rounded-0"
+                        placeholder="비밀번호 입력"
+                        value={input.memberPw} onChange={changeInput}
+                        onKeyUp={e => e.key === 'Enter' && sendLoginRequest()} />
+                </div>
+            </div>
+
+            <div className="row mt-4">
+                <div className="col">
+                    <label>
+                        <input type="checkbox" className="form-check-input rounded-0"
+                            checked={display}
+                            onChange={e => setDisplay(e.target.checked)} />
+                        <span className="form-check-label ms-2">비밀번호 표시</span>
+                    </label>
+
+                    <label className="ms-5">
+                        <input type="checkbox" className="form-check-input rounded-0"
+                            checked={stay}
+                            onChange={e => setStay(e.target.checked)} />
+                        <span className="form-check-label ms-2">로그인 유지</span>
+                    </label>
+                </div>
+            </div>
+
+            <div className="row mt-4">
+                <div className="col">
+                    <button className="btn btn-dark w-100 rounded-0"
+                        onClick={sendLoginRequest}>
+                        <CgLogIn />
+                        <span className="ms-2">로그인</span>
+                    </button>
+                </div>
+            </div>
+
+            {errorMessage && (
+                <div style={{ color: 'red', marginTop: '1rem' }}>
+                    {errorMessage}
+                </div>
+            )}
+
+            <div className="row mt-4">
+                <div className="col text-center">
+                    <button className="btn btn-link" style={{ textDecoration: 'none' }} onClick={() => navigate("/findPw")}>
+                        비밀번호 찾기
+                    </button>
+                </div>
+            </div>
+
         </>
     );
 }
