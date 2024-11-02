@@ -525,10 +525,10 @@ const Artist = () => {
                         disabled={!isEditing}></input>
                       {/* </>) : (<p>{detailArtist.artistName}</p>)} */}
                     </div>
-                    {/* <div className="col-2">
+                    <div className="col-2">
                       <input type="checkbox" name="artistName"
                         onChange={e => changeStatus(e)}></input>
-                    </div> */}
+                    </div>
                   </div>
 
                 </div>
@@ -546,10 +546,10 @@ const Artist = () => {
                         disabled={!isEditing}></input>
                       {/* </>) : (<p>{detailArtist.artistDescription}</p>)} */}
                     </div>
-                    {/* <div className="col-2">
+                    <div className="col-2">
                       <input type="checkbox" name="artistDescription"
                         onChange={e => changeStatus(e)}></input>
-                    </div> */}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -566,10 +566,10 @@ const Artist = () => {
                         disabled={!isEditing}></input>
                       {/* </>) : (<p>{detailArtist.artistHistory}</p>)} */}
                     </div>
-                    {/* <div className="col-2">
+                    <div className="col-2">
                       <input type="checkbox" name='artistHistory'
                         onChange={e => changeStatus(e)}></input>
-                    </div> */}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -586,10 +586,10 @@ const Artist = () => {
                         disabled={!isEditing}></input>
                       {/* </>) : (<p>{detailArtist.artistBirth}</p>)} */}
                     </div>
-                    {/* <div className="col-2">
+                    <div className="col-2">
                       <input type="checkbox" name='artistBirth'
                         onChange={e => changeStatus(e)}></input>
-                    </div> */}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -606,10 +606,10 @@ const Artist = () => {
                         disabled={!isEditing}></input>
                       {/* </>) : (<p>{detailArtist.artistDeath}</p>)}{ } */}
                     </div>
-                    {/* <div className="col-2">
+                    <div className="col-2">
                       <input type="checkbox" name='artistDeath'
                         onChange={e => changeStatus(e)}></input>
-                    </div> */}
+                    </div>
                   </div>
                 </div>
               </div>
