@@ -1,15 +1,7 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import axios from "axios";
-import { Modal } from "bootstrap";
-import { useNavigate } from "react-router-dom";
-import * as hangul from 'hangul-js';
-import Artist from './../Artist/Artist';
-import { MdCancel } from "react-icons/md";
-import Jumbotron from "../Jumbotron";
+const WorkTest = () => {
 
-const WorkList = () => {
 
-    //state
+        //state
     const [workList, setWorkList] = useState([]);
     const [images, setImages] = useState([]);
     const [isEditing, setIsEditing] = useState(false); // 추가된 상태
@@ -160,6 +152,9 @@ const WorkList = () => {
         formData.append("workSize", input.workSize);
         formData.append("workCategory", input.workCategory);
 
+        // 실제로 어떤 값이 전송되는지 로그 확인
+        console.log("attachment:", input.attachList);
+
         await axios.post("http://localhost:8080/work/", formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -288,34 +283,6 @@ const WorkList = () => {
 
     const changeTarget = useCallback(e => {
         const { name, value } = e.target;
-        if(e.target.type === "file") {
-            const files = Array.from(e.target.files);
-            setInput(prevInput =>({
-                ...prevInput,
-                attachList: files
-            }));
-            const imageUrls = files.map(file=>{
-                const reader =new FileReader();
-                reader.readAsDataURL(file);
-                return new Promise ((resolve) => {
-                    reader.onloadend = () =>{
-                        resolve(reader.result);
-                    };
-                });
-            });
-            Promise.all(imageUrls).then(urls => {
-                setAttachImages(urls);
-            });
-        }
-        else{
-            setInput(prevInput => ({
-                ...prevInput,
-                product: {
-                    ...prevInput.work,
-                    [e.target.name] : e.target.value
-                }
-            }));
-        }
 
         if (name === 'artistNo') {
             const selectedArtist = artistList.find(artist => artist.artistNo === value);
@@ -370,7 +337,7 @@ const WorkList = () => {
         formData.append("workCategory", target.workCategory);
         formData.append("workNo", target.workNo);
 
-        formData.append("originList", target.attachment); // 삭제 하지 않을 그림들의 첨부파일번호(attachmentNo) - target.attachment / loadImages
+        formData.append("originList", target.attachment); // 삭제 하지 않을 그림들의 첨부파일번호(attachmentNo)
 
         await axios.post("http://localhost:8080/work/edit", formData, {
             headers: {
@@ -389,9 +356,9 @@ const WorkList = () => {
         setLoadImages(image => image.filter(image => image !== img));
     }, [deleteList, loadImages]);
 
-    const deleteAttachImage = useCallback((img) => {
+    const deleteAttachImage = useCallback((target) => {
         //이미지 미리보기에서 삭제
-        setAttachImages(prevImages => prevImages.filter(image => image !== img));
+        setAttachImages(prevImages => prevImages.filter(image => image !== target));
     }, []);
 
     const checkWorkFile = useCallback(() => {
@@ -505,7 +472,6 @@ const WorkList = () => {
                 </div>
             </div>
         </div> */}
-
         <Jumbotron title="작품 리스트" />
 
         <div className="row mt-4 text-center">
@@ -522,6 +488,8 @@ const WorkList = () => {
                 <button className={collapse.ancientButton} name="ancient" onClick={changeCollapse}>고미술</button>
             </div>
         </div>
+
+
 
         <div className="row mt-2">
             <div className="col">
@@ -822,28 +790,9 @@ const WorkList = () => {
                                 )}
                             </div>
                         </div>
+                        
 
-                        {/* 새로운 첨부 이미지 미리보기 */}
-                        {attachImages.map((image, index) => (
-                            <div key={index} style={{ position: "relative", display: "inline-block" }}>
-                                <img src={image} alt={`미리보기 ${index + 1}`} style={{ maxWidth: '100px', margin: '5px', display: "block" }} />
-                                <MdCancel
-                                    style={{ position: "absolute", top: "10px", right: "10px", color: "red" }}
-                                    size={20}
-                                    onClick={() => deleteAttachImage(image)}
-                                />
-                            </div>
-                        ))} 
-
-                        {isEditing && (
-                            <div className="row mt-2">
-                                <div className="col">
-                                    <label>이미지 수정</label>
-                                    <input type="file" className="form-control" name="attachList" multiple
-                                        accept="image/*"  onChange={changeTarget} ref={inputFileRef}/>
-                                </div>
-                            </div>
-                        )}
+                        
 
                         <div className="row mt-2">
                             <div className="col">
@@ -1026,4 +975,5 @@ const WorkList = () => {
     </>);
 };
 
-export default WorkList;
+
+export default WorkTest;
