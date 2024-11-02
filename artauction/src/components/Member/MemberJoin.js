@@ -169,7 +169,7 @@ const MemberJoin = () => {
         try {
             const resp = await axios.post("http://localhost:8080/member/join", input);
             console.log(resp.data);
-            navigate("/");
+            navigate("/join/finish");
         } catch (error) {
             console.error("회원 가입 요청 중 오류:", error);
         }
