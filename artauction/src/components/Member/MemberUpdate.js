@@ -116,7 +116,7 @@ const MemberUpdate = () => {
 
     return (
         <>
-            <Jumbotron title= {`${member.memberName} 님의 정보수정`} />
+            <Jumbotron title={`${member.memberName} 님의 정보수정`} />
             <div className="row mt-4">
                 <div className="col-md-6 offset-md-3">
                     <form onSubmit={handleSubmit}>
@@ -126,7 +126,7 @@ const MemberUpdate = () => {
                                 value={currentPw}
                                 onChange={handleCurrentPwChange}
                                 placeholder="현재 비밀번호"
-                                className={`form-control ${!isPwValid ? "is-invalid" : ""}`}
+                                className={`form-control rounded-0 ${!isPwValid ? "is-invalid" : ""}`}
                             />
                             {!isPwValid && <div className="invalid-feedback">비밀번호가 일치하지 않습니다.</div>}
                         </div>
@@ -136,7 +136,7 @@ const MemberUpdate = () => {
                                 value={member.memberName}
                                 onChange={changeInput}
                                 placeholder="이름"
-                                className="form-control"
+                                className="form-control rounded-0"
                             />
                         </div>
                         <div className="mb-3">
@@ -145,7 +145,7 @@ const MemberUpdate = () => {
                                 value={member.memberEmail}
                                 onChange={changeInput}
                                 placeholder="이메일"
-                                className="form-control"
+                                className="form-control rounded-0"
                             />
                         </div>
                         <div className="mb-3">
@@ -154,7 +154,7 @@ const MemberUpdate = () => {
                                 value={member.memberContact}
                                 onChange={changeInput}
                                 placeholder="전화번호"
-                                className="form-control"
+                                className="form-control rounded-0"
                             />
                         </div>
                         <div className="mb-3">
@@ -162,10 +162,10 @@ const MemberUpdate = () => {
                                 name="memberPost"
                                 value={member.memberPost}
                                 placeholder="우편번호"
-                                className="form-control"
+                                className="form-control rounded-0"
                                 readOnly
                             />
-                            <button type="button" onClick={sample6_execDaumPostcode} className="btn btn-primary mt-2">우편번호 찾기</button>
+                            <button type="button" onClick={sample6_execDaumPostcode} className="btn btn-dark mt-2 rounded-0">우편번호 찾기</button>
                         </div>
                         <div className="mb-3">
                             <input type="text"
@@ -173,7 +173,7 @@ const MemberUpdate = () => {
                                 value={member.memberAddress1}
                                 onChange={changeInput}
                                 placeholder="일반주소"
-                                className="form-control"
+                                className="form-control rounded-0"
                                 readOnly
                             />
                         </div>
@@ -183,13 +183,15 @@ const MemberUpdate = () => {
                                 value={member.memberAddress2}
                                 onChange={changeInput}
                                 placeholder="상세주소"
-                                className="form-control"
+                                className="form-control rounded-0"
                             />
                         </div>
-                        <button className="btn btn-success w-100">수정 완료</button>
-                        <button type="button" className="btn btn-secondary" onClick={() => navigate(`/member/mypage`)}>
-                            취소
-                        </button>
+                        <div className="d-flex justify-content-between">
+                            <button className="btn btn-dark rounded-0">수정 완료</button>
+                            <button type="button" className="btn btn-secondary rounded-0" onClick={() => navigate(`/member/mypage`)}>
+                                취소
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>

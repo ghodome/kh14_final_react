@@ -169,7 +169,7 @@ const MemberJoin = () => {
         try {
             const resp = await axios.post("http://localhost:8080/member/join", input);
             console.log(resp.data);
-            navigate("/");
+            navigate("/join/finish");
         } catch (error) {
             console.error("회원 가입 요청 중 오류:", error);
         }
@@ -202,14 +202,13 @@ const MemberJoin = () => {
 
     return (
         <>
-            <div className='row'>
-                <div className='col-md-6 offset-md-3'>
+           
                     <Jumbotron title="회원가입" />
                     <div className='row mt-4'>
                         <div className='col'>
                             <input
                                 type='text' name='memberId'
-                                className='form-control' placeholder='아이디'
+                                className='form-control rounded-0' placeholder='아이디'
                                 value={input.memberId}
                                 onChange={changeInput}
                                 onBlur={handleBlurMemberId}
@@ -222,7 +221,7 @@ const MemberJoin = () => {
                             <input
                                 type={display ? "text" : "password"}
                                 name="memberPw"
-                                className="form-control"
+                                className="form-control rounded-0"
                                 placeholder="비밀번호 입력"
                                 value={input.memberPw}
                                 onChange={changeInput}
@@ -233,7 +232,7 @@ const MemberJoin = () => {
                         <label>
                             <input
                                 type="checkbox"
-                                className="form-check-input"
+                                className="form-check-input rounded-0"
                                 checked={display}
                                 onChange={e => setDisplay(e.target.checked)}
                             />
@@ -244,7 +243,7 @@ const MemberJoin = () => {
                         <div className="col">
                             <input
                                 type='text' name='memberName'
-                                className='form-control' placeholder='이름'
+                                className='form-control rounded-0' placeholder='이름'
                                 value={input.memberName}
                                 onChange={changeInput}
                                 onBlur={handleBlurMemberName}
@@ -255,7 +254,7 @@ const MemberJoin = () => {
                     <div className="row mt-4">
                         <div className="col">
                             <input type='email' name='memberEmail'
-                                className='form-control' placeholder='이메일'
+                                className='form-control rounded-0' placeholder='이메일'
                                 value={input.memberEmail}
                                 onChange={changeInput}
                                 onBlur={() => handleBlur('memberEmail')}
@@ -266,7 +265,7 @@ const MemberJoin = () => {
                     <div className="row mt-4">
                         <div className="col">
                             <input type='text' name='memberContact'
-                                className='form-control' placeholder='연락처'
+                                className='form-control rounded-0' placeholder='연락처'
                                 value={input.memberContact}
                                 onChange={changeInput}
                                 onBlur={() => handleBlur('memberContact')}
@@ -277,18 +276,18 @@ const MemberJoin = () => {
                     <div className="row mt-4">
                         <div className="col">
                             <input type='text' id="sample6_postcode" name='memberPost'
-                                className='form-control' placeholder='우편번호'
+                                className='form-control rounded-0' placeholder='우편번호'
                                 value={input.memberPost}
                                 readOnly
                             />
-                            <button type="button" onClick={sample6_execDaumPostcode} className="btn btn-primary mt-2">우편번호 찾기</button>
+                            <button type="button" onClick={sample6_execDaumPostcode} className="btn btn-dark mt-2 rounded-0">우편번호 찾기</button>
                             {errors.memberPost && <div className="text-danger">{errors.memberPost}</div>}
                         </div>
                     </div>
                     <div className="row mt-4">
                         <div className="col">
                             <input type='text' id="sample6_address" name='memberAddress1'
-                                className='form-control' placeholder='주소'
+                                className='form-control rounded-0' placeholder='주소'
                                 value={input.memberAddress1}
                                 readOnly
                             />
@@ -298,7 +297,7 @@ const MemberJoin = () => {
                     <div className="row mt-4">
                         <div className="col">
                             <input type='text' id="sample6_detailAddress" name='memberAddress2'
-                                className='form-control' placeholder='상세주소'
+                                className='form-control rounded-0' placeholder='상세주소'
                                 value={input.memberAddress2}
                                 onChange={changeInput}
                                 onBlur={() => handleBlur('memberAddress2')}
@@ -309,15 +308,14 @@ const MemberJoin = () => {
                     <div className="row mt-4">
                         <div className="col">
                             <button
-                                className="btn btn-success w-100"
+                                className="btn btn-dark w-100 rounded-0"
                                 onClick={joinRequest}
                             >
                                 회원 가입
                             </button>
                         </div>
                     </div>
-                </div>
-            </div>
+                
         </>
     );
 };

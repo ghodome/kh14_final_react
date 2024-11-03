@@ -32,9 +32,8 @@ const MemberEdit = () => {
     };
 
     const loadMember = useCallback(async () => {
-        
-            const resp = await axios.get(`http://localhost:8080/member/${memberId}`);
-            setMember(resp.data);
+        const resp = await axios.get(`http://localhost:8080/member/${memberId}`);
+        setMember(resp.data);
     }, [memberId, navigate]);
 
     const changeInput = useCallback(e => {
@@ -104,7 +103,7 @@ const MemberEdit = () => {
                                 value={member.memberName}
                                 onChange={changeInput}
                                 placeholder="이름"
-                                className="form-control"
+                                className="form-control rounded-0"
                                 required
                             />
                         </div>
@@ -114,7 +113,7 @@ const MemberEdit = () => {
                                 value={member.memberEmail}
                                 onChange={changeInput}
                                 placeholder="이메일"
-                                className="form-control"
+                                className="form-control rounded-0"
                                 required
                             />
                         </div>
@@ -124,7 +123,7 @@ const MemberEdit = () => {
                                 value={member.memberContact}
                                 onChange={changeInput}
                                 placeholder="전화번호"
-                                className="form-control"
+                                className="form-control rounded-0"
                                 required
                             />
                         </div>
@@ -133,10 +132,10 @@ const MemberEdit = () => {
                                 name="memberPost"
                                 value={member.memberPost}
                                 placeholder="우편번호"
-                                className="form-control"
+                                className="form-control rounded-0"
                                 readOnly
                             />
-                            <button type="button" onClick={sample6_execDaumPostcode} className="btn btn-primary mt-2">우편번호 찾기</button>
+                            <button type="button" onClick={sample6_execDaumPostcode} className="btn btn-dark mt-2 rounded-0">우편번호 찾기</button>
                         </div>
                         <div className="mb-3">
                             <input type="text"
@@ -144,7 +143,7 @@ const MemberEdit = () => {
                                 value={member.memberAddress1}
                                 onChange={changeInput}
                                 placeholder="일반주소"
-                                className="form-control"
+                                className="form-control rounded-0"
                                 readOnly
                             />
                         </div>
@@ -154,13 +153,15 @@ const MemberEdit = () => {
                                 value={member.memberAddress2}
                                 onChange={changeInput}
                                 placeholder="상세주소"
-                                className="form-control"
+                                className="form-control rounded-0"
                             />
                         </div>
-                        <button className="btn btn-success w-100">수정 완료</button>
-                        <button type="button" className="btn btn-secondary mt-2" onClick={() => navigate(`/admin/member/detail/${memberId}`)}>
+                        <div className="d-flex justify-content-between">
+                            <button className="btn btn-dark rounded-0">수정 완료</button>
+                        <button type="button" className="btn btn-secondary rounded-0" onClick={() => navigate(`/admin/member/detail/${memberId}`)}>
                             취소
                         </button>
+                        </div>
                     </form>
                 </div>
             </div>
