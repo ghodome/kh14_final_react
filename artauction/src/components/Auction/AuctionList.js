@@ -19,12 +19,12 @@ const AuctionList = ()=>{
     useEffect(()=>{
         loadAuctionScheduleInfo();
         loadAuctionDataCollectionList();
-    },[auctionScheduleNo]); 
+    },[auctionScheduleNo]);
 
     const loadAuctionDataCollectionList = useCallback(async()=>{
         try{
         const resp = await axios.get(`http://localhost:8080/auction/auctionLotList/${auctionScheduleNo}`);
-        console.log("resp=", resp.data);
+        // console.log("resp=", resp.data);
         setAuctionDataCollectionList(resp.data);
         } 
         catch (error) {
@@ -75,20 +75,17 @@ const AuctionList = ()=>{
                     key={auctionData.auctionNo}>
                         <div className="card h-100 d-flex flex-column">
                             <h4 className="m-2">LOT {auctionData.auctionLot}</h4>
-                        <div className="card-header text-center" 
+                        <div className="card-header" 
                                 style={{ height: '200px', overflow: 'hidden' }}>
                             {auctionData.attachment === null ? (
-                                <div className="card-img-top">
+                               
                                      <img src="https://placehold.co/300x200"
-                                            className="img" alt="" 
+                                            className="card-img-top" alt="" 
                                             style={{ height: '100%', width: '100%', objectFit: 'cover' }}/>
-                                </div>
                             ) : (
-                                <div className="card-img-top">
                                     <img src={`http://localhost:8080/attach/download/${auctionData.attachment}`} 
-                                        className="img" alt="이미지 정보 없음" 
+                                        className="card-img-top" alt="이미지 정보 없음" 
                                         style={{ height: '100%', width: '100%', objectFit: 'cover' }}/>
-                                </div>
                             )}
                         </div>
                         
@@ -103,7 +100,7 @@ const AuctionList = ()=>{
                             <div className="card-text text-muted text-end">~ {auctionData.auctionHighPrice}원</div>
                             <div className="card-text text-muted">마감일</div>
                             <div className="text-sm text-muted text-end">
-                                {moment(auctionData.auctionScheduleEndDate).format("YY-MM-DD a hh:mm")}
+                                {moment(auctionData.auctionEndDate).format("YY-MM-DD a hh:mm")}
                             </div>
                         </div>
                         <div className="card-body text-end">

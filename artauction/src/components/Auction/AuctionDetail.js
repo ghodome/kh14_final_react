@@ -45,6 +45,8 @@ const Auction = () => {
     const [member, setMember] = useState({});
     const [bidIncrementUnit, setBidIncrementUnit]=useState();
 
+    const [workImage, setWorkImage] = useState({});
+
     //recoil
     const login = useRecoilValue(loginState);
     const memberId = useRecoilValue(memberIdState);
@@ -83,6 +85,17 @@ const Auction = () => {
             });
         }
     },[auctionNo,bidIncrement,auctionAndWork,transferTime]);
+
+    const loadWorkImage = useCallback(async()=>{
+        try{
+            const resp = await axios.get(`http://localhost:8080/auction/workImage/${auctionNo}`);
+            // console.log("resp=", resp.data);
+            setWorkImage(resp.data[0]);
+            } 
+            catch (error) {
+                console.error("Failed to load auction data:", error);
+            }
+    },[auctionNo]);
 
     const setBidIncrementByPrice = useCallback((price) => {
         let increment;
@@ -217,6 +230,7 @@ const Auction = () => {
         loadAuctionAndWork();
         connectToServer();
         loadMessageList();
+        loadWorkImage();
         return () => {
             disconnectToServer(client);
         };
@@ -271,11 +285,18 @@ const Auction = () => {
                         ))}
                     </ul>
                 </div>
+
                 {auctionAndWork ? (
                     <>
                         <div className="row mt-4">
                             <div className="col-7">
                                 {/* 작품 상세내용  */}
+                                <div className="row my-2 text-center">
+                                    <div className="col">
+                                        <img src={`http://localhost:8080/attach/download/${workImage.attachment}`} 
+                                        className="img-thumbnail rounded-1" alt="" height='250px' width='450px' />
+                                    </div>
+                                </div>
                                 <div className="row my-2">
                                     <div className="col">
                                         {auctionAndWork.workTitle}
