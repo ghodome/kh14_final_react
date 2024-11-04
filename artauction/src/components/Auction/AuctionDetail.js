@@ -414,7 +414,7 @@ const Auction = () => {
                                         </tr>
                                     </tbody>
                                 </table>
-                                {login ? (
+                                {login && (
                                     <div className="row mt-3">
                                         <div className="col-md-10 affset-md-1">
                                             {blocked ? (
@@ -449,20 +449,17 @@ const Auction = () => {
                                             )}
                                         </div>
                                     </div>
-                                </div>
-                            )}
-                            <ul className="list-group">
-                                
-                                {messageList && messageList.slice().reverse().map((message, index) => (
+                                    )}
+                                        {messageList && messageList.slice().reverse().map((message, index) => (<>
                                     <div className="row" key={index}>
-                                        <div className="col">
-                                            <p>{message.content.contentForLot}</p>
-                                            <p className="text-muted">
-                                                {moment(message.content.bidTime).format('HH:mm:ss:SSS')}
-                                            </p>
-                                        </div>
+                                    <div className="col">
+                                    <p>{message.content.contentForLot}</p>
+                                    <p className="text-muted">
+                                    {moment(message.content.bidTime).format('HH:mm:ss:SSS')}
+                                    </p>
                                     </div>
-                                )}
+                                    </div>
+                                </>))}
                                 <ul className="list-group">
                                     {messageList && messageList.slice().reverse().map((message, index) => (
                                         <div className="row" key={index}>
@@ -477,18 +474,18 @@ const Auction = () => {
                                 </ul>
                                 {wholeMessageList && wholeMessageList.slice().reverse().map((message, index) => (
                                     <div className="row" key={index}>
-                                        <div className="col">
-                                            <p>{message.content.contentForLot}</p>
-                                            <p className="text-muted">
-                                                {moment(message.time).format('HH:mm:ss:SSS')}
-                                            </p>
-                                        </div>
+                                    <div className="col">
+                                    <p>{message.content.contentForLot}</p>
+                                    <p className="text-muted">
+                                    {moment(message.time).format('HH:mm:ss:SSS')}
+                                    </p>
+                                    </div>
                                     </div>
                                 ))}
-                            </div>
-                            <hr />
-                        </div>
-                        <div className="modal fade" ref={bidModal}>
+                                </div>
+                                <hr />
+                                </div>
+                                <div className="modal fade" ref={bidModal}>
                             <div className="modal-dialog">
                                 <div className="modal-content">
                                     <div className="modal-header">
@@ -525,6 +522,7 @@ const Auction = () => {
                         </div>
                     </>
                 ) : (
+                
                     <h1>로딩 중...</h1>
                 )}
             </div>
