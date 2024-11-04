@@ -18,10 +18,7 @@ const AuctionScheduleDetail = ()=>{
      
      //state
      const [auctionSchedule, setAuctionSchedule] = useState({});
-     const [auctionList, setAuctionList] =useState([]);
-     
      const [images, setImages] = useState([]); // 이미지 미리보기 URL 목록
-
      const [target, setTarget] = useState({    //수정
         auctionScheduleNo : "",
         auctionScheduleTitle : "",
@@ -33,22 +30,19 @@ const AuctionScheduleDetail = ()=>{
         attachList: []
     });
 
-    const [presentInput, setPresentInput]= useState({   //출품작 등록
+    const [presentInput, setPresentInput]= useState({   //출품등록
         auctionScheduleNo: auctionScheduleNo,
         workNo: "",
         auctionLot: "",
         auctionStartPrice: "",
         auctionLowPrice: "",
         auctionHighPrice: "",
-        auctionState: "예정경매",
         auctionConsigner: "",
         auctionConsignmentFee: "",
         auctionNetProceeds: "",
-        attachList: []
-        // auctionStartDate:"",
-        // auctionEndDate:"",
     });
 
+    const [auctionList, setAuctionList] =useState([]);
 
     //effect
     useEffect(()=>{
@@ -57,49 +51,43 @@ const AuctionScheduleDetail = ()=>{
     }, []);
 
     //callback
-    const loadAuctionSchedule = useCallback(async ()=>{ //일정 불러오기
+    const loadAuctionSchedule = useCallback(async ()=>{ //일정 상세 불러오기
         const resp = await axios.get("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
         setAuctionSchedule({
             ...resp.data,
-            // auctionScheduleStartDate:new Date(resp.data.auctionScheduleStartDate).toISOString().slice(0,16),
-            // auctionScheduleEndDate:new Date(resp.data.auctionScheduleEndDate).toISOString().slice(0,16)
         })
     }, [auctionSchedule]);
-
-    const loadAuctionList=useCallback(async ()=>{   //출품작 불러오기
-        const resp=await axios.get(`http://localhost:8080/auction/auctionList/${auctionScheduleNo}`);
-        console.log(resp.data.auctionList);
-        setAuctionList([
-            ...resp.data
-        ]);
-    },[auctionList]);
 
     const inputFileRef = useRef(null);
 
     //수정내용 작성
     const changeTarget = useCallback(e=>{
+        const { name, value } = e.target;
         if (e.target.type === "file") {
             const files = Array.from(e.target.files);
-            setTarget({ 
-                ...target, 
+            setTarget( prevTarget=>({
+                ...prevTarget, 
                 attachList: files 
-            });
-            const imagePromises = files.map((file) => {
-                const reader = new FileReader();
-                return new Promise((resolve) => {
-                    reader.onloadend = () => resolve(reader.result);
-                    reader.readAsDataURL(file);
+            }));
+            // 새로 선택한 파일의 미리보기 URL 생성
+            const imageUrls = files.map(file=>{
+                const reader =new FileReader();
+                reader.readAsDataURL(file);
+                return new Promise ((resolve) => {
+                    reader.onloadend = () =>{
+                        resolve(reader.result);
+                    };
                 });
             });
-            Promise.all(imagePromises).then((urls) => 
-                setImages(urls));
-            console.log(imagePromises);
-            console.log(images[0]);
-        } else {
-            setTarget({ 
-                ...target, 
-                [e.target.name]: e.target.value 
+            Promise.all(imageUrls).then(urls => {
+                setAttachImages(urls);
             });
+        }
+        else{
+            setTarget(prevTarget => ({
+                ...prevTarget,
+                [name] : value
+            }));
         }
     }, [target]);
 
@@ -116,39 +104,44 @@ const AuctionScheduleDetail = ()=>{
         })
     }, [target])
 
-    
+    const [loadImages, setLoadImages] = useState([]);
+    const [attachImages, setAttachImages] = useState([]);//보낼 추가첨부사진이미지
+
     // 수정내용 저장
     const saveTarget = useCallback(async ()=>{
         const formData = new FormData();
         const fileList = inputFileRef.current.files;
         
-        for (let i = 0; i < fileList.length; i++) {
-            formData.append("attachList", fileList[i]);
+        if (fileList.length > 0) {
+            for (let i = 0; i < fileList.length; i++) {
+                formData.append("attachList", fileList[i]);
+            }
         }
         
+        formData.append("auctionScheduleNo", target.auctionScheduleNo); 
         formData.append("auctionScheduleTitle", target.auctionScheduleTitle);
         formData.append("auctionScheduleStartDate", target.auctionScheduleStartDate);
         formData.append("auctionScheduleEndDate", target.auctionScheduleEndDate);
         formData.append("auctionScheduleState", target.auctionScheduleState);
         formData.append("auctionScheduleNotice", target.auctionScheduleNotice);
-        formData.append("attachment", target.attachment);
-        
-        console.log("attachment :" , target.attachList);
-        
-        await axios.put("http://localhost:8080/auctionSchedule/", formData,
+
+        formData.append("originList", target.attachment);
+
+        await axios.post("http://localhost:8080/auctionSchedule/edit", formData,
         { 
             headers:  { 
-                "Content-Type": "application/json",
+                "Content-Type": "multipart/form-data",
             },
         });
-            
-        inputFileRef.current.value = ""
+        
+        setImages(loadImages);
+      
         clearTarget();
         loadAuctionSchedule();
         closeEditModal();
         setImages([]);
-    }, [auctionSchedule, target]);
-        
+    }, [target]);
+
     //일정삭제
     const deleteAuctionSchedule = useCallback(async ()=>{
         const choice = window.confirm("정말 삭제하시겠습니까?");
@@ -164,9 +157,16 @@ const AuctionScheduleDetail = ()=>{
     const openEditModal = useCallback((auctionSchedule)=>{
         const tag = Modal.getOrCreateInstance(editModal.current);
         tag.show();
+
+        // 파일 입력 필드 초기화
+        if (inputFileRef.current) {
+            inputFileRef.current.value = "";
+        }
+
         setTarget({
             ...auctionSchedule, 
         });
+        // 기존 첨부파일 이미지 URL 설정
         setImages([
             `http://localhost:8080/attach/download/${auctionSchedule.attachment}`
         ]);
@@ -177,31 +177,19 @@ const AuctionScheduleDetail = ()=>{
         tag.hide();
         clearTarget(); 
     }, [editModal]);
-        
-    //출품작 등록
+
+    
+    //출품작 목록
+    const loadAuctionList=useCallback(async ()=>{   //출품작 불러오기
+        const resp=await axios.get(`http://localhost:8080/auction/${auctionScheduleNo}`);
+        console.log(resp.data.auctionList);
+        setAuctionList([
+            ...resp.data
+        ]);
+    },[auctionList]);
+    
+    //출품작 등록 모달
     const presentModal=useRef();
-
-    const changePresentInput=useCallback((e)=>{
-        setPresentInput({
-            ...presentInput,
-            [e.target.name] : e.target.value 
-        });
-    },[presentInput])
-
-    const savePresentInput=useCallback(async ()=>{
-        const resp = await axios.post("http://localhost:8080/auction/", presentInput, {
-            headers:  { 
-                "Content-Type": "multipart/form-data",
-            },
-        });
-        // console.log(presentInput.auctionLot===null)
-        if(resp.status===200) 
-            window.alert("등록이완료되었습니다.");
-        
-        clearPresentModal();
-        closePresentModal();
-        loadAuctionList();
-    },[]);
 
     const openPresentModal=useCallback(()=>{
         if(presentModal.current){
@@ -209,64 +197,104 @@ const AuctionScheduleDetail = ()=>{
             tag.show();
         }
     },[presentModal])
-
+    
     const closePresentModal=useCallback(()=>{
         if(presentModal.current){
         const tag = Modal.getInstance(presentModal.current);
         tag.hide();
-        clearPresentModal();
-    }
+        }
     },[presentModal]);
 
-    const clearPresentModal = useCallback(() => {
-        setPresentInput(() => ({
-            auctionScheduleNo: auctionScheduleNo, 
+    //출품 입력 초기화
+    const clearPresentInput = useCallback(() => {
+        setPresentInput((prev) => ({
+            ...prev,
+            auctionScheduleNo: auctionScheduleNo,
             workNo: "",
             auctionLot: "",
             auctionStartPrice: "",
             auctionLowPrice: "",
             auctionHighPrice: "",
-            auctionState: "",
             auctionConsigner: "",
             auctionConsignmentFee: "",
             auctionNetProceeds: "",
-            attachList: []
         }));
     }, [auctionScheduleNo]);
 
+    //출품 내용 작성
+    const changePresentInput=useCallback((e)=>{
+        setPresentInput({
+            ...presentInput,
+            [e.target.name] : e.target.value
+        })
+    },[presentInput])
+    
+    //출품 등록
+    const registPresentInput=useCallback(async ()=>{
+        try {
+        const resp=await axios.post(`http://localhost:8080/auction/`, presentInput);
+        console.log(presentInput.auctionLot===null)
+        if(resp.status===200) 
+            window.alert("출품작 등록 완료");
+        clearPresentInput();
+        closePresentModal();
+        loadAuctionList();
+    } catch (error) {
+        alert("누락된 항목 발생. 전체 항목을 입력해주세요");
+    }
+    },[presentInput])
+
+
+    //출품 데이터 서버로 전송
+    // const savePresentInput=useCallback(async ()=>{
+    //     const resp = await axios.post("http://localhost:8080/auction/", presentInput, {
+    //         headers:  { 
+    //             "Content-Type": "multipart/form-data",
+    //         },
+    //     });
+    //     // console.log(presentInput.auctionLot===null)
+    //     if(resp.status===200) 
+    //         window.alert("등록이완료되었습니다.");
+        
+    //     clearPresentInput();
+    //     closePresentModal();
+    //     loadAuctionList();
+    // },[]);
+
+
+    //출품작 삭제
     const deleteLot=useCallback(async (auction)=>{
-        const resp=await axios.delete(`http://localhost:8080/auction/${auction.auctionNo}`);
-        const list = resp.data.auctionList;
-        if(resp.status===200)
+        if(window.confirm("출품 작품을 삭제하시겠습니까?")){
+            const resp=await axios.delete("http://localhost:8080/auction/"+auction.auctionNo)
+            if(resp.status===200)
             window.alert(`LOT : ${auction.auctionLot}, ${auction.workTitle}이(가) 삭제되었습니다`);
-        setAuctionList(list);
-        loadAuctionList(list);
+            loadAuctionList();
+        }
     },[auctionList]);
 
+    //출품 취소
     const cancelLot=useCallback(async (auction)=>{
         if(window.confirm("출품을 취소하시겠습니까?")){
             const resp=await axios.get("http://localhost:8080/auction/cancelPresent/"+auction.auctionNo);
             if(resp.status===200)
                 window.alert(`LOT : ${auction.auctionLot}, ${auction.workTitle}의 출품이 취소되었습니다`);
+            clearPresentInput();
+            loadAuctionList();
         }
-        clearPresentModal();
-        closePresentModal();
-        loadAuctionList();
     },[auctionList]);
 
+    //출품 재등록
     const uncancelLot=useCallback(async (auction)=>{
         if(window.confirm("출품 하시겠습니까?")){
             const resp=await axios.get("http://localhost:8080/auction/uncancelPresent/"+auction.auctionNo);
             if(resp.status===200)
                 window.alert(`LOT : ${auction.auctionLot}, ${auction.workTitle}의 출품이 등록되었습니다`);
+            loadAuctionList();
+
         }
-        clearPresentModal();
-        closePresentModal();
-        setAuctionList();
-        loadAuctionList();
     },[auctionList]);
 
-
+    
     //view
     return (<>
         <Jumbotron title={auctionSchedule.auctionScheduleTitle} content={auctionScheduleNo + " 번 경매 일정 상세정보"}/>
@@ -276,20 +304,21 @@ const AuctionScheduleDetail = ()=>{
             <div className="row mt-4 text-center">
                 <div className="col my-4">
                         <img src={`http://localhost:8080/attach/download/${auctionSchedule.attachment}`} 
-                                className="img-thumbnail" alt="" height='300px' width='500px' />
+                                className="img-thumbnail rounded-1" alt="" height='300px' width='500px' />
                 </div>
             </div>
+
             {/* 경매일정 상세정보 */}
             <div className="row mt-4">
                 <div className="col">
                     {auctionSchedule.auctionScheduleState === '진행경매' &&(
-                        <div className="badge text-bg-success text-wrap">{auctionSchedule.auctionScheduleState}</div>
+                        <div className="badge text-bg-dark text-wrap rounded-1">{auctionSchedule.auctionScheduleState}</div>
                     )}
                     {auctionSchedule.auctionScheduleState === '예정경매' &&(
-                        <div className="badge text-bg-info text-wrap">{auctionSchedule.auctionScheduleState}</div>
+                        <div className="badge text-bg-secondary text-wrap rounded-1">{auctionSchedule.auctionScheduleState}</div>
                     )}
                     {auctionSchedule.auctionScheduleState === '종료경매' &&(
-                        <div className="badge text-bg-secondary text-wrap">{auctionSchedule.auctionScheduleState}</div>
+                        <div className="badge text-bg-light text-wrap rounded-1">{auctionSchedule.auctionScheduleState}</div>
                     )}
                     <h3 className="mt-2">{auctionSchedule.auctionScheduleTitle}</h3>
                 </div>
@@ -323,190 +352,30 @@ const AuctionScheduleDetail = ()=>{
             {/* 각종 버튼들 */}
             <div className="row mt-4">
                 <div className="col text-end">
-                    <button className="btn btn-success ms-2"
-                                    onClick={e=>navigate("/auctionList/"+auctionScheduleNo)}>경매보기(임시)</button>
-                    <button className="btn btn-success ms-2" 
-                                    onClick={openPresentModal}>출품 등록</button>
-                    <button className="btn btn-secondary ms-2" 
-                                    onClick={e=>navigate("/auctionschedule")}>목록</button>
-                    <button className="btn btn-warning ms-2" 
-                                onClick={e=>openEditModal(auctionSchedule)}>수정</button>
-                    <button className="btn btn-danger ms-2" 
-                                onClick={e=>deleteAuctionSchedule(auctionSchedule)}>삭제</button>
+                {auctionSchedule.auctionScheduleState === '진행경매' && (
+                    <button className="btn btn-outline-dark ms-2 rounded-1"
+                                    onClick={e=>navigate("/auction/auctionLotList/"+auctionScheduleNo)}>경매참여</button>
+                )}
+                    <button className="btn btn-outline-secondary ms-2 rounded-1" 
+                                    onClick={e=>navigate("/auctionschedule")}>뒤로가기</button>
+                </div>
+            </div>
+
+            {/* 관리자 기능 */}
+            <div className="row mt-2">    
+                <div className="col text-end">
+                    <button className="btn btn-primary ms-2 rounded-1" 
+                                    onClick={openPresentModal}>출품등록</button>
+                    <button className="btn btn-warning ms-2 rounded-1" 
+                                onClick={e=>openEditModal(auctionSchedule)}>일정수정</button>
+                    <button className="btn btn-danger ms-2 rounded-1" 
+                                onClick={e=>deleteAuctionSchedule(auctionSchedule)}>일정삭제</button>
                 </div>
             </div>
 
         </div>
-        
-        {/* 출품 목록 (카드) */}
-        <div className="row mt-5">
-            <div className="col">
-                <h3 className="text-center my-3">출품 목록</h3>
-                <ul className="row mt-2">
-                    {auctionList.length > 0 && auctionList.map((auction, index) => (
-                        auction.auctionState === '출품취소' ? (
-                            <div className="col-8 offset-2 col-sm-5 offset-sm-1 col-md-4 offset-md-0 mb-3 opacity-50 bg-secondary}" key={index}>
-                                <div className="card">
-                                    <div className="card-body text-nowrap">
-                                        <h5 className="card-title">LOT {auction.auctionLot}</h5>
-                                        <p className="card-text">{auction.workTitle}</p>
-                                        <p className="card-text">{auction.workMaterials}</p>
-                                        <p className="card-text">{auction.workCategory}</p><button type="button" className="btn btn-danger card-text mx-2" onClick={e => deleteLot(auction)}>삭제</button>
-                                        <button type="button" className="btn btn-success card-text mx-2" onClick={e => uncancelLot(auction)}>등록</button>
-                                    </div>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="col-8 offset-2 col-sm-5 offset-sm-1 col-md-4 offset-md-0 mb-3" key={index}>
-                                <div className="card">
-                                    <div className="card-body text-nowrap">
-                                        <h5 className="card-title">LOT {auction.auctionLot}</h5>
-                                        <p className="card-text">{auction.workTitle}</p>
-                                        <p className="card-text">{auction.workMaterials}</p>
-                                        <p className="card-text">{auction.workCategory}</p>
-                                        <p className="card-text" onClick={e=>navigate(`/auction/detail/${auction.auctionNo}`)}>경매 입장</p>
-                                        <button type="button" className="btn btn-danger card-text mx-2" onClick={e => deleteLot(auction)}>삭제</button>
-                                        <button type="button" className="btn btn-warning card-text mx-2" onClick={e => cancelLot(auction)}>취소</button>
-                                    </div>
-                                </div>
-                            </div>
-                        )
-                    ))}
-                </ul>
-            </div>
-        </div>
-                    
-        {/* 출품용 모달 */}
-        <div className="modal fade" tabIndex="-1" ref={presentModal}>
-            <div className="modal-dialog">
-            <div className="modal-content">
-            <div className="modal-header">
-                <h5 className="modal-title">출품 등록</h5>
-                <button
-                    type="button"
-                    className="btn-close"
-                    aria-label="Close"
-                    onClick={closePresentModal}></button>
-                </div>
 
-                <div className="modal-body">
-                <div className="row">
-                    <div className="col">
-                        <label>작품 번호</label>
-                        <input type="text" 
-                        value={presentInput.workNo} 
-                        name="workNo" 
-                        className="form-control" 
-                        onChange={e => changePresentInput(e)} 
-                        placeholder="작품 번호"
-                        autoComplete="off"/>
-                    </div>
-
-                </div>
-                <div className="row">
-                    <div className="col">
-                        <label>출품 번호</label>
-                        <input type="text" 
-                        value={presentInput.auctionLot} 
-                        name="auctionLot" 
-                        className="form-control" 
-                        onChange={e => changePresentInput(e)} 
-                        placeholder="출품 번호는 비어있는 Lot가 있을시에만 입력하세요"
-                        autoComplete="off"/>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col">
-                        <label>시작 가격</label>
-                        <input type="text" 
-                        name="auctionStartPrice" 
-                        className="form-control" 
-                        value={presentInput.auctionStartPrice} 
-                        onChange={e => changePresentInput(e)} 
-                        placeholder="숫자만"
-                        autoComplete="off"/>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col">
-                        <label>예상 최저가</label>
-                        <input type="text" 
-                        name="auctionLowPrice" 
-                        className="form-control" 
-                        value={presentInput.auctionLowPrice} 
-                        onChange={e => changePresentInput(e)} 
-                        placeholder="예상 최저가"
-                        autoComplete="off"/>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col">
-                        <label>예상 최고가</label>
-                        <input type="text" 
-                        name="auctionHighPrice" 
-                        className="form-control" 
-                        value={presentInput.auctionHighPrice} 
-                        onChange={e => changePresentInput(e)} 
-                        placeholder="예상 최고가"
-                        autoComplete="off"/>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col">
-                        <label>위탁자</label>
-                        <input type="text" 
-                        name="auctionConsigner" 
-                        className="form-control" 
-                        value={presentInput.auctionConsigner} 
-                        onChange={e => changePresentInput(e)} 
-                        placeholder="위탁자"
-                        autoComplete="off"/>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col">
-                        <label>위탁 수수료</label>
-                        <input type="text" 
-                        name="auctionConsignmentFee" 
-                        className="form-control" 
-                        value={presentInput.auctionConsignmentFee} 
-                        onChange={e => changePresentInput(e)} 
-                        placeholder="숫자만"
-                        autoComplete="off"/>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col">
-                        <label>위탁 대금</label>
-                        <input type="text" 
-                        name="auctionNetProceeds" 
-                        className="form-control" 
-                        value={presentInput.auctionNetProceeds} 
-                        onChange={e => changePresentInput(e)} 
-                        placeholder="숫자만"
-                        autoComplete="off"/>
-                    </div>
-                </div>
-                </div>
-                <div className="modal-footer">
-                <button
-                    type="button"
-                    className="btn btn-lg btn-success"
-                    onClick={savePresentInput}>
-                    등록
-                </button>
-                <button
-                    type="button"
-                    className="btn btn-lg btn-secondary"
-                    onClick={closePresentModal}>
-                    취소
-                </button>
-                </div>
-            </div>
-            </div>
-        </div>
-
-
+        {/* 관리자 기능 */}
         {/* 경매 일정 수정 모달 */}
         <div className="modal fade" tabIndex="-1"
                 ref={editModal} data-bs-backdrop="static">
@@ -557,7 +426,6 @@ const AuctionScheduleDetail = ()=>{
                                     onChange={changeTarget}/>
 
                                 <label>사진 첨부</label><br/>
-                                {/* <input type="file" id="input" multiple /> */}
                                     <input type="file" className="form-control" name="attachList" multiple accept="image/*"
                                            onChange={changeTarget} ref={inputFileRef} />
                                     {images.map((image, index) => (
@@ -569,16 +437,192 @@ const AuctionScheduleDetail = ()=>{
                     </div>
 
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary btn-manual-close" 
-                                    onClick={closeEditModal}>취소</button>
-                        <button type="button" className="btn btn-success"
+                        <button type="button" className="btn btn-success rounded-1"
                                     onClick={saveTarget}>수정</button>
+                        <button type="button" className="btn btn-secondary btn-manual-close rounded-1" 
+                                    onClick={closeEditModal}>취소</button>
                                     
                     </div>
                 </div>
             </div>
         </div>
-    
+
+        {/* 출품 목록 (카드) */}
+        <div className="row mt-5">
+            <div className="col">
+                {auctionList.length > 0 && (<h3 className="text-center my-3">출품 목록</h3>)}
+                <ul className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 mt-2">
+                    {auctionList.map((auction, index) => (
+                        auction.auctionState === '출품취소' ? (
+                            <div className="col-8 offset-2 offset-md-0 mb-3 opacity-50 bg-secondary}" key={index}>
+                                <div className="card">
+                                    <div className="card-body text-nowrap">
+                                        <h5 className="card-title">LOT {auction.auctionLot}</h5>
+                                        <div className="card-text">{auction.workTitle}</div>
+                                        <div className="card-text">{auction.workMaterials}</div>
+                                        <div className="card-text">{auction.workCategory}</div>
+                                        <div className="text-end">
+                                            <button type="button" className="btn btn-primary card-text ms-2 rounded-1" 
+                                                    onClick={e => uncancelLot(auction)}>등록</button>
+                                            <button type="button" className="btn btn-danger card-text ms-2 rounded-1" 
+                                                    onClick={e => deleteLot(auction)}>삭제</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="col-8 offset-2 offset-md-0 mb-3" key={index}>
+                                <div className="card">
+                                    <div className="card-body text-nowrap">
+                                        <h5 className="card-title">LOT {auction.auctionLot}</h5>
+                                        <div className="card-text">{auction.workTitle}</div>
+                                        <div className="card-text">{auction.workMaterials}</div>
+                                        <div className="card-text">{auction.workCategory}</div>
+                                        <div className="text-end mt-4">
+                                        <button type="button" className="btn btn-outline-dark card-text ms-2 rounded-1" 
+                                                    onClick={e=>navigate(`/auction/detail/${auction.auctionNo}`)}>입찰상세</button>
+                                        <button type="button" className="btn btn-warning card-text ms-2 rounded-1" onClick={e => cancelLot(auction)}>취소</button>
+                                        <button type="button" className="btn btn-danger card-text ms-2 rounded-1" onClick={e => deleteLot(auction)}>삭제</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    ))}
+                </ul>
+            </div>
+        </div>
+
+        {/* 출품용 모달 */}
+        <div className="modal fade" tabIndex="-1" ref={presentModal}>
+            <div className="modal-dialog">
+            <div className="modal-content">
+            <div className="modal-header">
+                <h5 className="modal-title">출품 등록</h5>
+                <button
+                    type="button"
+                    className="btn-close"
+                    aria-label="Close"
+                    onClick={closePresentModal}></button>
+                </div>
+
+                <div className="modal-body">
+                <div className="row">
+                    <div className="col">
+                        <label>작품 번호</label>
+                        <input type="text" 
+                        value={presentInput.workNo} 
+                        name="workNo" 
+                        className="form-control" 
+                        onChange={changePresentInput} 
+                        placeholder="작품 번호"
+                        autoComplete="off"/>
+                    </div>
+
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <label>출품 번호</label>
+                        <input type="text" 
+                        value={presentInput.auctionLot} 
+                        name="auctionLot" 
+                        className="form-control" 
+                        onChange={changePresentInput} 
+                        placeholder="출품 번호는 비어있는 Lot가 있을시에만 입력하세요"
+                        autoComplete="off"/>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <label>시작 가격</label>
+                        <input type="text" 
+                        name="auctionStartPrice" 
+                        className="form-control" 
+                        value={presentInput.auctionStartPrice} 
+                        onChange={changePresentInput} 
+                        placeholder="숫자만"
+                        autoComplete="off"/>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <label>예상 최저가</label>
+                        <input type="text" 
+                        name="auctionLowPrice" 
+                        className="form-control" 
+                        value={presentInput.auctionLowPrice} 
+                        onChange={changePresentInput} 
+                        placeholder="예상 최저가"
+                        autoComplete="off"/>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <label>예상 최고가</label>
+                        <input type="text" 
+                        name="auctionHighPrice" 
+                        className="form-control" 
+                        value={presentInput.auctionHighPrice} 
+                        onChange={changePresentInput} 
+                        placeholder="예상 최고가"
+                        autoComplete="off"/>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <label>위탁자</label>
+                        <input type="text" 
+                        name="auctionConsigner" 
+                        className="form-control" 
+                        value={presentInput.auctionConsigner} 
+                        onChange={changePresentInput} 
+                        placeholder="위탁자"
+                        autoComplete="off"/>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <label>위탁 수수료</label>
+                        <input type="text" 
+                        name="auctionConsignmentFee" 
+                        className="form-control" 
+                        value={presentInput.auctionConsignmentFee} 
+                        onChange={changePresentInput} 
+                        placeholder="숫자만"
+                        autoComplete="off"/>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <label>위탁 대금</label>
+                        <input type="text" 
+                        name="auctionNetProceeds" 
+                        className="form-control" 
+                        value={presentInput.auctionNetProceeds} 
+                        onChange={changePresentInput} 
+                        placeholder="숫자만"
+                        autoComplete="off"/>
+                    </div>
+                </div>
+                </div>
+                <div className="modal-footer">
+                <button
+                    type="button"
+                    className="btn btn-success rounded-1"
+                    onClick={registPresentInput}>
+                    등록
+                </button>
+                <button
+                    type="button"
+                    className="btn btn-secondary rounded-1"
+                    onClick={closePresentModal}>
+                    취소
+                </button>
+                </div>
+            </div>
+
+            </div>
+        </div>
     </>);
 };
 

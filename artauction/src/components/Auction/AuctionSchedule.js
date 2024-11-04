@@ -19,7 +19,11 @@ const AuctionSchedule = () => {
     const [auctionState, setAuctionState] = useState('');
     const [images, setImages] = useState([]);
     const [page, setPage] = useState(1);
-    const [row, setRow] = useState({});
+    const [row, setRow] = useState({
+        beginRow: (page - 1) * 10 + 1, 
+        endRow: page * 10 
+    });
+
     const [insert, setInsert] = useState({  //등록
         auctionScheduleTitle: '',
         auctionScheduleStartDate: '',
@@ -32,22 +36,28 @@ const AuctionSchedule = () => {
 
     useEffect(() => {
         loadAuctionScheduleList();
-    }, []);    
+    }, [page]); 
 
     // 경매 일정 목록 불러오기
-    const loadAuctionScheduleList = useCallback(async()=>{
-        const resp = await axios.post("http://localhost:8080/auctionSchedule/", row);
-        const list = resp.data.auctionScheduleList;
-
-        setAuctionScheduleList();
-        setAllAuctionScheduleList(list);
-        setfilterAuctionScheduleList(list, auctionState);
-    }, [row]);
-
-    const filterSchedule = (schedule, state)=>{
-        const filtered = state ? schedule.filter(e =>
+    const loadAuctionScheduleList = useCallback(async () => {
+        try {
+            const resp = await axios.post("http://localhost:8080/auctionSchedule/", {
+                beginRow: Number(row.beginRow),
+                endRow: Number(row.endRow)
+            });
+            const list = resp.data.auctionScheduleList;
+            setAuctionScheduleList(list);
+            setAllAuctionScheduleList(list);
+            filterSchedule(list, auctionState);
+        } catch (error) {
+            console.error("Error loading auction schedule list:", error);
+        }
+    }, [row, auctionState]);
+    
+    const filterSchedule = (schedule, state) => {
+        const filtered = state ? schedule.filter(e => 
             e.auctionScheduleState === state) : schedule;
-        setfilterAuctionScheduleList(filtered)
+        setfilterAuctionScheduleList(Array.isArray(filtered) ? filtered : []);
     };
 
     useEffect(()=>{
@@ -57,14 +67,14 @@ const AuctionSchedule = () => {
     useEffect(() => {
         setRow({ 
             beginRow: (page - 1) * 10 + 1, 
-            endRow: page * 10 });
+            endRow: page * 10 
+        });
     }, [page]);
 
     const handlePagination = (pageNumber)=>{
         setPage(pageNumber); 
     };
 
-    
     // 경매 일정 등록 모달
     const insertModal = useRef();
 
@@ -125,38 +135,45 @@ const AuctionSchedule = () => {
     const inputFileRef = useRef(null);
 
     // 등록 버튼 클릭 시 서버로 데이터 전송
-    const saveInsertInput = useCallback(async ()=>{
-        const formData = new FormData();
-        const fileList = inputFileRef.current.files;
+    const saveInsertInput = useCallback(async () => {
+        try {
+            const formData = new FormData();
+            const fileList = inputFileRef.current?.files || [];
     
-        for (let i = 0; i < fileList.length; i++) {
-            formData.append("attachList", fileList[i]);
-        };
-        
-        // const startDate = moment(insert.auctionScheduleStartDate).toISOString();
-        // const endDate = moment(insert.auctionScheduleEndDate).toISOString();
-
-        formData.append("auctionScheduleTitle", insert.auctionScheduleTitle);
-        formData.append("auctionScheduleStartDate", insert.auctionScheduleStartDate);
-        formData.append("auctionScheduleEndDate", insert.auctionScheduleEndDate);
-        formData.append("auctionScheduleState", insert.auctionScheduleState);
-        formData.append("auctionScheduleNotice", insert.auctionScheduleNotice);
-        // formData.append("attachment :", insert.attachment);
-
-        await axios.post("http://localhost:8080/auctionSchedule/", formData,
-            { 
-                headers:  { 
-                    "Content-Type": "multipart/form-data",
-                },
+            // 파일 첨부
+            if (fileList.length > 0) {
+                for (let i = 0; i < fileList.length; i++) {
+                    formData.append("attachList", fileList[i]);
+                }
+            }
+    
+            // 다른 필드 추가
+            formData.append("auctionScheduleTitle", insert.auctionScheduleTitle || '');
+            formData.append("auctionScheduleStartDate", insert.auctionScheduleStartDate || '');
+            formData.append("auctionScheduleEndDate", insert.auctionScheduleEndDate || '');
+            formData.append("auctionScheduleState", insert.auctionScheduleState || '');
+            formData.append("auctionScheduleNotice", insert.auctionScheduleNotice || '');
+    
+            console.log('FormData entries:', Array.from(formData.entries()));
+    
+            // 서버로 요청 전송
+            const resp = await axios.post("http://localhost:8080/auctionSchedule/", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
             });
-        
-        inputFileRef.current.value = "";
-        clearInsert();
-        closeInsertModal();
-        loadAuctionScheduleList();
-        setImages([]);
-    }, []);
     
+            // 성공 시 초기화
+            clearInsert();
+            closeInsertModal();
+            loadAuctionScheduleList();
+            setImages([]);
+            alert("경매일정 등록 완료");
+        } catch (error) {
+            alert("누락된 항목 발생. 전체 항목을 입력해주세요");
+        }
+    }, [insert, loadAuctionScheduleList]);
+
+    // 입력검사
+
 
     return (<>
             <Jumbotron title="경매 일정" content="예정/진행/종료경매 목록" />
@@ -164,33 +181,35 @@ const AuctionSchedule = () => {
             <div className="row mt-4">
                 <div className="col">
                     <div className="d-flex flex-row mt-2 mb-2">
-                        <button className="btn btn-outline-info me-2"
+                        <button className="btn btn-outline-secondary me-2 rounded-1"
                             onClick={e=>{setAuctionState(""); setPage(1);}}>전체일정</button>
-                        <button className="btn btn-outline-info me-2"
+                        <button className="btn btn-outline-secondary me-2 rounded-1"
                             onClick={e=>{setAuctionState("진행경매"); setPage(1);}}>진행경매</button>
-                        <button className="btn btn-outline-info me-2" 
+                        <button className="btn btn-outline-secondary me-2 rounded-1" 
                             onClick={e=>{setAuctionState("예정경매"); setPage(1);}}>예정경매</button>
-                        <button className="btn btn-outline-info me-2" 
+                        <button className="btn btn-outline-secondary me-2 rounded-1" 
                             onClick={e=>{setAuctionState("종료경매"); setPage(1);}}>종료경매</button>
 
-                        <button className="btn btn-outline-primary ms-auto"
+                        {/* 관리자 기능 */}
+                        <button className="btn btn-primary ms-auto rounded-1"
                                 onClick={openInsertModal}>경매등록
                         </button>
                     </div>
 
                     {/* 경매 일정 목록 */}
-                    {filterAuctionScheduleList.slice(row.beginRow - 1, row.endRow).map((schedule) => (
+                    {filterAuctionScheduleList.length > 0 ? (
+                        filterAuctionScheduleList.slice(row.beginRow - 1, row.endRow).map((schedule) => (
                         <div className="row" key={schedule.auctionScheduleNo}>
-                             <div className="col-9 p-4 d-flex flex-column position-static">
+                            <div className="col-9 p-4 d-flex flex-column position-static">
                                 <div className="d-flex flex-row mb-2">
                                 {schedule.auctionScheduleState === '진행경매' &&(
-                                    <div className="badge text-bg-success text-wrap">{schedule.auctionScheduleState}</div>
+                                    <div className="badge text-bg-dark text-wrap rounded-1">{schedule.auctionScheduleState}</div>
                                 )}
                                 {schedule.auctionScheduleState === '예정경매' &&(
-                                    <div className="badge text-bg-info text-wrap">{schedule.auctionScheduleState}</div>
+                                    <div className="badge text-bg-secondary text-wrap rounded-1">{schedule.auctionScheduleState}</div>
                                 )}
                                 {schedule.auctionScheduleState === '종료경매' &&(
-                                    <div className="badge text-bg-secondary text-wrap">{schedule.auctionScheduleState}</div>
+                                    <div className="badge text-bg-light text-wrap rounded-1">{schedule.auctionScheduleState}</div>
                                 )}
                                 </div>
                                 <div className="d-flex flex-row">
@@ -209,18 +228,12 @@ const AuctionSchedule = () => {
                                 </div>
 
                                 <div className="d-flex flex-row mt-2 mb-2">
-                                {/* {schedule.auctionScheduleState === '진행경매' &&(
-                                    <button className="btn btn-outline-secondary mt-2 col-3"
-                                        onClick={e=>navigate("/auctionList/"+schedule.auctionScheduleNo)}>상세보기</button>
+                                <button className="btn btn-outline-secondary mt-2 col-3 rounded-1"
+                                        onClick={e=>navigate("/auctionschedule/detail/"+schedule.auctionScheduleNo)}>경매상세</button>
+                                {schedule.auctionScheduleState === '진행경매' &&(
+                                    <button className="btn btn-outline-dark mt-2 col-3 ms-3 rounded-1"
+                                        onClick={e=>navigate("/auctionList/"+schedule.auctionScheduleNo)}>경매참여</button>
                                 )}
-                                {schedule.auctionScheduleState !== '진행경매' &&(
-                                    <button className="btn btn-outline-secondary mt-2 col-3"
-                                            onClick={e=>navigate("/auctionschedule/detail/"+schedule.auctionScheduleNo)}>상세보기</button>
-                                )} */}
-                                <button className="btn btn-outline-secondary mt-2 col-3"
-                                        onClick={e=>navigate("/auctionschedule/detail/"+schedule.auctionScheduleNo)}>상세보기</button>
-                                <button className="btn btn-outline-secondary mt-2 col-3 ms-2"
-                                        onClick={e=>navigate("/auctionList/"+schedule.auctionScheduleNo)}>경매보기(임시버튼)</button>
                                 </div>
                                      
                             </div>
@@ -228,32 +241,31 @@ const AuctionSchedule = () => {
                             {schedule.attachment === null ? (
                                 <div className="col-3 p-4">
                                     <img src="https://placehold.co/300x200"
-                                            className="img-thumbnail" alt=""/>
+                                            className="img-thumbnail rounded-1" alt=""/>
                                 </div>
                             ) : (
                                 <div className="col-3 p-4">
                                     <img src={`http://localhost:8080/attach/download/${schedule.attachment}`} 
-                                            className="img-thumbnail" alt="이미지 정보 없음"/>
+                                            className="img-thumbnail rounded-1" alt="이미지 정보 없음"/>
                                 </div>
                             )}
 
                             <hr />
-
+                        
                         </div>
-                    ))}
+                        ))
+                    ) : (
+                        <div>경매 일정이 없습니다.</div>
+                    )}
                     
                     <div className="row">
                         <div className="col text-center">
                             <div className="d-flex justify-content-center">
                                 {Array.from({ length: Math.ceil(filterAuctionScheduleList.length / 10) }, (_, i) => (
-                                    <button key={i + 1} className={`btn ${page === i + 1 ? 'btn-secondary' : 'btn-outline-secondary'} me-2`} 
+                                    <button key={i + 1} className={`btn ${page === i + 1 ? 'btn-secondary' : 'btn-outline-secondary'} me-2 rounded-1`} 
                                         onClick={e=>handlePagination(i + 1)}>{i + 1}
                                     </button>
                                 ))}
-                                {/* <button className="btn btn-secondary" name="buttonLeft"
-                                    onClick={()=>setPage(prev=>prev - 1)}><FaAngleLeft/> </button>       
-                                <button className="btn btn-secondary" name="buttonRight"
-                                    onClick={()=>setPage(prev=>prev + 1)}><FaAngleRight /> </button> */}
                             </div>
                         </div>
                     </div>
@@ -305,8 +317,8 @@ const AuctionSchedule = () => {
                                     ))}
                                 </div>
                                 <div className="modal-footer">
-                                    <button type="button" className="btn btn-secondary" onClick={closeInsertModal}>취소</button>
-                                    <button type="button" className="btn btn-success" onClick={saveInsertInput}>등록</button>
+                                    <button type="button" className="btn btn-secondary rounded-1" onClick={closeInsertModal}>취소</button>
+                                    <button type="button" className="btn btn-success rounded-1" onClick={saveInsertInput}>등록</button>
                                 </div>
                             </div>
                         </div>
