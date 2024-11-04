@@ -66,40 +66,44 @@ const ChangePw = () => {
 
     return (
         <>
-            <Jumbotron title="비밀번호 재설정" />
-            <div className="row mt-4">
-                <div className="col">
-                    <input
-                        type="password"
-                        className="form-control rounded-0"
-                        placeholder="새 비밀번호"
-                        value={newPw}
-                        onChange={(e) => setNewPw(e.target.value)} />
-                </div>
-            </div>
-            <div className="row mt-4">
-                <div className="col">
-                    <input
-                        type="password"
-                        className="form-control rounded-0"
-                        placeholder="비밀번호 확인"
-                        value={confirmPw}
-                        onChange={(e) => setConfirmPw(e.target.value)} />
-                </div>
-            </div>
-            <div className="row mt-4">
-                <div className="col">
-                    <button className="btn btn-dark w-100 mt-2 rounded-0" onClick={handleChangePw}>
-                        비밀번호 재설정
-                    </button>
-                </div>
-            </div>
+            <div className="row">
+                <div className="col-md-6 offset-md-3">
+                    <Jumbotron title="비밀번호 재설정" />
+                    <div className="row mt-4">
+                        <div className="col">
+                            <input
+                                type="password"
+                                className="form-control rounded-0"
+                                placeholder="새 비밀번호"
+                                value={newPw}
+                                onChange={(e) => setNewPw(e.target.value)} />
+                        </div>
+                    </div>
+                    <div className="row mt-4">
+                        <div className="col">
+                            <input
+                                type="password"
+                                className="form-control rounded-0"
+                                placeholder="비밀번호 확인"
+                                value={confirmPw}
+                                onChange={(e) => setConfirmPw(e.target.value)} />
+                        </div>
+                    </div>
+                    <div className="row mt-4">
+                        <div className="col">
+                            <button className="btn btn-dark w-100 mt-2 rounded-0" onClick={handleChangePw}>
+                                비밀번호 재설정
+                            </button>
+                        </div>
+                    </div>
 
-            {message && (
-                <div style={{ color: 'red', marginTop: '1rem' }}>
-                    {message}
+                    {message && (
+                        <div style={{ color: 'red', marginTop: '1rem' }}>
+                            {message}
+                        </div>
+                    )}
                 </div>
-            )}
+            </div>
         </>
     );
 };

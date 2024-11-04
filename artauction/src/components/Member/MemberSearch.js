@@ -120,7 +120,7 @@ const MemberSearch = () => {
             memberList: filteredMemberList,
             count: resp.data.count,
         });
-    }, [basicSearch, input, page, searchColumn]);
+    }, [basicSearch, input, page, searchColumn, size]);
 
     const handleComplexSearch = async (e) => {
         e.preventDefault();
@@ -163,251 +163,253 @@ const MemberSearch = () => {
 
     return (
         <>
-            <Jumbotron title="회원 조회" />
-            <div className="row mt-4">
-                <label className="col-sm-2 col-form-label"></label>
-                <div className="col-sm-8 d-flex">
-                    <select className="form-select form-select-sm me-2 rounded-0" style={{ width: '30%' }}
-                        onChange={handleSearchColumnChange} value={searchColumn}>
-                        <option value="member_id">아이디</option>
-                        <option value="member_name">이름</option>
-                        <option value="member_email">이메일</option>
-                    </select>
-                    <div className="input-group">
-                        <input
-                            type="text"
-                            className="form-control ms-2 rounded-0"
-                            value={basicSearch.keyword}
-                            onChange={handleBasicSearchChange}
-                            style={{ width: '70%', backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }}
-                        />
-                        <button className="btn btn-dark rounded-0" onClick={handleBasicSearch}>
-                            <FaMagnifyingGlass />
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div className="row mt-4">
-                <label className="col-sm-2 col-form-label"></label>
-                <div className="col-sm-8 d-flex">
-                    <button className="btn btn-secondary w-100 rounded-0 mt-3" onClick={openModal}>
-                        상세 조건
-                    </button>
-                </div>
-            </div>
-
-            <Modal 
-                isOpen={modalIsOpen} 
-                onRequestClose={closeModal} 
-                contentLabel="상세 조건"
-                style={{
-                    content: {
-                        backgroundColor: 'white',
-                        color: 'black',
-                        top: '50%',
-                        left: '50%',
-                        right: 'auto',
-                        bottom: 'auto',
-                        marginRight: '-50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: 'auto',
-                        height: '810px',
-                        border: 'none',
-                        borderRadius: '8px',
-                        boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
-                    }
-                }}>
-                <h2>복합검색</h2>
-                <form onSubmit={handleComplexSearch}>
-                    {/* 복합 검색 필드들 */}
-                    <div className="row mt-4">
-                        <label className="col-sm-3 col-form-label">아이디</label>
-                        <div className="col-sm-9">
-                            <input type="text" className="form-control rounded-0"
-                                name="memberId" value={input.memberId}
-                                onChange={changeInputString}
-                                style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
-                        </div>
-                    </div>
-                    <div className="row mt-4">
-                        <label className="col-sm-3 col-form-label">이름</label>
-                        <div className="col-sm-9">
-                            <input type="text" className="form-control rounded-0"
-                                name="memberName" value={input.memberName}
-                                onChange={changeInputString}
-                                style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
-                        </div>
-                    </div>
-                    <div className="row mt-4">
-                        <label className="col-sm-3 col-form-label">연락처</label>
-                        <div className="col-sm-9">
-                            <input type="tel" className="form-control rounded-0"
-                                name="memberContact" value={input.memberContact}
-                                onChange={changeInputString}
-                                style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
-                        </div>
-                    </div>
-                    <div className="row mt-4">
-                        <label className="col-sm-3 col-form-label">이메일</label>
-                        <div className="col-sm-9">
-                            <input type="email" className="form-control rounded-0"
-                                name="memberEmail" value={input.memberEmail}
-                                onChange={changeInputString}
-                                style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
-                        </div>
-                    </div>
-                    <div className="row mt-4">
-                        <label className="col-sm-3 col-form-label">포인트</label>
-                        <div className="col-sm-9 d-flex">
-                            <input type="text" className="form-control rounded-0"
-                                name="minMemberPoint" value={input.minMemberPoint}
-                                onChange={changeInputNumber}
-                                style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
-                            <span className="mx-2">
-                                <PiTildeBold />
-                            </span>
-                            <input type="text" className="form-control rounded-0"
-                                name="maxMemberPoint" value={input.maxMemberPoint}
-                                onChange={changeInputNumber}
-                                style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
-                        </div>
-                    </div>
-                    <div className="row mt-4">
-                        <label className="col-sm-3 col-form-label">주소</label>
-                        <div className="col-sm-9">
-                            <input type="text" className="form-control rounded-0"
-                                name="memberAddress" value={input.memberAddress}
-                                onChange={changeInputString}
-                                style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
-                        </div>
-                    </div>
-                    <div className="row mt-4">
-                        <label className="col-sm-3 col-form-label">가입일</label>
-                        <div className="col-sm-9 d-flex">
-                            <input type="date" className="form-control rounded-0"
-                                name="beginMemberJoinDate" value={input.beginMemberJoinDate}
-                                onChange={changeInputString}
-                                style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
-                            <span className="mx-2">
-                                <PiTildeBold />
-                            </span>
-                            <input type="date" className="form-control rounded-0"
-                                name="endMemberJoinDate" value={input.endMemberJoinDate}
-                                onChange={changeInputString}
-                                style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
-                        </div>
-                    </div>
-                    <div className="row mt-4">
-                        <label className="col-sm-3 col-form-label ">차단 여부</label>
-                        <div className="col-sm-9">
-                            <input
-                                type="checkbox"
-                                className="form-check-input rounded-0"
-                                name="isBlocked"
-                                checked={input.isBlocked}
-                                onChange={e => setInput({ ...input, isBlocked: e.target.checked })}
-                                style={{ accentColor: '#888' }}
-                            />
-                            <span className="ms-1">차단된 회원만 보기</span>
-                        </div>
-                    </div>
-
-                    <div className="row mt-4">
-                        <label className="col-sm-3 col-form-label">정렬방식</label>
-                        <div className="col-sm-9">
-                            <div className="row">
-                                <div className="col-6">
-                                    <label>
-                                        <input type="checkbox"
-                                            className="form-check-input rounded-0"
-                                            onChange={() => changeOrder("member_id ASC")} />
-                                        <span className="ms-1">아이디 오름차순</span>
-                                    </label>
-                                </div>
-                                <div className="col-6">
-                                    <label>
-                                        <input type="checkbox"
-                                            className="form-check-input rounded-0"
-                                            onChange={() => changeOrder("member_id DESC")} />
-                                        <span className="ms-1">아이디 내림차순</span>
-                                    </label>
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-6">
-                                    <label>
-                                        <input type="checkbox"
-                                            className="form-check-input rounded-0"
-                                            onChange={() => changeOrder("member_name ASC")} />
-                                        <span className="ms-1">이름 오름차순</span>
-                                    </label>
-                                </div>
-                                <div className="col-6">
-                                    <label>
-                                        <input type="checkbox"
-                                            className="form-check-input rounded-0"
-                                            onChange={() => changeOrder("member_name DESC")} />
-                                        <span className="ms-1">이름 내림차순</span>
-                                    </label>
-                                </div>
+            <div className="row">
+                <div className="col-md-6 offset-md-3">
+                    <Jumbotron title="회원 조회" />
+                   
+                        <div className="col-sm-12 d-flex mt-3">
+                            <select className="form-select form-select-sm rounded-0" style={{ width: '30%' }}
+                                onChange={handleSearchColumnChange} value={searchColumn}>
+                                <option value="member_id">아이디</option>
+                                <option value="member_name">이름</option>
+                                <option value="member_email">이메일</option>
+                            </select>
+                            <div className="input-group">
+                                <input
+                                    type="text"
+                                    className="form-control rounded-0"
+                                    value={basicSearch.keyword}
+                                    onChange={handleBasicSearchChange}
+                                    style={{ width: '70%', backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }}
+                                />
+                                <button className="btn btn-dark rounded-0" onClick={handleBasicSearch}>
+                                    <FaMagnifyingGlass />
+                                </button>
                             </div>
                         </div>
-                    </div>
-
-                    <div className="row mt-4">
-                        <div className="col">
-                            <button type="submit" className="btn btn-dark rounded-0">
-                                검색
+                    
+                  
+                        <div className="col-sm-12 d-flex">
+                            <button className="btn btn-secondary w-100 rounded-0 mt" onClick={openModal}>
+                                상세 조건
                             </button>
                         </div>
-                    </div>
-                </form>
-                <button className="btn btn-secondary rounded-0" onClick={closeModal}>
-                    닫기
-                </button>
-            </Modal>
+                    
 
-            <ul className="list-group mt-4" style={{ width: '1030px', boxSizing: 'border-box', margin: '0 auto'  }}>
-    {result.memberList.map(member => (
-        <li
-            className="list-group-item rounded-0"
-            key={member.memberId}
-            data-member-id={member.memberId}
-            onClick={() => handleMemberClick(member.memberId)}
-            onMouseOver={() => handleMouseOver(member.memberId)}
-            onMouseOut={() => handleMouseOut(member.memberId)}
-            style={{ cursor: 'pointer' }}
-        >
-            <h3>{member.memberId} ({member.memberName})</h3>
-        </li>
-    ))}
-</ul>
+                    <Modal
+                        isOpen={modalIsOpen}
+                        onRequestClose={closeModal}
+                        contentLabel="상세 조건"
+                        style={{
+                            content: {
+                                backgroundColor: 'white',
+                                color: 'black',
+                                top: '50%',
+                                left: '50%',
+                                right: 'auto',
+                                bottom: 'auto',
+                                marginRight: '-50%',
+                                transform: 'translate(-50%, -50%)',
+                                width: 'auto',
+                                height: '810px',
+                                border: 'none',
+                                borderRadius: '8px',
+                                boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
+                            }
+                        }}>
+                        <h2>복합검색</h2>
+                        <form onSubmit={handleComplexSearch}>
+                           
+                            <div className="row mt-4">
+                                <label className="col-sm-3 col-form-label">아이디</label>
+                                <div className="col-sm-9">
+                                    <input type="text" className="form-control rounded-0"
+                                        name="memberId" value={input.memberId}
+                                        onChange={changeInputString}
+                                        style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
+                                </div>
+                            </div>
+                            <div className="row mt-4">
+                                <label className="col-sm-3 col-form-label">이름</label>
+                                <div className="col-sm-9">
+                                    <input type="text" className="form-control rounded-0"
+                                        name="memberName" value={input.memberName}
+                                        onChange={changeInputString}
+                                        style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
+                                </div>
+                            </div>
+                            <div className="row mt-4">
+                                <label className="col-sm-3 col-form-label">연락처</label>
+                                <div className="col-sm-9">
+                                    <input type="tel" className="form-control rounded-0"
+                                        name="memberContact" value={input.memberContact}
+                                        onChange={changeInputString}
+                                        style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
+                                </div>
+                            </div>
+                            <div className="row mt-4">
+                                <label className="col-sm-3 col-form-label">이메일</label>
+                                <div className="col-sm-9">
+                                    <input type="email" className="form-control rounded-0"
+                                        name="memberEmail" value={input.memberEmail}
+                                        onChange={changeInputString}
+                                        style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
+                                </div>
+                            </div>
+                            <div className="row mt-4">
+                                <label className="col-sm-3 col-form-label">포인트</label>
+                                <div className="col-sm-9 d-flex">
+                                    <input type="text" className="form-control rounded-0"
+                                        name="minMemberPoint" value={input.minMemberPoint}
+                                        onChange={changeInputNumber}
+                                        style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
+                                    <span className="mx-2">
+                                        <PiTildeBold />
+                                    </span>
+                                    <input type="text" className="form-control rounded-0"
+                                        name="maxMemberPoint" value={input.maxMemberPoint}
+                                        onChange={changeInputNumber}
+                                        style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
+                                </div>
+                            </div>
+                            <div className="row mt-4">
+                                <label className="col-sm-3 col-form-label">주소</label>
+                                <div className="col-sm-9">
+                                    <input type="text" className="form-control rounded-0"
+                                        name="memberAddress" value={input.memberAddress}
+                                        onChange={changeInputString}
+                                        style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
+                                </div>
+                            </div>
+                            <div className="row mt-4">
+                                <label className="col-sm-3 col-form-label">가입일</label>
+                                <div className="col-sm-9 d-flex">
+                                    <input type="date" className="form-control rounded-0"
+                                        name="beginMemberJoinDate" value={input.beginMemberJoinDate}
+                                        onChange={changeInputString}
+                                        style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
+                                    <span className="mx-2">
+                                        <PiTildeBold />
+                                    </span>
+                                    <input type="date" className="form-control rounded-0"
+                                        name="endMemberJoinDate" value={input.endMemberJoinDate}
+                                        onChange={changeInputString}
+                                        style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
+                                </div>
+                            </div>
+                            <div className="row mt-4">
+                                <label className="col-sm-3 col-form-label ">차단 여부</label>
+                                <div className="col-sm-9">
+                                    <input
+                                        type="checkbox"
+                                        className="form-check-input rounded-0"
+                                        name="isBlocked"
+                                        checked={input.isBlocked}
+                                        onChange={e => setInput({ ...input, isBlocked: e.target.checked })}
+                                        style={{ accentColor: '#888' }}
+                                    />
+                                    <span className="ms-1">차단된 회원만 보기</span>
+                                </div>
+                            </div>
+
+                            <div className="row mt-4">
+                                <label className="col-sm-3 col-form-label">정렬방식</label>
+                                <div className="col-sm-9">
+                                    <div className="row">
+                                        <div className="col-6">
+                                            <label>
+                                                <input type="checkbox"
+                                                    className="form-check-input rounded-0"
+                                                    onChange={() => changeOrder("member_id ASC")} />
+                                                <span className="ms-1">아이디 오름차순</span>
+                                            </label>
+                                        </div>
+                                        <div className="col-6">
+                                            <label>
+                                                <input type="checkbox"
+                                                    className="form-check-input rounded-0"
+                                                    onChange={() => changeOrder("member_id DESC")} />
+                                                <span className="ms-1">아이디 내림차순</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-6">
+                                            <label>
+                                                <input type="checkbox"
+                                                    className="form-check-input rounded-0"
+                                                    onChange={() => changeOrder("member_name ASC")} />
+                                                <span className="ms-1">이름 오름차순</span>
+                                            </label>
+                                        </div>
+                                        <div className="col-6">
+                                            <label>
+                                                <input type="checkbox"
+                                                    className="form-check-input rounded-0"
+                                                    onChange={() => changeOrder("member_name DESC")} />
+                                                <span className="ms-1">이름 내림차순</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="row mt-4">
+                                <div className="col">
+                                    <button type="submit" className="btn btn-dark rounded-0">
+                                        검색
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <button className="btn btn-secondary rounded-0" onClick={closeModal}>
+                            닫기
+                        </button>
+                    </Modal>
+
+                    <ul className="list-group mt-4" style={{ boxSizing: 'border-box', margin: '0 auto' }}>
+                        {result.memberList.map(member => (
+                            <li
+                                className="list-group-item rounded-0"
+                                key={member.memberId}
+                                data-member-id={member.memberId}
+                                onClick={() => handleMemberClick(member.memberId)}
+                                onMouseOver={() => handleMouseOver(member.memberId)}
+                                onMouseOut={() => handleMouseOut(member.memberId)}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <h3>{member.memberId} ({member.memberName})</h3>
+                            </li>
+                        ))}
+                    </ul>
 
 
-            {result.memberList.length > 0 && !modalIsOpen && (
-                <div className="row mt-4">
-                    <div className="col">
-                        <nav>
-                            <ul className="pagination justify-content-center">
-                                <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
-                                    <button className="page-link rounded-0" onClick={() => handlePageClick(page - 1)}>이전</button>
-                                </li>
-                                {Array.from({ length: endPage - startPage + 1 }).map((_, index) => {
-                                    const pageNum = startPage + index;
-                                    return (
-                                        <li className={`page-item ${page === pageNum ? 'active' : ''}`} key={pageNum}>
-                                            <button className="page-link rounded-0" onClick={() => handlePageClick(pageNum)}>{pageNum}</button>
+                    {result.memberList.length > 0 && !modalIsOpen && (
+                        <div className="row mt-4">
+                            <div className="col">
+                                <nav>
+                                    <ul className="pagination justify-content-center">
+                                        <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                                            <button className="page-link rounded-0" onClick={() => handlePageClick(page - 1)}>이전</button>
                                         </li>
-                                    );
-                                })}
-                                <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
-                                    <button className="page-link rounded-0" onClick={() => handlePageClick(page + 1)}>다음</button>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
+                                        {Array.from({ length: endPage - startPage + 1 }).map((_, index) => {
+                                            const pageNum = startPage + index;
+                                            return (
+                                                <li className={`page-item ${page === pageNum ? 'active' : ''}`} key={pageNum}>
+                                                    <button className="page-link rounded-0" onClick={() => handlePageClick(pageNum)}>{pageNum}</button>
+                                                </li>
+                                            );
+                                        })}
+                                        <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                                            <button className="page-link rounded-0" onClick={() => handlePageClick(page + 1)}>다음</button>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    )}
                 </div>
-            )}
+            </div>
         </>
     );
 };
