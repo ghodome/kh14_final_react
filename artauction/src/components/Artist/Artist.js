@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Jumbotron from "../Jumbotron";
 import axios from "axios";
 import { Modal } from "bootstrap";
@@ -175,6 +175,7 @@ const Artist = () => {
     });
 
     inputFileRef.current.value = ""
+    clearState();
     closeModal();
     loadArtistList();
     setImages([]);
@@ -288,12 +289,186 @@ const Artist = () => {
     setIsEditing(!isEditing);
   };
 
+//------------------작가 등록 형식검사-----------------------------
+const [artistFileValid, setArtistFileValid] = useState(false);
+const [artistNameValid, setArtistNameValid] = useState(false);
+const [artistDescriptionValid, setArtistDescriptionValid] = useState(false);
+const [artistHistoryValid, setArtistHistoryValid] = useState(false);
+const [artistBirthValid, setArtistBirthValid] = useState(false);
+const [artistDeathValid, setArtistDeathValid] = useState(false);
+
+const [artistFileClass, setArtistFileClass] = useState("");
+const [artistNameClass, setArtistNameClass] = useState("");
+const [artistDescriptionClass, setArtistDescriptionClass] = useState("");
+const [artistHistoryClass, setArtistHistoryClass] = useState("");
+const [artistBirthClass, setArtistBirthClass] = useState("");
+const [artistDeathClass, setArtistDeathClass] = useState("");
+
+const checkArtistFile = useCallback(()=> {
+  const valid = input.attachList.length > 0;
+  setArtistFileValid(valid);
+  if(input.attachList.length===0)  setArtistFileClass("");
+  else setArtistFileClass(valid ? "is-valid" : "is-invalid");
+}, [input]);
+
+const checkArtistName = useCallback(()=>{
+  const regex = /^([가-힣]{2,7}|[a-zA-Z ]{1,30})$/;
+  const valid = regex.test(input.artistName);
+  setArtistNameValid(valid);
+  if(input.artistName.length === 0) setArtistNameClass("");
+  else setArtistNameClass(valid ? "is-valid" : "is-invalid");
+}, [input]);
+
+const checkArtistDescription = useCallback(()=>{
+  const regex = /^.{1,300}$/;
+  const valid = regex.test(input.artistDescription);
+  setArtistDescriptionValid(valid);
+  if(input.artistDescription.length === 0) setArtistDescriptionClass("");
+  else setArtistDescriptionClass(valid ? "is-valid" : "is-invalid");
+}, [input]);
+
+const checkArtistHistory = useCallback(()=> {
+  const regex = /^.{1,300}$/;
+  const valid = regex.test(input.artistHistory);
+  setArtistHistoryValid(valid);
+  if(input.artistHistory.length ===0) setArtistHistoryClass("");
+  else setArtistHistoryClass(valid ? "is-valid" : "is-invalid");
+}, [input]);
+
+const checkArtistBirth = useCallback(()=> {
+  const regex = /^([0-9]{4})-(02-(0[1-9]|1[0-9]|2[0-8])|(0[469]|11)-(0[1-9]|1[0-9]|2[0-9]|30)|(0[13578]|1[02])-(0[1-9]|1[0-9]|2[0-9]|3[01]))$/;
+  const valid = regex.test(input.artistBirth);
+  setArtistBirthValid(valid);
+  if(input.artistBirth.length ===0) setArtistBirthClass("");
+  else setArtistBirthClass(valid ? "is-valid" : "is-invalid");
+}, [input]);
+
+const checkArtistDeath = useCallback(()=> {
+  const regex = /^([0-9]{4})-(02-(0[1-9]|1[0-9]|2[0-8])|(0[469]|11)-(0[1-9]|1[0-9]|2[0-9]|30)|(0[13578]|1[02])-(0[1-9]|1[0-9]|2[0-9]|3[01]))$/;
+  const valid = regex.test(input.artistDeath);
+  setArtistDeathValid(valid);
+  if(input.artistDeath.length ===0) setArtistDeathClass("");
+  else setArtistDeathClass(valid ? "is-valid" : "is-invalid");
+}, [input]);
+
+const isAllValid = useMemo(()=>{
+  return artistFileValid && artistNameValid && artistDescriptionValid && artistHistoryValid
+              && artistBirthValid && artistDeathValid
+}, [artistFileValid, artistNameValid, artistDescriptionValid, artistHistoryValid, artistBirthValid, artistDeathValid]);
+
+const clearState = useCallback(()=>{
+  setArtistFileValid(false);
+  setArtistNameValid(false);
+  setArtistDescriptionValid(false);
+  setArtistHistoryValid(false);
+  setArtistBirthValid(false);
+  setArtistDeathValid(false);
+
+  setArtistFileClass("");
+  setArtistNameClass("");
+  setArtistDescriptionClass("");
+  setArtistHistoryClass("");
+  setArtistBirthClass("");
+  setArtistDeathClass("");
+}, []);
+
+//-------------------------------------------- 작가 수정 형식 검사 ------------------------------------------------
+const [artistFileEValid, setArtistFileEValid] = useState(true);
+const [artistNameEValid, setArtistNameEValid] = useState(true);
+const [artistDescriptionEValid, setArtistDescriptionEValid] = useState(true);
+const [artistHistoryEValid, setArtistHistoryEValid] = useState(true);
+const [artistBirthEValid, setArtistBirthEValid] = useState(true);
+const [artistDeathEValid, setArtistDeathEValid] = useState(true);
+
+const [artistFileEClass, setArtistFileEClass] = useState("");
+const [artistNameEClass, setArtistNameEClass] = useState("");
+const [artistDescriptionEClass, setArtistDescriptionEClass] = useState("");
+const [artistHistoryEClass, setArtistHistoryEClass] = useState("");
+const [artistBirthEClass, setArtistBirthEClass] = useState("");
+const [artistDeathEClass, setArtistDeathEClass] = useState("");
+
+const checkArtistFileE = useCallback(() => {
+  const valid = (input.attachList && input.attachList.length > 0);
+  setArtistFileValid(valid);
+
+  // updateInput.attachList가 정의되어 있는지 먼저 확인
+  if (!updateInput.attachList || updateInput.attachList.length === 0) {
+      setArtistFileClass("");
+  } else {
+      setArtistFileClass(valid ? "is-valid" : "is-invalid");
+  }
+}, [updateInput]);
+
+const checkArtistNameE = useCallback(()=>{
+  const regex = /^([가-힣]{2,7}|[a-zA-Z ]{1,30})$/;
+  const valid = regex.test(updateInput.artistName);
+  setArtistNameEValid(valid);
+  if(updateInput.artistName.length === 0) setArtistNameEClass("");
+  else setArtistNameEClass(valid ? "is-valid" : "is-invalid");
+}, [updateInput]);
+
+const checkArtistDescriptionE = useCallback(()=>{
+  const regex = /^.{1,300}$/;
+  const valid = regex.test(updateInput.artistDescription);
+  setArtistDescriptionEValid(valid);
+  if(updateInput.artistDescription.length === 0) setArtistDescriptionEClass("");
+  else setArtistDescriptionEClass(valid ? "is-valid" : "is-invalid");
+}, [updateInput]);
+
+const checkArtistHistoryE = useCallback(()=> {
+  const regex = /^.{1,300}$/;
+  const valid = regex.test(updateInput.artistHistory);
+  setArtistHistoryEValid(valid);
+  if(updateInput.artistHistory.length ===0) setArtistHistoryEClass("");
+  else setArtistHistoryEClass(valid ? "is-valid" : "is-invalid");
+}, [updateInput]);
+
+const checkArtistBirthE = useCallback(()=> {
+  const regex = /^([0-9]{4})-(02-(0[1-9]|1[0-9]|2[0-8])|(0[469]|11)-(0[1-9]|1[0-9]|2[0-9]|30)|(0[13578]|1[02])-(0[1-9]|1[0-9]|2[0-9]|3[01]))$/;
+  const valid = regex.test(updateInput.artistBirth);
+  setArtistBirthEValid(valid);
+  if(updateInput.artistBirth.length ===0) setArtistBirthEClass("");
+  else setArtistBirthEClass(valid ? "is-valid" : "is-invalid");
+}, [updateInput]);
+
+const checkArtistDeathE = useCallback(()=> {
+  const regex = /^([0-9]{4})-(02-(0[1-9]|1[0-9]|2[0-8])|(0[469]|11)-(0[1-9]|1[0-9]|2[0-9]|30)|(0[13578]|1[02])-(0[1-9]|1[0-9]|2[0-9]|3[01]))$/;
+  const valid = regex.test(updateInput.artistDeath);
+  setArtistDeathEValid(valid);
+  if(updateInput.artistDeath.length ===0) setArtistDeathEClass("");
+  else setArtistDeathEClass(valid ? "is-valid" : "is-invalid");
+}, [updateInput]);
+
+const isAllEValid = useMemo(()=>{
+  return artistFileEValid && artistNameEValid && artistDescriptionEValid && artistHistoryEValid
+              && artistBirthEValid && artistDeathEValid
+}, [artistFileEValid, artistNameEValid, artistDescriptionEValid, artistHistoryEValid, artistBirthEValid, artistDeathEValid]);
+
+const clearEState = useCallback(()=>{
+  setArtistFileEValid(true);
+  setArtistNameEValid(true);
+  setArtistDescriptionEValid(true);
+  setArtistHistoryEValid(true);
+  setArtistBirthEValid(true);
+  setArtistDeathEValid(true);
+
+  setArtistFileEClass("");
+  setArtistNameEClass("");
+  setArtistDescriptionEClass("");
+  setArtistHistoryEClass("");
+  setArtistBirthEClass("");
+  setArtistDeathEClass("");
+}, []);
+
+//-------------------------------------------------------------------------------------------------
+
+
   return (
     <>
       <Jumbotron title="작가 페이지"></Jumbotron>
       <div className="row mt-3">
         <div className="col-11 text-end">
-          <button className="btn btn-secondary" onClick={openModal}>
+          <button className="btn btn-primary" onClick={openModal}>
             작가 등록하기
           </button>
         </div>
@@ -314,10 +489,13 @@ const Artist = () => {
               <div className="row">
                 <div className="col">
                   <label>작가 이미지</label>
-                  <input type="file" className="form-control" name="attachList" multiple accept="image/*" onChange={changeInput} ref={inputFileRef} />
+                  <input type="file" className={"form-control "+artistFileClass} name="attachList" multiple accept="image/*" onChange={changeInput} ref={inputFileRef} 
+                                    onBlur={checkArtistFile} onFocus={checkArtistFile}/>
                   {images.map((image, index) => (
                     <img key={index} src={image} alt={`미리보기 ${index + 1}`} style={{ maxWidth: '100px', margin: '5px' }} />
                   ))}
+                  <div className="valid-feedback"></div>
+                  <div className="invalid-feedback"></div>
                 </div>
               </div>
 
@@ -328,10 +506,14 @@ const Artist = () => {
                   <input type="text"
                     value={input.artistName}
                     name="artistName"
-                    className="form-control"
+                    className={"form-control "+artistNameClass}
                     onChange={changeInput}
                     placeholder="작가명"
-                    autoComplete="off" />
+                    autoComplete="off" 
+                    onBlur={checkArtistName}
+                    onFocus={checkArtistName}/>
+                    <div className="valid-feedback"></div>
+                    <div className="invalid-feedback"></div>
                 </div>
               </div>
               <div className="row">
@@ -340,10 +522,14 @@ const Artist = () => {
                   <textarea type="text"
                     value={input.artistDescription}
                     name="artistDescription"
-                    className="form-control"
+                    className={"form-control "+artistDescriptionClass}
                     onChange={e => changeInput(e)}
                     placeholder="작가에 대한 소개"
-                    autoComplete="off" />
+                    autoComplete="off" 
+                    onBlur={checkArtistDescription}
+                    onFocus={checkArtistDescription}/>
+                    <div className="valid-feedback"></div>
+                    <div className="invalid-feedback"></div>
                 </div>
               </div>
               <div className="row">
@@ -351,11 +537,15 @@ const Artist = () => {
                   <label>작가 기록</label>
                   <input type="text"
                     name="artistHistory"
-                    className="form-control"
+                    className={"form-control "+artistHistoryClass}
                     value={input.artistHistory}
                     onChange={e => changeInput(e)}
                     placeholder="작품, 활동 등"
-                    autoComplete="off" />
+                    autoComplete="off" 
+                    onBlur={checkArtistHistory}
+                    onFocus={checkArtistHistory}/>
+                    <div className="valid-feedback"></div>
+                    <div className="invalid-feedback"></div>
                 </div>
               </div>
               <div className="row">
@@ -363,11 +553,15 @@ const Artist = () => {
                   <label>출생</label>
                   <input type="date"
                     name="artistBirth"
-                    className="form-control"
+                    className={"form-control "+artistBirthClass}
                     value={input.artistBirth}
                     onChange={e => changeInput(e)}
                     placeholder="yyyy-mm-dd 형식으로만"
-                    autoComplete="off" />
+                    autoComplete="off" 
+                    onBlur={checkArtistBirth}
+                    onFocus={checkArtistBirth}/>
+                    <div className="valid-feedback"></div>
+                    <div className="invalid-feedback"></div>
                 </div>
               </div>
               <div className="row">
@@ -375,11 +569,15 @@ const Artist = () => {
                   <label>사망</label>
                   <input type="date"
                     name="artistDeath"
-                    className="form-control"
+                    className={"form-control "+artistDeathClass}
                     value={input.artistDeath}
                     onChange={e => changeInput(e)}
                     placeholder="yyyy-mm-dd 형식으로만"
-                    autoComplete="off" />
+                    autoComplete="off" 
+                    onBlur={checkArtistDeath}
+                    onFocus={checkArtistDeath}/>
+                    <div className="valid-feedback"></div>
+                    <div className="invalid-feedback"></div>
                 </div>
               </div>
             </div>
@@ -387,7 +585,8 @@ const Artist = () => {
               <button
                 type="button"
                 className="btn btn-success"
-                onClick={registInput}>
+                onClick={registInput}
+                disabled={!isAllValid}>
                 등록
               </button>
               <button
@@ -422,7 +621,7 @@ const Artist = () => {
                   </div>
                 </div>
                 <div className="col-md-2 d-flex">
-                  <button type="button" className="btn btn-outline-secondary"
+                  <button type="button" className="btn btn-outline-success"
                     onClick={e => openDetailModal(artist)}>
                     상세
                   </button>
@@ -446,7 +645,7 @@ const Artist = () => {
               {[...Array(totalPage)].map((_, index) => (
                 <button
                   key={index}
-                  className={`btn btn-outline-secondary mx-1 ${page === index + 1 ? 'active' : ''}`}
+                  className={`btn btn-outline-primary mx-1 ${page === index + 1 ? 'active' : ''}`}
                   onClick={() => pageClick(index + 1)}
                 >
                   {index + 1}
@@ -505,8 +704,11 @@ const Artist = () => {
                 <div className="row mt-2">
                   <div className="col">
                     <label>이미지 수정</label>
-                    <input type="file" className="form-control" name="attachList" multiple
-                      accept="image/*" onChange={e => changeUpdateInput(e)} ref={inputFileRef} />
+                    <input type="file" className={"form-control "+artistFileEClass} name="attachList" multiple
+                      accept="image/*" onChange={e => changeUpdateInput(e)} ref={inputFileRef} 
+                      onBlur={checkArtistFileE} onFocus={checkArtistFileE}/>
+                      <div className="valid-feedback"></div>
+                      <div className="invalid-feedback"></div>
                   </div>
                 </div>
               )}
@@ -520,9 +722,13 @@ const Artist = () => {
                       {/* {updateStatus.artistName == true ? (<> */}
                       <input type="text" name="artistName"
                         value={updateInput.artistName || ""}
-                        className="form-control"
+                        className={"form-control "+artistNameEClass}
                         onChange={e => changeUpdateInput(e)}
-                        disabled={!isEditing}></input>
+                        onBlur={checkArtistNameE}
+                        onFocus={checkArtistNameE}
+                        disabled={!isEditing}/>
+                        <div className="valid-feedback"></div>
+                        <div className="invalid-feedback"></div>
                       {/* </>) : (<p>{detailArtist.artistName}</p>)} */}
                     </div>
                     <div className="col-2">
@@ -541,9 +747,13 @@ const Artist = () => {
                       {/* {updateStatus.artistDescription == true ? (<> */}
                       <input type="text" name="artistDescription"
                         value={updateInput.artistDescription || ""}
-                        className="form-control"
+                        className={"form-control "+artistDescriptionEClass}
                         onChange={e => changeUpdateInput(e)}
-                        disabled={!isEditing}></input>
+                        onBlur={checkArtistDescriptionE}
+                        onFocus={checkArtistDescriptionE}
+                        disabled={!isEditing}/>
+                        <div className="valid-feedback"></div>
+                        <div className="invalid-feedback"></div>
                       {/* </>) : (<p>{detailArtist.artistDescription}</p>)} */}
                     </div>
                     <div className="col-2">
@@ -561,9 +771,13 @@ const Artist = () => {
                       {/* {updateStatus.artistHistory == true ? (<> */}
                       <input type="text" name="artistHistory"
                         value={updateInput.artistHistory || ""}
-                        className="form-control"
+                        className={"form-control "+ artistHistoryEClass}
                         onChange={e => changeUpdateInput(e)}
-                        disabled={!isEditing}></input>
+                        onBlur={checkArtistHistoryE}
+                        onFocus={checkArtistHistoryE}
+                        disabled={!isEditing}/>
+                        <div className="valid-feedback"></div>
+                        <div className="invalid-feedback"></div>
                       {/* </>) : (<p>{detailArtist.artistHistory}</p>)} */}
                     </div>
                     <div className="col-2">
@@ -581,9 +795,13 @@ const Artist = () => {
                       {/* {updateStatus.artistBirth == true ? (<> */}
                       <input type="date" name="artistBirth"
                         value={updateInput.artistBirth || ""}
-                        className="form-control"
+                        className={"form-control "+artistBirthEClass}
                         onChange={e => changeUpdateInput(e)}
-                        disabled={!isEditing}></input>
+                        onBlur={checkArtistBirthE}
+                        onFocus={checkArtistBirthE}
+                        disabled={!isEditing}/>
+                        <div className="valid-feedback"></div>
+                        <div className="invalid-feedback"></div>
                       {/* </>) : (<p>{detailArtist.artistBirth}</p>)} */}
                     </div>
                     <div className="col-2">
@@ -601,9 +819,13 @@ const Artist = () => {
                       {/* {updateStatus.artistDeath == true ? (<> */}
                       <input type="date" name="artistDeath"
                         value={updateInput.artistDeath || ""}
-                        className="form-control"
+                        className={"form-control "+artistDeathEClass}
                         onChange={e => changeUpdateInput(e)}
-                        disabled={!isEditing}></input>
+                        onBlur={checkArtistDeathE}
+                        onFocus={checkArtistDeathE}
+                        disabled={!isEditing}/>
+                        <div className="valid-feedback"></div>
+                        <div className="invalid-feedback"></div>
                       {/* </>) : (<p>{detailArtist.artistDeath}</p>)}{ } */}
                     </div>
                     <div className="col-2">
@@ -625,14 +847,14 @@ const Artist = () => {
                   </button>
                 </div>
                 <div className="col-4">
-                  <button type="button" className="btn btn-success" onClick={toggleEditMode}>
+                  <button type="button" className="btn btn-success" onClick={toggleEditMode} disabled={isAllEValid=== false}>
                     {isEditing ? "완료" : "수정"}
                   </button>
                 </div>
                 <div className="col-4">
                   <button
                     type="button"
-                    className="btn btn-secondary"
+                    className="btn btn-primary"
                     onClick={closeDetailModal}>
                     확인
                   </button>
