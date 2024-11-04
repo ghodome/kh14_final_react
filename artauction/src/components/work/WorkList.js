@@ -86,7 +86,7 @@ const WorkList = () => {
 
     useEffect(()=>{
         loadArtistList();
-    }, [loadArtistList]);
+    }, []);
 
     const clearInput = useCallback(() => {
         setInput({
