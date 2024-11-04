@@ -43,6 +43,7 @@ const Auction = () => {
 
     const [wholeMessageList, setWholeMessageList] = useState([]);
     const [member, setMember] = useState({});
+    const [bidIncrementUnit, setBidIncrementUnit]=useState();
 
     //recoil
     const login = useRecoilValue(loginState);
@@ -111,6 +112,7 @@ const Auction = () => {
                 increment = 10000000;
         }
         setBidIncrement(increment);
+        setBidIncrementUnit(increment);
     }, [bidIncrement]);
 
     const connectToServer = useCallback(() => {
@@ -183,7 +185,7 @@ const Auction = () => {
                 bidIncrement: input.bid.bidIncrement + bidIncrement
             }
         })
-    },[bidIncrement])
+    },[input,bidIncrement])
 
     const decreaseBidIncrement = useCallback(() => {
         setInput({
@@ -194,7 +196,7 @@ const Auction = () => {
                     input.bid.bidIncrement - bidIncrement : input.bid.bidIncrement
             }
         })
-    },[bidIncrement]);
+    },[input,bidIncrement]);
 
     const loadMessageList = useCallback(async () => {
         const resp = await axios.get(`http://localhost:8080/bid/bidMessageList/${auctionNo}`);
@@ -232,7 +234,7 @@ const Auction = () => {
                 },
             }));
         }
-    }, [auctionAndWork,bidIncrement]);
+    }, [auctionAndWork]);
     
     useEffect(() => {
         const loadMember = async () => {
