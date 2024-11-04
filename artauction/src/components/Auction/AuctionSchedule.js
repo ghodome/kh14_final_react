@@ -225,7 +225,7 @@ const AuctionSchedule = () => {
                                     <div className="p-2">
                                         {moment(schedule.auctionScheduleEndDate).format("yyyy/MM/DD (dd) a hh:mm")}
                                     </div>
-                                </div>
+                                </div> 
 
                                 <div className="d-flex flex-row mt-2 mb-2">
                                 <button className="btn btn-outline-secondary mt-2 col-3 rounded-1"

@@ -51,12 +51,19 @@ const AuctionScheduleDetail = ()=>{
     }, []);
 
     //callback
-    const loadAuctionSchedule = useCallback(async ()=>{ //일정 상세 불러오기
+    const loadAuctionSchedule = useCallback(async ()=>{
         const resp = await axios.get("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
         setAuctionSchedule({
             ...resp.data,
+            auctionScheduleStartDate:new Date(resp.data.auctionScheduleStartDate).toISOString().slice(0,16),
+            auctionScheduleEndDate:new Date(resp.data.auctionScheduleEndDate).toISOString().slice(0,16)
         })
-    }, [auctionSchedule]);
+        setPresentInput({
+            ...presentInput,
+            auctionStartDate:new Date(resp.data.auctionScheduleStartDate).toISOString().slice(0,16),
+            auctionEndDate:new Date(resp.data.auctionScheduleEndDate).toISOString().slice(0,16),
+        });
+    }, [auctionSchedule,presentInput]);
 
     const inputFileRef = useRef(null);
 
@@ -349,12 +356,12 @@ const AuctionScheduleDetail = ()=>{
                 </div>
             </div>
 
-            {/* 각종 버튼들 */}
+            {/* 각종 버튼들 */} 
             <div className="row mt-4">
                 <div className="col text-end">
                 {auctionSchedule.auctionScheduleState === '진행경매' && (
                     <button className="btn btn-outline-dark ms-2 rounded-1"
-                                    onClick={e=>navigate("/auction/auctionLotList/"+auctionScheduleNo)}>경매참여</button>
+                                    onClick={e=>navigate("/auctionList/"+auctionScheduleNo)}>경매참여</button>
                 )}
                     <button className="btn btn-outline-secondary ms-2 rounded-1" 
                                     onClick={e=>navigate("/auctionschedule")}>뒤로가기</button>
@@ -366,6 +373,8 @@ const AuctionScheduleDetail = ()=>{
                 <div className="col text-end">
                     <button className="btn btn-primary ms-2 rounded-1" 
                                     onClick={openPresentModal}>출품등록</button>
+                    <button className="btn btn-outline-dark ms-2 rounded-1"
+                                    onClick={e=>navigate("/auctionList/"+auctionScheduleNo)}>경매보기</button>
                     <button className="btn btn-warning ms-2 rounded-1" 
                                 onClick={e=>openEditModal(auctionSchedule)}>일정수정</button>
                     <button className="btn btn-danger ms-2 rounded-1" 
