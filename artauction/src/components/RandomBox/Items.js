@@ -3,7 +3,7 @@ import Jumbotron from "../Jumbotron";
 import axios from "axios";
 import { Modal } from "bootstrap";
 import { NavLink } from "react-router-dom";
-import { motion } from "framer-motion"
+
 const Items = () => {
     const [item, setItem] = useState([]);
     const [result, setResult] = useState(null);
