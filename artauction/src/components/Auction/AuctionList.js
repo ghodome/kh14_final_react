@@ -35,7 +35,7 @@ const AuctionList = ()=>{
     const loadAuctionScheduleInfo = useCallback(async()=>{
         try{
             const resp = await axios.get(`http://localhost:8080/auction/auctionScheduleInfo/${auctionScheduleNo}`);
-            console.log("resp=", resp.data);
+            // console.log("resp=", resp.data);
             setAuctionScheduleInfo(resp.data[0]);
             } 
             catch (error) {
@@ -76,7 +76,7 @@ const AuctionList = ()=>{
                         <div className="card h-100 d-flex flex-column">
                             <h4 className="m-2">LOT {auctionData.auctionLot}</h4>
                         <div className="card-header text-center" 
-                                style={{ height: '150px', overflow: 'hidden' }}>
+                                style={{ height: '200px', overflow: 'hidden' }}>
                             {auctionData.attachment === null ? (
                                 <div className="card-img-top">
                                      <img src="https://placehold.co/300x200"
@@ -103,7 +103,7 @@ const AuctionList = ()=>{
                             <div className="card-text text-muted text-end">~ {auctionData.auctionHighPrice}원</div>
                             <div className="card-text text-muted">마감일</div>
                             <div className="text-sm text-muted text-end">
-                                {moment(auctionScheduleInfo.auctionScheduleEndDate).format("YY-MM-DD a hh:mm")}
+                                {moment(auctionData.auctionScheduleEndDate).format("YY-MM-DD a hh:mm")}
                             </div>
                         </div>
                         <div className="card-body text-end">
