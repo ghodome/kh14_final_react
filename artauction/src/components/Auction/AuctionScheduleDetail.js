@@ -53,10 +53,11 @@ const AuctionScheduleDetail = ()=>{
     //callback
     const loadAuctionSchedule = useCallback(async ()=>{
         const resp = await axios.get("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
+        // console.log(resp.data);
         setAuctionSchedule({
             ...resp.data,
-            auctionScheduleStartDate:new Date(resp.data.auctionScheduleStartDate).toISOString().slice(0,16),
-            auctionScheduleEndDate:new Date(resp.data.auctionScheduleEndDate).toISOString().slice(0,16)
+            // auctionScheduleStartDate:new Date(resp.data.auctionScheduleStartDate).toISOString().slice(0,16),
+            // auctionScheduleEndDate:new Date(resp.data.auctionScheduleEndDate).toISOString().slice(0,16)
         })
         setPresentInput({
             ...presentInput,
@@ -189,7 +190,7 @@ const AuctionScheduleDetail = ()=>{
     //출품작 목록
     const loadAuctionList=useCallback(async ()=>{   //출품작 불러오기
         const resp=await axios.get(`http://localhost:8080/auction/${auctionScheduleNo}`);
-        console.log(resp.data.auctionList);
+        // console.log(resp.data.auctionList);
         setAuctionList([
             ...resp.data
         ]);
@@ -356,7 +357,7 @@ const AuctionScheduleDetail = ()=>{
                 </div>
             </div>
 
-            {/* 각종 버튼들 */} 
+            {/* 각종 버튼들 */}
             <div className="row mt-4">
                 <div className="col text-end">
                 {auctionSchedule.auctionScheduleState === '진행경매' && (
