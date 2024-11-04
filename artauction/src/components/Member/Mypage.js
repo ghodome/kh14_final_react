@@ -185,7 +185,7 @@ const Mypage = () => {
                                             <td>{item.itemName}</td>
                                             <td>{item.itemValue.toLocaleString()}원</td>
                                             <td>
-                                                <button className="btn btn-success" onClick={e => openInsertModal(item.inventoryId)}>수령하기</button>
+                                                <button className="btn btn-dark rounded-0" onClick={e => openInsertModal(item.inventoryId)}>수령하기</button>
                                             </td>
                                         </tr>
                                     ))
