@@ -96,7 +96,7 @@ const Mypage = () => {
             </div>
             <div className="row mt-4">
                 <div className="col-3">포인트</div>
-                <div className="col-3">{member[0]?.memberPoint || ''}</div>
+                <div className="col-3">{member[0]?.memberPoint.toLocaleString() || '0'}</div>
             </div>
             <div className="row mt-4">
                 <div className="col-3">우편번호</div>

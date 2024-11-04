@@ -79,9 +79,28 @@ const Payment = () => {
 
     },[]);
 
-    // const calculateDay = useMemo((dealDate)=>{
-
-    // },[]);
+    const calculateDay = useCallback((dealDate) => {
+        const startDate = new Date(dealDate);
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 7); // 7일 후의 마감일 계산
+        const now = new Date();
+        const timeDifference = endDate - now;
+    
+        if (timeDifference < 0) {
+            return '마감일 지남'; // 이미 마감된 경우
+        }
+    
+        const daysRemaining = Math.floor(timeDifference / (1000 * 60 * 60 * 24)); // 남은 일 수 계산
+        if (daysRemaining < 1) {
+            const hoursRemaining = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); // 남은 시간 계산
+            return `${hoursRemaining}시간 남음`;
+        }
+    
+        return `${daysRemaining}일 남음`;
+    }, []);
+    const changeEndTime = useCallback(async(dealTime)=>{
+        // const resp = await axios.post("http://localhost:8080/");//이걸로 포인트 까고
+    },[]);
     return (
         <>
             <Jumbotron title="결제 하기" />
@@ -95,7 +114,7 @@ const Payment = () => {
                         <th>포인트로 결제한 가격</th>
                         <th>결제 가격</th>
                         <th>낙찰 일자</th>
-                        {/* <th>남은 일수</th> */}
+                        <th>남은 일수</th>
                         <th></th>
                         <th></th>
                     </tr>
@@ -115,14 +134,14 @@ const Payment = () => {
                             <td>{(deal?.dealPrice*0.3).toLocaleString() || ''}원</td>
                             <td>{(deal?.dealPrice*0.7).toLocaleString() || ''}원</td>
                             <td>{deal.dealTime}</td>
-                            {/* <td>{deal.dealTime}</td> */}
+                            <td>{calculateDay(deal.dealTime)}</td>
                             <td>
-                                <button className="btn btn-success" onClick={() => {
+                                <button className="btn btn-dark text-light" onClick={() => {
                                     sendPurchaseRequest([deal]); // 해당 항목만 결제
                                 }}>결제</button>
                             </td>
                             <td>
-                                <button className="btn btn-danger" onClick={e=>sendGiveUp(deal.dealNo)}>결제 포기</button>
+                                <button className="btn btn-light text-dark" onClick={e=>sendGiveUp(deal.dealNo)}>결제 포기</button>
                             </td>
                         </tr>
                     ))}
@@ -132,7 +151,7 @@ const Payment = () => {
             <div className="row mt-4">
                 <div className="col">
                     <h3>총 가격은 : {(checkedDealTotal*0.7)?.toLocaleString() || ''}원</h3>
-                    <button className="btn btn-success w-100" onClick={() => sendPurchaseRequest(checkedDealList)}>결제하기</button>
+                    <button className="btn btn-dark text-light w-100" onClick={() => sendPurchaseRequest(checkedDealList)}>결제하기</button>
                 </div>
             </div>
             
