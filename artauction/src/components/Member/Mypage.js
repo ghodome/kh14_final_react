@@ -72,6 +72,7 @@ const Mypage = () => {
         <>
             <Jumbotron title={`${member[0]?.memberName || ''} 님의 정보`} />
 
+
             <div className="container my-4">
                 <div className="row mt-4">
                     <div className="col-3 border p-2">
@@ -122,6 +123,7 @@ const Mypage = () => {
                     <div className="col-9 border p-2">
                         {member[0]?.memberAddress1 || ''} {member[0]?.memberAddress2 || ''}
                     </div>
+
                 </div>
 
                 <div className="row mt-4">

@@ -3,12 +3,12 @@ import Jumbotron from "../Jumbotron";
 import axios from "axios";
 import { Modal } from "bootstrap";
 import { NavLink } from "react-router-dom";
-
+import { motion } from "framer-motion"
 const Items = () => {
     const [item, setItem] = useState([]);
     const [result, setResult] = useState(null);
     const [isButtonDisabled, setIsButtonDisabled] = useState(false); // 버튼 비활성화 상태
-
+    const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
         loadItems();
     }, []);
@@ -30,7 +30,7 @@ const Items = () => {
             // 3초 후 버튼 활성화
             setTimeout(() => {
                 setIsButtonDisabled(false);
-            }, 1000);
+            }, 10);
         }
     },[result,isButtonDisabled]);
 
@@ -107,7 +107,7 @@ const Items = () => {
                 </tbody>
             </table>
             <button
-                className="btn btn-success w-100"
+                className="btn btn-dark text-light w-100"
                 onClick={openRandomBox}
                 disabled={isButtonDisabled} // 버튼 비활성화 상태에 따라 비활성화
             >

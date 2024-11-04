@@ -125,7 +125,11 @@ const Menu = () => {
                                 <NavLink className="nav-link" to="/faq">FAQ</NavLink>
                             </li>
                             <li className="nav-item">
-                                <NavLink className="nav-link" to="/charge">포인트 충전하기</NavLink>
+
+                                <NavLink className="nav-link" to="/websocket">websocket</NavLink>
+                            </li>
+                            <li className="nav-item">
+                                <NavLink className="nav-link" to="/charge">포인트 충전/환불</NavLink>
                             </li>
                             <li className="nav-item">
                                 <NavLink className="nav-link" to="/payment">결제하기</NavLink>
@@ -134,11 +138,12 @@ const Menu = () => {
                                 <NavLink className="nav-link" to="/randomBox">랜덤박스</NavLink>
                             </li>
 
-                            {memberRank === '회원' && (
+                            {memberRank === '관리자' && (
                             <li className="nav-item">
                                 <NavLink className="nav-link" to="/giveup">관리자용 취소 물품 확인</NavLink>
                             </li>
-                             )}
+                            )}
+
                             {login && (
                                 <li className="nav-item">
                                     <button className="nav-link btn" onClick={createInquiryRoom}>
