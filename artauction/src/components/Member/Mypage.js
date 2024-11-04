@@ -185,7 +185,7 @@ const Mypage = () => {
                                             <td>{item.itemName}</td>
                                             <td>{item.itemValue.toLocaleString()}원</td>
                                             <td>
-                                                <button className="btn btn-success" onClick={e => openInsertModal(item.inventoryId)}>수령하기</button>
+                                                <button className="btn btn-dark rounded-0" onClick={e => openInsertModal(item.inventoryId)}>수령하기</button>
                                             </td>
                                         </tr>
                                     ))
@@ -207,7 +207,7 @@ const Mypage = () => {
 
                         <div className="modal-header">
                             <h5 className="modal-title">상품 수령하기</h5>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={closeInsertModal}>
+                            <button type="button" className="btn btn-close rounded-0" data-bs-dismiss="modal" aria-label="Close" onClick={closeInsertModal}>
                                 <span aria-hidden="true"></span>
                             </button>
                         </div>
@@ -225,8 +225,8 @@ const Mypage = () => {
                         </div>
 
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary btn-manual-close" onClick={closeInsertModal}>취소</button>
-                            <button type="button" className="btn btn-success" onClick={saveInsertInput}>수령하기</button>
+                            <button type="button" className="btn btn-secondary rounded-0 btn-manual-close" onClick={closeInsertModal}>취소</button>
+                            <button type="button" className="btn btn-dark rounded-0" onClick={saveInsertInput}>수령하기</button>
                         </div>
                     </div>
                 </div>
