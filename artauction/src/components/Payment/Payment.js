@@ -98,9 +98,7 @@ const Payment = () => {
     
         return `${daysRemaining}일 남음`;
     }, []);
-    const changeEndTime = useCallback(async(dealTime)=>{
-        // const resp = await axios.post("http://localhost:8080/");//이걸로 포인트 까고
-    },[]);
+   
     return (
         <>
             <Jumbotron title="결제 하기" />
