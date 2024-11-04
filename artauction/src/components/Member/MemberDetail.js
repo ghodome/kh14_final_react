@@ -12,7 +12,7 @@ const MemberDetail = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [blocked, setBlocked] = useRecoilState(blockedState);
-    const [blockReason, setBlockReason] = useState(null);
+    const [blockReason, setBlockReason] = useState(localStorage.getItem(`blockReason_${memberId}`) || null);
 
     useEffect(() => {
         loadMember();
@@ -23,6 +23,9 @@ const MemberDetail = () => {
             const resp = await axios.get(`http://localhost:8080/member/${memberId}`);
             setMember(resp.data);
             setBlocked(resp.data.blocked);
+            if (resp.data.blocked) {
+                setBlockReason(localStorage.getItem(`blockReason_${memberId}`) || null);
+            }
         } catch (error) {
             setError("회원 정보를 불러오는 데 실패했습니다.");
             navigate("/");
@@ -33,12 +36,10 @@ const MemberDetail = () => {
 
     const handleDelete = useCallback(async () => {
         const confirmDelete = window.confirm("정말 삭제하시겠습니까?");
-        if (!confirmDelete) {
-            return;
-        }
+        if (!confirmDelete) return;
         try {
             await axios.delete(`http://localhost:8080/member/delete/${memberId}`);
-            navigate("/admin/member/list"); // 삭제 후 관리자 페이지로 리다이렉트
+            navigate("/admin/member/list");
         } catch (error) {
             console.error("Failed to delete member:", error);
             alert("탈퇴에 실패했습니다. 다시 시도해 주세요.");
@@ -52,9 +53,8 @@ const MemberDetail = () => {
             return;
         }
         const confirmBlock = window.confirm("정말 차단하시겠습니까?");
-        if (!confirmBlock) {
-            return;
-        }
+        if (!confirmBlock) return;
+
         try {
             await axios.post(`http://localhost:8080/member/block`, {
                 blockMemberId: memberId,
@@ -63,22 +63,24 @@ const MemberDetail = () => {
                 blockTime: new Date().toISOString(),
             });
             setBlocked(true);
-            setBlockReason(blockReasonInput); // 차단 사유 저장
+            setBlockReason(blockReasonInput);
+            localStorage.setItem(`blockReason_${memberId}`, blockReasonInput);
             alert("회원이 차단되었습니다.");
         } catch (error) {
             console.error("Failed to block member:", error);
             alert("차단에 실패했습니다. 다시 시도해 주세요.");
         }
     }, [memberId]);
+
     const handleUnblock = useCallback(async () => {
         const confirmUnblock = window.confirm("정말 차단 해제하시겠습니까?");
-        if (!confirmUnblock) {
-            return;
-        }
+        if (!confirmUnblock) return;
 
         try {
-            await axios.delete(`http://localhost:8080/member/unblock/${memberId}`); // 차단 해제 API 호출
-            setBlocked(false); // 차단 상태 업데이트
+            await axios.delete(`http://localhost:8080/member/unblock/${memberId}`);
+            setBlocked(false);
+            setBlockReason(null);
+            localStorage.removeItem(`blockReason_${memberId}`);
             alert("회원이 차단 해제되었습니다.");
         } catch (error) {
             console.error("Failed to unblock member:", error);
@@ -97,67 +99,67 @@ const MemberDetail = () => {
     return (
         <>
             <Jumbotron title={`${member.memberName}님의 정보`} />
+            <div className="container my-4">
 
-            <div className="row mt-4">
-                <div className="col-3">아이디</div>
-                <div className="col-3">{member.memberId}</div>
-            </div>
-            <div className="row mt-4">
-                <div className="col-3">이름</div>
-                <div className="col-3">{member.memberName}</div>
-            </div>
-            <div className="row mt-4">
-                <div className="col-3">이메일</div>
-                <div className="col-3">{member.memberEmail}</div>
-            </div>
-            <div className="row mt-4">
-                <div className="col-3">연락처</div>
-                <div className="col-3">{member.memberContact}</div>
-            </div>
-            <div className="row mt-4">
-                <div className="col-3">등급</div>
-                <div className="col-3">{member.memberRank}</div>
-            </div>
-            <div className="row mt-4">
-                <div className="col-3">포인트</div>
-                <div className="col-3">{member.memberPoint}</div>
-            </div>
-            <div className="row mt-4">
-                <div className="col-3">우편번호</div>
-                <div className="col-3">[{member.memberPost}]</div>
-            </div>
-            <div className="row mt-4">
-                <div className="col-3">주소</div>
-                <div className="col-3">
-                    {member.memberAddress1} {member.memberAddress2}
-                </div>
-            </div>
 
-            {blocked && blockReason && (
                 <div className="row mt-4">
-                    <div className="col-3">차단 사유</div>
-                    <div className="col-3">{blockReason}</div>
+                    <div className="col-3 border p-2"><strong>아이디</strong></div>
+                    <div className="col-3 border p-2">{member.memberId}</div>
+                    <div className="col-3 border p-2"><strong>이름</strong></div>
+                    <div className="col-3 border p-2">{member.memberName}</div>
                 </div>
-            )}
+                <div className="row mt-4">
+                    <div className="col-3 border p-2"><strong>이메일</strong></div>
+                    <div className="col-3 border p-2">{member.memberEmail}</div>
+                    <div className="col-3 border p-2"><strong>연락처</strong></div>
+                    <div className="col-3 border p-2">{member.memberContact}</div>
+                </div>
+                <div className="row mt-4">
+                    <div className="col-3 border p-2"><strong>등급</strong></div>
+                    <div className="col-3 border p-2">{member.memberRank}</div>
+                    <div className="col-3 border p-2"><strong>포인트</strong></div>
+                    <div className="col-3 border p-2">{member.memberPoint}</div>
+                </div>
+                <div className="row mt-4">
+                    <div className="col-3 "></div>
+                    <div className="col-3 border p-2"><strong>우편번호</strong></div>
+                    <div className="col-3 border p-2">{member.memberPost}</div>
+                    <div className="col-3"></div>
+                </div>
+                <div className="row mt-4">
+                    <div className="col-3"></div>
+                    <div className="col-3 border p-2"><strong>주소</strong></div>
+                    <div className="col-6 border p-2">
+                        {member.memberAddress1} {member.memberAddress2}
+                    </div>
+                </div>
 
-            <div className="row mt-4">
-                <div className="col">
-                    <button type="button" className="btn btn-primary" onClick={() => navigate(`/admin/member/edit/${memberId}`)}>
-                        수정하기
-                    </button>
-                    <button type="button" className="btn btn-danger ms-5" onClick={handleDelete}>
-                        계정 삭제
-                    </button>
-                    {!blocked ? (
-                        <button type="button" className="btn btn-warning ms-5" onClick={handleBlock}>
-                            회원 차단
-                        </button>
-                    ) : (
-                        <button type="button" className="btn btn-secondary ms-5" onClick={handleUnblock}>
-                            차단 해제
-                        </button>
-                    )}
+                {blocked && blockReason && (
+                    <div className="row mt-4">
+                        <div className="col-3"></div>
+                        <div className="col-3 border p-2"><strong>차단 사유</strong></div>
+                        <div className="col-3 border p-2">{blockReason}</div>
+                    </div>
+                )}
 
+                <div className="row mt-4">
+                    <div className="col text-center">
+                        <button type="button" className="btn btn-dark rounded-0" onClick={() => navigate(`/admin/member/edit/${memberId}`)}>
+                            수정하기
+                        </button>
+                        <button type="button" className="btn btn-danger ms-3 rounded-0" onClick={handleDelete}>
+                            계정 삭제
+                        </button>
+                        {!blocked ? (
+                            <button type="button" className="btn btn-secondary ms-3 rounded-0" onClick={handleBlock}>
+                                회원 차단
+                            </button>
+                        ) : (
+                            <button type="button" className="btn btn-light ms-3 rounded-0" onClick={handleUnblock}>
+                                차단 해제
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
         </>

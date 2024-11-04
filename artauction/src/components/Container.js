@@ -38,6 +38,8 @@ import MemberPwChange from "./Member/MemberPwChange";
 import RoomChat from "./websocket/RoomChat";
 import Room from "./websocket/Room";
 import Giveup from "./Payment/Giveup";
+import OfflineRoute from "./router/OfflineRoute";
+import MemberJoinFinish from "./Member/MemberJoinFinish";
 
 
 
@@ -51,9 +53,10 @@ const Container = () => {
                 <div className="col-sm-10 offset-sm-1">
                     <Routes>
                         <Route path="/" element={<Home />} />
-                        <Route path="/join" element={<MemberJoin />} />
-                        <Route path="/check" element={<MemberCheck />} />
-                        <Route path="/login" element={<MemberLogin />} />
+                        <Route path="/join" element={<OfflineRoute element={<MemberJoin />} />} />
+                        <Route path="/join/finish" element={<OfflineRoute element={<MemberJoinFinish />} />} />
+                        <Route path="/check" element={<OfflineRoute element={<MemberCheck />} />} />
+                        <Route path="/login" element={<OfflineRoute element={<MemberLogin />} />} />
                         <Route path="/member/update" element={<PrivateRoute element={<MemberUpdate />} />} />
                         <Route path="/member/myPage" element={<PrivateRoute element={<Mypage />} />} />
                         <Route path="/member/pwChange" element={<PrivateRoute element={<MemberPwChange />} />} />
@@ -61,8 +64,8 @@ const Container = () => {
                         <Route path="admin/member/detail/:memberId" element={<AdminRoute element={<MemberDetail />} />} />
                         <Route path="admin/member/edit/:memberId" element={<AdminRoute element={<MemberEdit />} />} />
                         <Route path="/work/list" element={<WorkList />} />
-                        <Route path="/findPw" element={<FindPw />} />
-                        <Route path="/changePw/:token" element={<ChangePw />} />
+                        <Route path="/findPw" element={<OfflineRoute element={<FindPw />} />} />
+                        <Route path="/changePw/:token" element={<OfflineRoute element={<ChangePw />} />} />
                         <Route path="/artist" element={<Artist />} />
                         <Route path="/auctionschedule" element={<AuctionSchedule />} />
                         <Route path="/auctionschedule/detail/:auctionScheduleNo" element={<AuctionScheduleDetail />} />
@@ -75,10 +78,10 @@ const Container = () => {
                         <Route path="/payment/success/:partnerOrderId" element={<PaymentSuccess />} />
                         <Route path="/charge" element={<Charge />} />
                         <Route path="/charge/success/:partnerOrderId" element={<ChargeSuccess />} />
-                        <Route path="/room" element={<PrivateRoute element={<Room/>}/>}/>
-                        <Route path="/randomBox" element={<Items/>}/>
-                        <Route path="/roomchat/:roomNo" element={<PrivateRoute element={<RoomChat/>}/>}/>
-                        <Route path="/giveup" element={<PrivateRoute element={<Giveup/>}/>}/>
+                        <Route path="/room" element={<PrivateRoute element={<Room />} />} />
+                        <Route path="/randomBox" element={<Items />} />
+                        <Route path="/roomchat/:roomNo" element={<PrivateRoute element={<RoomChat />} />} />
+                        <Route path="/giveup" element={<PrivateRoute element={<Giveup />} />} />
 
 
                     </Routes>

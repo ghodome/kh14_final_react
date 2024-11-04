@@ -114,8 +114,10 @@ const Charge = ()=>{
                 <button className="btn btn-secondary m-3"onClick={e=>setRefund(refund + 10000)}>+10,000</button>
                 <button className="btn btn-secondary m-3"onClick={e=>setRefund(refund + 100000)}>+100,000</button>
                 <button className="btn btn-secondary m-3"onClick={e=>setRefund(refund + 1000000)}>+1,000,000</button>
+
                 <button className="btn btn-dark text-light float-end m-3" onClick={handleShow}>환불하기</button>
                 <button className="btn  btn-light text-dark float-end m-3"onClick={e=>setRefund(0)}>초기화하기</button>
+
             </div>
         </div>
 

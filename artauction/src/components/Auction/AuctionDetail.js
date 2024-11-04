@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import { loginState, memberIdState, memberRankState } from "../../utils/recoil";
-import { useRecoilValue } from "recoil";
+import { blockedState, loginState, memberIdState, memberRankState } from "../../utils/recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import moment from "moment";
@@ -11,77 +11,82 @@ import { GiPayMoney } from "react-icons/gi";
 import { TbZoomMoney } from "react-icons/tb";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { Modal } from "bootstrap";
+import Time from "../time/Time";
 
 const Auction = () => {
     //ref
-    const bidModal=useRef();
+    const bidModal = useRef();
     const loading = useRef(false);
     //params
     const { auctionNo } = useParams();
     //navigate
     const navigate = useNavigate();
     // state
+    const [transferTime, setTranferTime]=useState();
     const [auctionAndWork, setAuctionAndWork] = useState({
-        auctionStartPrice:0,
-        auctionBidIncrement:0,
+        auctionStartPrice: 0,
+        auctionBidIncrement: 0,
     });
     const [client, setClient] = useState(null);
     const [messageList, setMessageList] = useState([]);
     const [connect, setConnect] = useState(false);
-    const [bidIncrement,setBidIncrement]=useState();
-    const [input, setInput]=useState({
-        type:"bid",
-        bid:{
-            workName:"",
-            auctionLot:"",
-            bidPrice:"",
-            bidIncrement:"",
+    const [bidIncrement, setBidIncrement] = useState();
+    const [input, setInput] = useState({
+        type: "bid",
+        bid: {
+            workName: "",
+            auctionLot: "",
+            bidPrice: "",
+            bidIncrement: "",
         }
     });
 
-    const [wholeMessageList, setWholeMessageList]=useState([]);
+    const [wholeMessageList, setWholeMessageList] = useState([]);
+    const [member, setMember] = useState({});
 
     //recoil
     const login = useRecoilValue(loginState);
     const memberId = useRecoilValue(memberIdState);
     const memberRank = useRecoilValue(memberRankState);
+    const [blocked, setBlocked] = useRecoilState(blockedState);
 
     //token
-    const accessToken=axios.defaults.headers.common["Authorization"];
-    const refreshToken=window.localStorage.getItem("refreshToken1")||window.sessionStorage.getItem("refreshToken1");
+    const accessToken = axios.defaults.headers.common["Authorization"];
+    const refreshToken = window.localStorage.getItem("refreshToken1") || window.sessionStorage.getItem("refreshToken1");
 
     //callback
-    const clearInput=(()=>{
+    const clearInput = (() => {
         setInput({
-            type:"bid",
-            bid:{
-                auctionLot:"",
-                bidPrice:"",
-                bidIncrement:"",
+            type: "bid",
+            bid: {
+                auctionLot: "",
+                bidPrice: "",
+                bidIncrement: "",
             }
         });
-    },[input])
+    },[])
     const loadAuctionAndWork=useCallback(async ()=>{
         const resp = await axios.get(`http://localhost:8080/auction/work/${auctionNo}`);
         setAuctionAndWork(resp.data);
+        setTranferTime(resp.data.auctionEndDate);
         setBidIncrementByPrice(resp.data.auctionBidPrice>0?resp.data.auctionBidPrice:resp.data.auctionStartPrice);
         if(resp){
             setInput({
-                type:"bid",
-                bid:{
-                    workName:auctionAndWork.workTitle,
-                    auctionLot:auctionAndWork.auctionLot,
-                    bidPrice:auctionAndWork.auctionBidPrice>0?auctionAndWork.auctionBidPrice:auctionAndWork.auctionStartPrice,
-                    bidIncrement:bidIncrement,
+                type: "bid",
+                bid: {
+                    workName: auctionAndWork.workTitle,
+                    auctionLot: auctionAndWork.auctionLot,
+                    bidPrice: auctionAndWork.auctionBidPrice > 0 ? auctionAndWork.auctionBidPrice : auctionAndWork.auctionStartPrice,
+                    bidIncrement: bidIncrement,
                 },
             });
         }
-    },[auctionAndWork,input,auctionNo,bidIncrement]);
+    },[auctionNo,bidIncrement,auctionAndWork,transferTime]);
 
     const setBidIncrementByPrice = useCallback((price) => {
         let increment;
         switch (true) {
-            case ( price < 1000000):
+            case (price < 1000000):
                 increment = 50000;
                 break;
             case (price >= 1000000 && price < 3000000):
@@ -105,109 +110,115 @@ const Auction = () => {
             default:
                 increment = 10000000;
         }
-        setBidIncrement(increment); 
-    },[bidIncrement]);
+        setBidIncrement(increment);
+    }, [bidIncrement]);
 
-    const connectToServer= useCallback(()=>{
+    const connectToServer = useCallback(() => {
         const socket = new SockJS("http://localhost:8080/ws");
         const client = new Client({
-            webSocketFactory : ()=> socket,
-            onConnect : ()=>{
-                client.subscribe("/auction/progress",(message)=>{
+            webSocketFactory: () => socket,
+            onConnect: () => {
+                client.subscribe("/auction/progress", (message) => {
                     const json = JSON.parse(message.body);
-                    setMessageList(prev=>[...prev,json]);
+                    setMessageList(prev => [...prev, json]);
                 });
-                if(login){
-                    client.subscribe(`/auction/${auctionNo}`,(message)=>{
+                if (login) {
+                    client.subscribe(`/auction/${auctionNo}`, (message) => {
                         const json = JSON.parse(message.body);
-                        setMessageList(prev=>[...prev,json]);
+                        setMessageList(prev => [...prev, json]);
                     });
                 }
                 setConnect(true);
             },
-            onDisconnect:()=>{
+            onDisconnect: () => {
                 setConnect(false);
             },
             // debug:(str)=>{
-                // console.log("[DEBUG] : "+str);
+            // console.log("[DEBUG] : "+str);
             // }
         });
-        if(login  === true){
-            client.connectHeaders={
-                accessToken:accessToken,
-                refreshToken:refreshToken,
+        if (login === true) {
+            client.connectHeaders = {
+                accessToken: accessToken,
+                refreshToken: refreshToken,
             };
         }
         client.activate();
         setClient(client);
-    },[client,login,accessToken,refreshToken]);
+    }, [client, login, accessToken, refreshToken]);
 
-    const disconnectToServer=useCallback(()=>{
-        if(client){
+    const disconnectToServer = useCallback(() => {
+        if (client) {
             client.deactivate();
         }
-    },[client]);
+    }, [client]);
 
     const sendMessage = useCallback(async () => {
         const json = { content: input };
-    
+
         if (client === null || !connect) {
             loadAuctionAndWork();
             return;
-        } else {
+        } else if (blocked) {
+            alert("차단된 회원입니다. 입찰할 수 없습니다.");
+            return;
+        }
+        else {
             const bidResp = await axios.patch(`http://localhost:8080/auctionchat/${auctionNo}`, json.content);
-    
             if (bidResp.data.success) {
                 window.alert(`LOT ${json.content.bid.auctionLot} ${json.content.bid.bidPrice + json.content.bid.bidIncrement}원 응찰에 성공하셨습니다.`);
             } else {
                 window.alert(`동일 가격 차순위 응찰되었습니다.`);
             }
         }
-    
         // 응찰 성공 후 새 bidPrice 업데이트를 위해 loadAuctionAndWork 호출
         loadAuctionAndWork();
-    }, [input, client, connect, auctionAndWork]);
+    }, [input, client, connect, auctionAndWork, blocked]);
 
-    const increaseBidIncrement=useCallback(()=>{
+    const increaseBidIncrement = useCallback(() => {
         setInput({
             ...input,
-            bid:{...input.bid,
-                bidIncrement:input.bid.bidIncrement+bidIncrement}
+            bid: {
+                ...input.bid,
+                bidIncrement: input.bid.bidIncrement + bidIncrement
+            }
         })
-    },[input,bidIncrement])
+    },[bidIncrement])
 
-    const decreaseBidIncrement = useCallback(()=>{
+    const decreaseBidIncrement = useCallback(() => {
         setInput({
             ...input,
-            bid:{...input.bid,
-                bidIncrement:input.bid.bidIncrement>bidIncrement?
-                input.bid.bidIncrement-bidIncrement:input.bid.bidIncrement}
+            bid: {
+                ...input.bid,
+                bidIncrement: input.bid.bidIncrement > bidIncrement ?
+                    input.bid.bidIncrement - bidIncrement : input.bid.bidIncrement
+            }
         })
-    },[input,bidIncrement]);
+    },[bidIncrement]);
 
-    const loadMessageList=useCallback(async ()=>{
-        const resp=await axios.get(`http://localhost:8080/bid/bidMessageList/${auctionNo}`);
+    const loadMessageList = useCallback(async () => {
+        const resp = await axios.get(`http://localhost:8080/bid/bidMessageList/${auctionNo}`);
         setWholeMessageList(resp.data);
-    },[wholeMessageList]);
+    }, [wholeMessageList]);
 
     const openBidIncrementModal = useCallback(() => {
         const tag = Modal.getOrCreateInstance(bidModal.current);
         tag.show();
-    },[bidModal]);
+    }, [bidModal]);
     const closeBidIncrementModal = useCallback(() => {
         const tag = Modal.getInstance(bidModal.current);
         tag.hide();
-    },[bidModal]);
+    }, [bidModal]);
 
     //effect
-    useEffect(()=>{
+    useEffect(() => {
         loadAuctionAndWork();
         connectToServer();
         loadMessageList();
         return () => {
             disconnectToServer(client);
         };
-    },[])
+    }, [])
     useEffect(() => {
         if (auctionAndWork) {
             setInput((prev) => ({
@@ -221,101 +232,117 @@ const Auction = () => {
                 },
             }));
         }
-    }, [auctionAndWork, bidIncrement]);
+    }, [auctionAndWork,bidIncrement]);
     
+    useEffect(() => {
+        const loadMember = async () => {
+            if (login) { // 로그인 상태일 때만 요청
+                try {
+                    const resp = await axios.get(`http://localhost:8080/member/${memberId}`);
+                    setMember(resp.data);
+                    setBlocked(resp.data.blocked);
+                } catch (error) {
+                    console.error("Failed to load member:", error);
+                }
+            }
+
+        };
+    
+        loadMember();
+    }, [memberId]);
     // view
     return (
         <>
             <div className={styles.auctionContainer}>
-            <div className="mt-5 text-center">
-                {auctionAndWork&&(<h4>{auctionAndWork.auctionScheduleNo}주차 경매 현황</h4>)}
-                <ul className="list-group">
-                    {messageList.slice(-5).map((message, index) => (
-                        <div className="row" key={index}>
-                            <div className="col">
-                                <p>{message.content.contentForSchedule}</p>
-                                <p className="text-muted">
-                                    {(message.content.bidtime)}
-                                </p>
-                            </div>
-                        </div>
-                    ))}
-                </ul>
-            </div>
-            {auctionAndWork? ( 
-                <>
-                    <div className="row mt-4">
-                        <div className="col-7">
-                            {/* 작품 상세내용  */}
-                            <div className="row my-2">
+                <div className="mt-5 text-center">
+                    {auctionAndWork && (<h4>{auctionAndWork.auctionScheduleNo}주차 경매 현황</h4>)}
+                    <ul className="list-group">
+                        {messageList.slice(-5).map((message, index) => (
+                            <div className="row" key={index}>
                                 <div className="col">
-                                    {auctionAndWork.workTitle}
+                                    <p>{message.content.contentForSchedule}</p>
+                                    <p className="text-muted">
+                                        {(message.content.bidtime)}
+                                    </p>
                                 </div>
                             </div>
-                            <div className="row my-2">
-                                <div className="col">
-                                    {auctionAndWork.workDescription}
+                        ))}
+                    </ul>
+                </div>
+                {auctionAndWork ? (
+                    <>
+                        <div className="row mt-4">
+                            <div className="col-7">
+                                {/* 작품 상세내용  */}
+                                <div className="row my-2">
+                                    <div className="col">
+                                        {auctionAndWork.workTitle}
+                                    </div>
+                                </div>
+                                <div className="row my-2">
+                                    <div className="col">
+                                        {auctionAndWork.workDescription}
+                                    </div>
+                                </div>
+                                <div className="row my-2">
+                                    <div className="col">
+                                        {auctionAndWork.workMaterials}
+                                    </div>
+                                </div>
+                                <div className="row my-2">
+                                    <div className="col">
+                                        {auctionAndWork.workSize}
+                                    </div>
+                                </div>
+                                <div className="row my-2">
+                                    <div className="col">
+                                        {auctionAndWork.workCategory}
+                                    </div>
+                                </div>
+                                <div className="row my-2">
+                                    <div className="col">
+                                        {auctionAndWork.workTitle}
+                                    </div>
+                                </div>
+                                <div className="row my-2">
+                                    <div className="col">
+                                        {auctionAndWork.artistName}
+                                    </div>
+                                </div>
+                                <div className="row my-2">
+                                    <div className="col">
+                                        {auctionAndWork.artistDescription}
+                                    </div>
+                                </div>
+                                <div className="row my-2">
+                                    <div className="col">
+                                        {auctionAndWork.artistMaterials}
+                                    </div>
+                                </div>
+                                <div className="row my-2">
+                                    <div className="col">
+                                        {auctionAndWork.artistBirth} ~  {auctionAndWork.artistDeath}
+                                    </div>
+                                </div>
+                                <div className="row my-2">
+                                    <div className="col">
+
+                                    </div>
                                 </div>
                             </div>
-                            <div className="row my-2">
-                                <div className="col">
-                                    {auctionAndWork.workMaterials}
+                            <div className="col-5">
+                                <h2>LOT {auctionAndWork.auctionLot}</h2>
+                                <div className="row mt-2">
+                                    <div className="col-6">
+                                        일정번호 : {auctionAndWork.auctionScheduleNo}
+                                    </div>
+                                    <div className="col-6">
+                                        작품번호 : {auctionAndWork.workNo}
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="row my-2">
-                                <div className="col">
-                                    {auctionAndWork.workSize}
-                                </div>
-                            </div>
-                            <div className="row my-2">
-                                <div className="col">
-                                    {auctionAndWork.workCategory}
-                                </div>
-                            </div>
-                            <div className="row my-2">
-                                <div className="col">
-                                    {auctionAndWork.workTitle}
-                                </div>
-                            </div>
-                            <div className="row my-2">
-                                <div className="col">
-                                    {auctionAndWork.artistName}
-                                </div>
-                            </div>
-                            <div className="row my-2">
-                                <div className="col">
-                                    {auctionAndWork.artistDescription}
-                                </div>
-                            </div>
-                            <div className="row my-2">
-                                <div className="col">
-                                    {auctionAndWork.artistMaterials}
-                                </div>
-                            </div>
-                            <div className="row my-2">
-                                <div className="col">
-                                    {auctionAndWork.artistBirth} ~  {auctionAndWork.artistDeath}
-                                </div>
-                            </div>
-                            <div className="row my-2">
-                                <div className="col">
-                                   
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-5">
-                            <h2>LOT {auctionAndWork.auctionLot}</h2>
-                            <div className="row mt-2">
-                                <div className="col-6">
-                                    일정번호 : {auctionAndWork.auctionScheduleNo}
-                                </div>
-                                <div className="col-6">
-                                    작품번호 : {auctionAndWork.workNo}
-                                </div>
-                            </div>
-                            <table className="table table-striped">
-                                <thead>
-                                    <tr>
+                                <table className="table table-striped">
+                                    <thead>
+                                        <tr>
                                             <th>경매 진행 상황</th>
                                             <th></th>
                                     </tr>
@@ -325,7 +352,7 @@ const Auction = () => {
                                         <td>
                                             <div className="row">
                                                 <div className="col-4">추정가</div>
-                                                <div className="col-8">{auctionAndWork.auctionLowPrice}원</div>
+                                                <div className="col-8 text-end">{auctionAndWork.auctionLowPrice}원</div>
                                             </div>
                                         </td>
                                     </tr>
@@ -333,7 +360,7 @@ const Auction = () => {
                                         <td>
                                             <div className="row">
                                                 <div className="col-4">~</div>
-                                                <div className="col-8">{auctionAndWork.auctionHighPrice}원</div>
+                                                <div className="col-8 text-end">{auctionAndWork.auctionHighPrice}원</div>
                                             </div>
                                         </td>
                                     </tr>
@@ -341,107 +368,135 @@ const Auction = () => {
                                             <td>
                                                 <div className="row">
                                                     <div className="col-4">시작가</div>
-                                                    <div className="col-8">{auctionAndWork.auctionStartPrice}원</div>
+                                                    <div className="col-8 text-end">{auctionAndWork.auctionStartPrice}원</div>
                                                 </div>
                                             </td>
                                         </tr>
-                                        {input.bid.bidPrice>0&&(
+                                        {/* {input.bid.bidPrice>0&&( */}
                                         <tr>
                                             <td>
                                                 <div className="row">
                                                     <div className="col-4">현재가</div>
-                                                    <div className="col-5">{input.bid.bidPrice}원</div>
                                                     <div className="col-3">{auctionAndWork.auctionBidCnt}회</div>
+                                                    <div className="col-5 text-end">
+                                                        {input.bid.bidPrice}원</div>
                                                 </div>
                                             </td>
                                         </tr>
-                                        )}
+                                        {/* )} */}
                                         <tr>
                                             <td>
                                                 <div className="row">
                                                     <div className="col-4">호가 단위</div>
-                                                    <div className="col-5">{bidIncrement}원</div>
                                                     <div className="col-3">
-                                                        <div onClick={e=>openBidIncrementModal()}>
-                                                        <IoMdInformationCircleOutline /></div>
+                                                        <div onClick={e => openBidIncrementModal()}>
+                                                            <IoMdInformationCircleOutline /></div>
                                                     </div>
+                                                    <div className="col-5 text-end">{bidIncrement}원</div>
                                                 </div>
                                             </td>
                                         </tr>
-                                </tbody>
-                            </table>
-                            {login?(
-                            <div className="row mt-3">
-                                <div className="col-md-10 affset-md-1">
-                                    <div className=" input-group w-100">
-                                        <button type="button" className="btn btn-success"
-                                            onClick={increaseBidIncrement}><GiPayMoney /></button>
-                                        <button type="button" className="btn btn-danger"
-                                            onClick={decreaseBidIncrement}><GiPayMoney /></button>
-                                        <input 
-                                            type="text" 
-                                            className="form-control"
-                                            value={input.bid.bidPrice!==0?input.bid.bidPrice+input.bid.bidIncrement
-                                                :auctionAndWork.auctionStartPrice+auctionAndWork.auctionBidIncrement
-                                            } 
-                                            onChange={e=>setInput(prev=>({
-                                                ...prev,
-                                                bid:{...prev.content,
-                                                        bidPrice:e.target.value>0?e.target.value:0,
-                                                }
-                                            }))}
-                                            
-                                                placeholder="응찰 가격을 입력하세요"></input>
-                                        <button type="button" className="btn btn-success"
-                                            onClick={sendMessage}><TbZoomMoney /></button>
-                                    </div>
-                                </div>
-                            </div>
-                            ):(
-                                <div className="row mt-3">
-                                    <div className="col-md-10 affset-md-1">
-                                        <button type="button" className="btn btn-primary"
-                                        onClick={e=>navigate("/login")}>로그인 후 응찰이 가능합니다.</button>
-                                    </div>
-                                </div>
-                            )}
-                            <ul className="list-group">
-                                {messageList && messageList.slice().reverse().map((message, index) => (
-                                    <div className="row" key={index}>
-                                        <div className="col">
-                                            <p>{message.content.contentForLot}</p>
-                                            <p className="text-muted">
-                                                {moment(message.bidTime).format('HH:mm:ss')}
-                                            </p>
+                                        <tr>
+                                            <td>
+                                                <div className="row">
+                                                    <div className="col-4">마감 시간</div>
+                                                    <div className="col-8 text-end">{moment(auctionAndWork.auctionEndDate).format('yyyy년 MM월 DD일 H:mm:ss')}</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div className="row">
+                                                    <div className="col-4">남은 시간</div>
+                                                    <div className="col-8 text-end"><Time endDate={auctionAndWork.auctionEndDate}/></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                {login && (
+                                    <div className="row mt-3">
+                                        <div className="col-md-10 affset-md-1">
+                                            {blocked ? (
+                                                <div className="text-danger mb-2" style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '10px' }}>
+                                                    차단된 회원입니다.
+                                                </div>
+                                            ) : (
+
+                                                <div className=" input-group w-100">
+                                                    <button type="button" className="btn btn-success"
+                                                        onClick={increaseBidIncrement}><GiPayMoney /></button>
+                                                    <button type="button" className="btn btn-danger"
+                                                        onClick={decreaseBidIncrement}><GiPayMoney /></button>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        value={input.bid.bidPrice !== 0 ? input.bid.bidPrice + input.bid.bidIncrement
+                                                            : auctionAndWork.auctionStartPrice + auctionAndWork.auctionBidIncrement
+                                                        }
+                                                        onChange={e => setInput(prev => ({
+                                                            ...prev,
+                                                            bid: {
+                                                                ...prev.content,
+                                                                bidPrice: e.target.value > 0 ? e.target.value : 0,
+                                                            }
+                                                        }))}
+
+                                                        placeholder="응찰 가격을 입력하세요"></input>
+                                                    <button type="button" className="btn btn-success"
+                                                        onClick={sendMessage}><TbZoomMoney /></button>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
-                                ))}
-                            </ul>
+                                    )}
+                                        {messageList && messageList.slice().reverse().map((message, index) => (<>
+                                    <div className="row" key={index}>
+                                    <div className="col">
+                                    <p>{message.content.contentForLot}</p>
+                                    <p className="text-muted">
+                                    {moment(message.content.bidTime).format('HH:mm:ss:SSS')}
+                                    </p>
+                                    </div>
+                                    </div>
+                                </>))}
+                                <ul className="list-group">
+                                    {messageList && messageList.slice().reverse().map((message, index) => (
+                                        <div className="row" key={index}>
+                                            <div className="col">
+                                                <p>{message.content.contentForLot}</p>
+                                                <p className="text-muted">
+                                                    {moment(message.bidTime).format('HH:mm:ss')}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </ul>
                                 {wholeMessageList && wholeMessageList.slice().reverse().map((message, index) => (
                                     <div className="row" key={index}>
-                                        <div className="col">
-                                            <p>{message.content.contentForLot}</p>
-                                            <p className="text-muted">
-                                                {moment(message.time).format('HH:mm:ss')}
-                                            </p>
-                                        </div>
+                                    <div className="col">
+                                    <p>{message.content.contentForLot}</p>
+                                    <p className="text-muted">
+                                    {moment(message.time).format('HH:mm:ss:SSS')}
+                                    </p>
+                                    </div>
                                     </div>
                                 ))}
-                        </div>
-                       <hr/>
-                   </div>
-                   <div className="modal fade" ref={bidModal}>
-                            <div className="modal-dialog">
-                            <div className="modal-content">
-                                <div className="modal-header">
-                                    <h5 className="modal-title">호가 단위 안내</h5>
-                                    <button
-                                        type="button" 
-                                        className="btn-close"
-                                        aria-label="Close"
-                                        onClick={closeBidIncrementModal}>
-                                    </button>
                                 </div>
+                                <hr />
+                                </div>
+                                <div className="modal fade" ref={bidModal}>
+                            <div className="modal-dialog">
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <h5 className="modal-title">호가 단위 안내</h5>
+                                        <button
+                                            type="button"
+                                            className="btn-close"
+                                            aria-label="Close"
+                                            onClick={closeBidIncrementModal}>
+                                        </button>
+                                    </div>
                                     <div className="modal-body">
                                         <table className="table table-striped">
                                             <thead>
@@ -465,12 +520,13 @@ const Auction = () => {
                                 </div>
                             </div>
                         </div>
-                </>
-            ) : (
-                <h1>로딩 중...</h1>
-            )}
+                    </>
+                ) : (
+                
+                    <h1>로딩 중...</h1>
+                )}
             </div>
-           
+
         </>
     );
 }
