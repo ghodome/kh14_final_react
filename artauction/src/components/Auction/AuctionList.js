@@ -19,7 +19,7 @@ const AuctionList = ()=>{
     useEffect(()=>{
         loadAuctionScheduleInfo();
         loadAuctionDataCollectionList();
-    },[auctionScheduleNo]);
+    },[auctionScheduleNo]); 
 
     const loadAuctionDataCollectionList = useCallback(async()=>{
         try{

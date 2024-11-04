@@ -356,7 +356,7 @@ const AuctionScheduleDetail = ()=>{
                 </div>
             </div>
 
-            {/* 각종 버튼들 */}
+            {/* 각종 버튼들 */} 
             <div className="row mt-4">
                 <div className="col text-end">
                 {auctionSchedule.auctionScheduleState === '진행경매' && (
