@@ -5,10 +5,13 @@ import { Modal } from 'bootstrap';
 import moment from 'moment';
 import 'moment/locale/ko';
 import Jumbotron from '../Jumbotron';
+import { useRecoilValue } from 'recoil';
+import { memberRankState } from '../../utils/recoil';
 moment.locale('ko');
 
 
 const AuctionSchedule = () => {
+    const memberRank=useRecoilValue(memberRankState);
     //navigator 
     const navigate = useNavigate(); 
 
@@ -176,7 +179,6 @@ const AuctionSchedule = () => {
 
 
     return (<>
-            <Jumbotron title="경매 일정" content="예정/진행/종료경매 목록" />
                 
             <div className="row mt-4">
                 <div className="col">
@@ -191,9 +193,9 @@ const AuctionSchedule = () => {
                             onClick={e=>{setAuctionState("종료경매"); setPage(1);}}>종료경매</button>
 
                         {/* 관리자 기능 */}
-                        <button className="btn btn-primary ms-auto rounded-1"
+                        {memberRank==='관리자'&&<button className="btn btn-primary ms-auto rounded-1"
                                 onClick={openInsertModal}>경매등록
-                        </button>
+                        </button>}
                     </div>
 
                     {/* 경매 일정 목록 */}
@@ -317,8 +319,8 @@ const AuctionSchedule = () => {
                                     ))}
                                 </div>
                                 <div className="modal-footer">
-                                    <button type="button" className="btn btn-secondary rounded-1" onClick={closeInsertModal}>취소</button>
-                                    <button type="button" className="btn btn-success rounded-1" onClick={saveInsertInput}>등록</button>
+                                    {memberRank==='관리자'&&<button type="button" className="btn btn-secondary rounded-1" onClick={closeInsertModal}>취소</button>}
+                                    {memberRank==='관리자'&&<button type="button" className="btn btn-success rounded-1" onClick={saveInsertInput}>등록</button>}
                                 </div>
                             </div>
                         </div>
