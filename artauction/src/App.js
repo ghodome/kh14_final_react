@@ -2,7 +2,7 @@
 import axios from 'axios';
 import Container from './components/Container';
 import Menu from './components/Menu';
-import { memberIdState, memberLoadingState, memberRankState } from './utils/recoil';
+import { memberIdState, memberLoadingState, memberPointState, memberRankState } from './utils/recoil';
 import { useCallback, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 
@@ -13,6 +13,7 @@ const App = () => {
  const [memberId, setMemberId] = useRecoilState(memberIdState);
  const [memberRank, setMemberRank] = useRecoilState(memberRankState);
  const [memberLoading, setMemberLoading] = useRecoilState(memberLoadingState);
+ const [memberPoint, setMemberPoint]=useRecoilState(memberPointState);
 
  //최초 1회 실행
  useEffect(()=>{
@@ -42,6 +43,7 @@ const App = () => {
    //[7] 갱신 성공 시 응답(resp)에 담긴 데이터들을 적절하게 분배하여 저장(로그인과 동일)
    setMemberId(resp.data.memberId);
    setMemberRank(resp.data.memberRank);
+   setMemberPoint(resp.data.memberPoint);
    axios.defaults.headers.common["Authorization"] = "Bearer " + resp.data.accessToken;
    if(window.localStorage.getItem("refreshToken1") !== null) {
      window.localStorage.setItem("refreshToken1", resp.data.refreshToken);
