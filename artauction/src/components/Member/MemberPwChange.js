@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import Jumbotron from "../Jumbotron";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { memberIdState, memberRankState } from "../../utils/recoil";
@@ -111,6 +110,12 @@ const MemberPwChange = () => {
         setError("");
         setSuccess("");
 
+        // 현재 비밀번호와 새 비밀번호가 동일한지 확인
+        if (currentPw === newPw) {
+            setError("현재 비밀번호와 새 비밀번호는 같을 수 없습니다.");
+            return;
+        }
+
         if (!newPw) {
             setError("새 비밀번호를 입력하세요.");
             return;
@@ -139,6 +144,13 @@ const MemberPwChange = () => {
         } catch (error) {
             console.error("비밀번호 변경 오류:", error);
             setError("비밀번호 변경 중 오류가 발생했습니다.");
+        }
+    };
+
+    // 엔터키를 눌렀을 때 비밀번호 인증을 실행하는 함수
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handlePasswordVerification();
         }
     };
 
@@ -208,6 +220,7 @@ const MemberPwChange = () => {
                     type="password"
                     value={currentPw}
                     onChange={handleCurrentPwChange}
+                    onKeyDown={handleKeyDown} // 엔터키 이벤트 추가
                     placeholder="현재 비밀번호"
                     className="form-control rounded-0"
                 />
@@ -221,7 +234,6 @@ const MemberPwChange = () => {
                     </button>
                 </div>
             </Modal>
-
         </>
     );
 };

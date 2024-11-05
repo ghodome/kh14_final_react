@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "react-modal";
-import Jumbotron from "../Jumbotron";
 import axios from "axios";
 
 Modal.setAppElement('#root');
@@ -133,17 +132,24 @@ const MemberUpdate = () => {
         }).open();
     };
 
+    // 엔터키 눌렀을 때 비밀번호 인증 수행
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handlePasswordSubmit();
+        }
+    };
+
     return (
         <>
             <div className="row">
                 <div className="col-md-6 offset-md-3">
-            <div className="row mt-4">
-                <div className="col mb-4">
-                    <span style={{ fontWeight: 'bold', fontSize: '50px' }}>
-                        {`${member[0]?.memberName || ''} 님의 정보수정`}
-                    </span>
-                </div>
-            </div>
+                    <div className="row mt-4">
+                        <div className="col mb-4">
+                            <span style={{ fontWeight: 'bold', fontSize: '50px' }}>
+                                {`${member[0]?.memberName || ''} 님의 정보수정`}
+                            </span>
+                        </div>
+                    </div>
                     <form onSubmit={handleSubmit} style={{ display: isEditing ? 'block' : 'none' }}>
                         <div className="mb-3">
                             <input type="text"
@@ -235,6 +241,7 @@ const MemberUpdate = () => {
                     type="password"
                     value={currentPw}
                     onChange={handleCurrentPwChange}
+                    onKeyDown={handleKeyDown} // 엔터키 입력 이벤트 추가
                     placeholder="현재 비밀번호"
                     className={`form-control rounded-0 ${!isPwValid ? "is-invalid" : ""}`}
                 />

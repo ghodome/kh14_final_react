@@ -125,7 +125,7 @@ const MemberDetail = () => {
                             <div className="col-4 border p-2"><strong>등급</strong></div>
                             <div className="col-8 border p-2">{member.memberRank}</div>
                             <div className="col-4 border p-2"><strong>포인트</strong></div>
-                            <div className="col-8 border p-2">{member.memberPoint}</div>
+                            <div className="col-8 border p-2">{member.memberPoint.toLocaleString()}</div>
                             <div className="col-4 border p-2"><strong>우편번호</strong></div>
                             <div className="col-8 border p-2">{member.memberPost}</div>
                             <div className="col-4 border p-2"><strong>주소</strong></div>
@@ -144,18 +144,18 @@ const MemberDetail = () => {
 
                         <div className="row mt-4">
                             <div className="col text-center">
-                                <button type="button" className="btn btn-dark rounded-0" onClick={() => navigate(`/admin/member/edit/${memberId}`)} style={{ width: "25%", height: '40px' }}>
+                                <button type="button" className="btn btn-dark rounded-0 mt-3" onClick={() => navigate(`/admin/member/edit/${memberId}`)} style={{ width: "25%", height: '40px' }}>
                                     수정 하기
                                 </button>
-                                <button type="button" className="btn btn-danger ms-3 rounded-0" onClick={handleDelete} style={{ width: "25%", height: '40px' }}>
+                                <button type="button" className="btn btn-danger ms-3 rounded-0 mt-3" onClick={handleDelete} style={{ width: "25%", height: '40px' }}>
                                     계정 삭제
                                 </button>
                                 {!blocked ? (
-                                    <button type="button" className="btn btn-secondary ms-3 rounded-0 mb-3" onClick={handleBlock} style={{ width: "25%", height: '40px' }}>
+                                    <button type="button" className="btn btn-warning ms-3 rounded-0 mt-3" onClick={handleBlock} style={{ width: "25%", height: '40px' }}>
                                         회원 차단
                                     </button>
                                 ) : (
-                                    <button type="button" className="btn btn-light ms-3 rounded-0" onClick={handleUnblock} style={{ width: "25%", height: '40px' }}> 
+                                    <button type="button" className="btn btn-secondary ms-3 rounded-0" onClick={handleUnblock} style={{ width: "25%", height: '40px' }}> 
                                         차단 해제
                                     </button>
                                 )}
