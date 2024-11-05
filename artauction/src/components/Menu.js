@@ -259,6 +259,7 @@ const Menu = () => {
 
                             {/*-----------------------------*/}
                             {memberRank === '관리자' && (
+
                                 <>
                                     <li className="nav-item dropdown" style={{ marginLeft: '1.5cm' }}>
                                         <a
@@ -276,12 +277,14 @@ const Menu = () => {
                                         <div className={`dropdown-menu ${dropdownStates.manager ? 'show' : ''}`}>
                                             <NavLink className="dropdown-item" to="/admin/member/list">회원조회</NavLink>
                                             <NavLink className="dropdown-item" to="/giveup">취소 물품 확인</NavLink>
+                                             <NavLink className="nav-link" to="/paymentcancel">취소시키기</NavLink>
                                             <button className="nav-link btn" onClick={handleShowModal}>
                                                 1:1 채팅방
                                             </button>
                                         </div>
                                     </li>
                                 </>
+
                             )}
                         </ul>
                     </div>

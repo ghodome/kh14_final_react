@@ -40,6 +40,7 @@ import Room from "./websocket/Room";
 import Giveup from "./Payment/Giveup";
 import OfflineRoute from "./router/OfflineRoute";
 import MemberJoinFinish from "./Member/MemberJoinFinish";
+import PaymentCancel from "./Payment/PaymentCancel";
 
 
 
@@ -82,6 +83,7 @@ const Container = () => {
                         <Route path="/randomBox" element={<PrivateRoute element={<Items />}/>} />
                         <Route path="/roomchat/:roomNo" element={<PrivateRoute element={<RoomChat />} />} />
                         <Route path="/giveup" element={<PrivateRoute element={<Giveup />} />} />
+                        <Route path="/paymentcancel" element={<PrivateRoute element={<PaymentCancel />} />} />
 
 
                     </Routes>
