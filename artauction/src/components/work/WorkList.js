@@ -234,7 +234,7 @@ const WorkList = () => {
     const closeEditModal = useCallback(() => {
         var tag = Modal.getInstance(editModal.current);
         tag.hide();
-
+        setAttachImages([]); // 미리보기 이미지 초기화
     }, [editModal])
 
     //삭제
@@ -340,28 +340,50 @@ const WorkList = () => {
         }
     }, [target, artistList]);
 
-    //기존 수정(이미지X)
-    // const saveTarget = useCallback(async () => {
-    //     const copy = { ...target };
-    //     await axios.patch("http://localhost:8080/work/", copy);
-
-    //     loadWorkList();
-    //     closeEditModal();
-    // }, [target]);
     const [loadImages, setLoadImages] = useState([]);
     const [deleteList, setDeleteList] = useState([]);
     const [attachImages, setAttachImages] = useState([]);//보낼 추가첨부사진이미지
     const [workFileClass, setWorkFileClass] = useState("");
     const [workFileValid, setWorkFileValid] = useState(true);
 
+    // const saveTarget = useCallback(async () => {
+    //     const formData = new FormData();
+    //     const fileList = inputFileRef.current.files;
+
+    //     for (let i = 0; i < fileList.length; i++) {
+    //         formData.append("attachList", fileList[i]);
+    //     }
+
+    //     formData.append("workTitle", target.workTitle);
+    //     formData.append("artistNo", target.artistNo);
+    //     formData.append("workDescription", target.workDescription);
+    //     formData.append("workMaterials", target.workMaterials);
+    //     formData.append("workSize", target.workSize);
+    //     formData.append("workCategory", target.workCategory);
+    //     formData.append("workNo", target.workNo);
+
+    //     formData.append("originList", target.attachment); // 삭제 하지 않을 그림들의 첨부파일번호(attachmentNo) - target.attachment / loadImages
+
+    //     await axios.post("http://localhost:8080/work/edit", formData, {
+    //         headers: {
+    //             'Content-Type': 'multipart/form-data',
+    //         },
+    //     });
+
+    //     setImage(loadImages);
+
+    //     closeEditModal();
+    //     loadWorkList();
+    // }, [target, loadImages]);
+
     const saveTarget = useCallback(async () => {
         const formData = new FormData();
         const fileList = inputFileRef.current.files;
-
+    
         for (let i = 0; i < fileList.length; i++) {
             formData.append("attachList", fileList[i]);
         }
-
+    
         formData.append("workTitle", target.workTitle);
         formData.append("artistNo", target.artistNo);
         formData.append("workDescription", target.workDescription);
@@ -369,19 +391,24 @@ const WorkList = () => {
         formData.append("workSize", target.workSize);
         formData.append("workCategory", target.workCategory);
         formData.append("workNo", target.workNo);
-
-        formData.append("originList", target.attachment); // 삭제 하지 않을 그림들의 첨부파일번호(attachmentNo) - target.attachment / loadImages
-
+    
+        // 이미지가 새로 첨부된 경우 loadImages를, 그렇지 않다면 target.attachment를 사용
+        if (fileList.length > 0) {
+            formData.append("originList", loadImages); // 새로 첨부된 파일이 있는 경우
+        } else {
+            formData.append("originList", target.attachment); // 첨부된 파일이 없는 경우 기존 목록 유지
+        }
+    
         await axios.post("http://localhost:8080/work/edit", formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
         });
-
-        setImage(loadImages);
-
-        loadWorkList();
+    
+        setImage(fileList.length > 0 ? loadImages : target.attachment); // 이미지 목록 업데이트
+    
         closeEditModal();
+        loadWorkList();
     }, [target, loadImages]);
 
     const deleteImage = useCallback((img) => {
