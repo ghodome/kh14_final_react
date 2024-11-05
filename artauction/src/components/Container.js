@@ -79,7 +79,7 @@ const Container = () => {
                         <Route path="/charge" element={<Charge />} />
                         <Route path="/charge/success/:partnerOrderId" element={<ChargeSuccess />} />
                         <Route path="/room" element={<PrivateRoute element={<Room />} />} />
-                        <Route path="/randomBox" element={<Items />} />
+                        <Route path="/randomBox" element={<PrivateRoute element={<Items />}/>} />
                         <Route path="/roomchat/:roomNo" element={<PrivateRoute element={<RoomChat />} />} />
                         <Route path="/giveup" element={<PrivateRoute element={<Giveup />} />} />
 

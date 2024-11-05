@@ -128,15 +128,21 @@ const Menu = () => {
 
                                 <NavLink className="nav-link" to="/websocket">websocket</NavLink>
                             </li>
+                            {login &&(
                             <li className="nav-item">
                                 <NavLink className="nav-link" to="/charge">포인트 충전/환불</NavLink>
                             </li>
+                            )}
+                            {login &&(
                             <li className="nav-item">
                                 <NavLink className="nav-link" to="/payment">결제하기</NavLink>
                             </li>
+                            )}
+                            {login &&(
                             <li className="nav-item">
                                 <NavLink className="nav-link" to="/randomBox">랜덤박스</NavLink>
                             </li>
+                            )}
 
                             {memberRank === '관리자' && (
                             <li className="nav-item">

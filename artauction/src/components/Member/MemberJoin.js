@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import Jumbotron from '../Jumbotron';
 import axios from 'axios';
+import { FaAsterisk } from 'react-icons/fa'; // FaAsterisk 아이콘 추가
 
 const MemberJoin = () => {
     const navigate = useNavigate();
@@ -95,11 +96,12 @@ const MemberJoin = () => {
         }
         return newErrors;
     };
+
     const checkIdDuplicate = useCallback(async () => {
         try {
             const value = input.memberId;
             if (!value) return;
-    
+
             const resp = await axios.get(`http://localhost:8080/member/checkId`, {
                 params: { memberId: value }
             });
@@ -113,12 +115,12 @@ const MemberJoin = () => {
             console.error(`아이디 중복 검사 중 오류 발생: ${error}`);
         }
     }, [input.memberId]);
-    
+
     const checkNameDuplicate = useCallback(async () => {
         try {
             const value = input.memberName;
             if (!value) return;
-    
+
             const resp = await axios.get(`http://localhost:8080/member/checkName`, {
                 params: { memberName: value }
             });
@@ -132,7 +134,7 @@ const MemberJoin = () => {
             console.error(`이름 중복 검사 중 오류 발생: ${error}`);
         }
     }, [input.memberName]);
-    
+
     const handleBlur = async (field) => {
         const newErrors = { ...validateInput(field) };
         setErrors(prev => ({ ...prev, ...newErrors }));
@@ -169,7 +171,7 @@ const MemberJoin = () => {
         try {
             const resp = await axios.post("http://localhost:8080/member/join", input);
             console.log(resp.data);
-            navigate("/join/finish");
+            navigate("/login");
         } catch (error) {
             console.error("회원 가입 요청 중 오류:", error);
         }
@@ -202,10 +204,12 @@ const MemberJoin = () => {
 
     return (
         <>
-           
+            <div className="row">
+                <div className="col-md-6 offset-md-3">
                     <Jumbotron title="회원가입" />
                     <div className='row mt-4'>
                         <div className='col'>
+                            <label className="form-label">아이디 <FaAsterisk style={{ color: 'red', fontSize: '0.7rem', verticalAlign: 'super', marginLeft: '0.2rem' }} /></label>
                             <input
                                 type='text' name='memberId'
                                 className='form-control rounded-0' placeholder='아이디'
@@ -218,6 +222,7 @@ const MemberJoin = () => {
                     </div>
                     <div className="row mt-4">
                         <div className="col">
+                            <label className="form-label">비밀번호 <FaAsterisk style={{ color: 'red', fontSize: '0.7rem', verticalAlign: 'super', marginLeft: '0.2rem' }} /></label>
                             <input
                                 type={display ? "text" : "password"}
                                 name="memberPw"
@@ -228,19 +233,20 @@ const MemberJoin = () => {
                                 onBlur={() => handleBlur('memberPw')}
                             />
                             {errors.memberPw && <div className="text-danger">{errors.memberPw}</div>}
+                            <label className="form-check-label" style={{ fontSize: '1rem' }}>
+                                <input
+                                    type="checkbox"
+                                    className="form-check-input rounded-0"
+                                    checked={display}
+                                    onChange={e => setDisplay(e.target.checked)}
+                                />
+                                비밀번호 표시
+                            </label>
                         </div>
-                        <label>
-                            <input
-                                type="checkbox"
-                                className="form-check-input rounded-0"
-                                checked={display}
-                                onChange={e => setDisplay(e.target.checked)}
-                            />
-                            <span className="form-check-label ms-2">비밀번호 표시</span>
-                        </label>
                     </div>
                     <div className="row mt-4">
                         <div className="col">
+                            <label className="form-label">이름 <FaAsterisk style={{ color: 'red', fontSize: '0.7rem', verticalAlign: 'super', marginLeft: '0.2rem' }} /></label>
                             <input
                                 type='text' name='memberName'
                                 className='form-control rounded-0' placeholder='이름'
@@ -253,6 +259,7 @@ const MemberJoin = () => {
                     </div>
                     <div className="row mt-4">
                         <div className="col">
+                            <label className="form-label">이메일 <FaAsterisk style={{ color: 'red', fontSize: '0.7rem', verticalAlign: 'super', marginLeft: '0.2rem' }} /></label>
                             <input type='email' name='memberEmail'
                                 className='form-control rounded-0' placeholder='이메일'
                                 value={input.memberEmail}
@@ -264,6 +271,7 @@ const MemberJoin = () => {
                     </div>
                     <div className="row mt-4">
                         <div className="col">
+                            <label className="form-label">연락처 <FaAsterisk style={{ color: 'red', fontSize: '0.7rem', verticalAlign: 'super', marginLeft: '0.2rem' }} /></label>
                             <input type='text' name='memberContact'
                                 className='form-control rounded-0' placeholder='연락처'
                                 value={input.memberContact}
@@ -275,17 +283,35 @@ const MemberJoin = () => {
                     </div>
                     <div className="row mt-4">
                         <div className="col">
-                            <input type='text' id="sample6_postcode" name='memberPost'
-                                className='form-control rounded-0' placeholder='우편번호'
-                                value={input.memberPost}
-                                readOnly
-                            />
-                            <button type="button" onClick={sample6_execDaumPostcode} className="btn btn-dark mt-2 rounded-0">우편번호 찾기</button>
+                            <label className="form-label">우편번호 <FaAsterisk style={{ color: 'red', fontSize: '0.7rem', verticalAlign: 'super', marginLeft: '0.2rem' }} /></label>
+                            <div className="input-group">
+                                <input
+                                    type='text'
+                                    id="sample6_postcode"
+                                    name='memberPost'
+                                    className='form-control rounded-0'
+                                    placeholder='우편번호'
+                                    value={input.memberPost}
+                                    readOnly
+                                    style={{ width: '200px', flex: '0 0 auto' }} // 너비 조정 및 flex 속성 추가
+                                />
+                                <button
+                                    type="button"
+                                    onClick={sample6_execDaumPostcode}
+                                    className="btn btn-dark rounded-0"
+                                    style={{ marginLeft: '-1px' }} // 버튼과의 간격 조정
+                                >
+                                    찾기
+                                </button>
+                            </div>
                             {errors.memberPost && <div className="text-danger">{errors.memberPost}</div>}
                         </div>
                     </div>
+
+
                     <div className="row mt-4">
                         <div className="col">
+                            <label className="form-label">주소 <FaAsterisk style={{ color: 'red', fontSize: '0.7rem', verticalAlign: 'super', marginLeft: '0.2rem' }} /></label>
                             <input type='text' id="sample6_address" name='memberAddress1'
                                 className='form-control rounded-0' placeholder='주소'
                                 value={input.memberAddress1}
@@ -296,6 +322,7 @@ const MemberJoin = () => {
                     </div>
                     <div className="row mt-4">
                         <div className="col">
+                            <label className="form-label">상세주소 <FaAsterisk style={{ color: 'red', fontSize: '0.7rem', verticalAlign: 'super', marginLeft: '0.2rem' }} /></label>
                             <input type='text' id="sample6_detailAddress" name='memberAddress2'
                                 className='form-control rounded-0' placeholder='상세주소'
                                 value={input.memberAddress2}
@@ -315,7 +342,8 @@ const MemberJoin = () => {
                             </button>
                         </div>
                     </div>
-                
+                </div>
+            </div>
         </>
     );
 };

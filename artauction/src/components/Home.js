@@ -5,14 +5,14 @@ import ImageSlider from "./ImageSlider";
 
 
 const Home=()=>{
-    
     const [rankList,setRankList] = useState([]);
     
     const sendRankList = useCallback(async()=>{
-        const resp = await axios.get("http://localhost:8080/payment/rank");
+        const resp = await axios.get("http://localhost:8080/deal/list");
         setRankList(resp.data);
     },[]);
-    
+
+
     useEffect(()=>{
         sendRankList();
     },[]);
@@ -30,15 +30,39 @@ const Home=()=>{
             <div className="col-6">
                 <ul className="navbar-nav me-auto">
                     <li className="nav-item dropdown">
-                       <h2>최고 거래 물품</h2>
+                       <h2>최근 낙찰 물품</h2>
                     </li>
-                    {rankList.map(rank=>(
-                    <li className="nav-item dropdown" key={rank.paymentDetailNo}>
-                        작품명 : {rank.paymentDetailName} <br/>
-                        낙찰자 : {rank.memberId}님<br/>
-                        낙찰가 : {rank.paymentDetailPrice.toLocaleString()} 원<hr/>
+                    
+                    <li className="nav-item dropdown" >
+                        <table className="table table-striped table-borderless">
+                        <thead className="table-dark">
+                            <tr>
+                                <th>작품명</th>
+                                <th>낙찰자</th>
+                                <th>낙찰가</th>
+                                <th>낙찰 일자</th>
+                                <th>작가명</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    {rankList.length > 0 && rankList[0].dealNo > 0 ? (
+                    rankList.map(rank=>(
+                            <tr key={rank.dealNo}>
+                                <td>{rank.workTitle}</td>
+                                <td>{rank.dealBuyer}</td>
+                                <td>{rank.dealPrice.toLocaleString()}원</td>
+                                <td>{rank.dealTime}일</td>
+                                <td>{rank.artistName}</td>
+                            </tr>
+                    ))
+                ) : (
+                    <tr>
+                        <td colSpan="4" className="text-center">최근 낙찰 물품이 없습니다.</td>
+                    </tr>
+                )}
+                        </tbody>
+                        </table>
                     </li>
-                    ))}
                 </ul>
             </div>
         </div>

@@ -51,12 +51,20 @@ const AuctionScheduleDetail = ()=>{
     }, []);
 
     //callback
-    const loadAuctionSchedule = useCallback(async ()=>{ //일정 상세 불러오기
+    const loadAuctionSchedule = useCallback(async ()=>{
         const resp = await axios.get("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
+        // console.log(resp.data);
         setAuctionSchedule({
             ...resp.data,
+            // auctionScheduleStartDate:new Date(resp.data.auctionScheduleStartDate).toISOString().slice(0,16),
+            // auctionScheduleEndDate:new Date(resp.data.auctionScheduleEndDate).toISOString().slice(0,16)
         })
-    }, [auctionSchedule]);
+        setPresentInput({
+            ...presentInput,
+            auctionStartDate:new Date(resp.data.auctionScheduleStartDate).toISOString().slice(0,16),
+            auctionEndDate:new Date(resp.data.auctionScheduleEndDate).toISOString().slice(0,16),
+        });
+    }, [auctionSchedule,presentInput]);
 
     const inputFileRef = useRef(null);
 
@@ -182,7 +190,7 @@ const AuctionScheduleDetail = ()=>{
     //출품작 목록
     const loadAuctionList=useCallback(async ()=>{   //출품작 불러오기
         const resp=await axios.get(`http://localhost:8080/auction/${auctionScheduleNo}`);
-        console.log(resp.data.auctionList);
+        // console.log(resp.data.auctionList);
         setAuctionList([
             ...resp.data
         ]);
@@ -354,7 +362,7 @@ const AuctionScheduleDetail = ()=>{
                 <div className="col text-end">
                 {auctionSchedule.auctionScheduleState === '진행경매' && (
                     <button className="btn btn-outline-dark ms-2 rounded-1"
-                                    onClick={e=>navigate("/auction/auctionLotList/"+auctionScheduleNo)}>경매참여</button>
+                                    onClick={e=>navigate("/auctionList/"+auctionScheduleNo)}>경매참여</button>
                 )}
                     <button className="btn btn-outline-secondary ms-2 rounded-1" 
                                     onClick={e=>navigate("/auctionschedule")}>뒤로가기</button>
@@ -366,6 +374,8 @@ const AuctionScheduleDetail = ()=>{
                 <div className="col text-end">
                     <button className="btn btn-primary ms-2 rounded-1" 
                                     onClick={openPresentModal}>출품등록</button>
+                    <button className="btn btn-outline-dark ms-2 rounded-1"
+                                    onClick={e=>navigate("/auctionList/"+auctionScheduleNo)}>경매보기</button>
                     <button className="btn btn-warning ms-2 rounded-1" 
                                 onClick={e=>openEditModal(auctionSchedule)}>일정수정</button>
                     <button className="btn btn-danger ms-2 rounded-1" 
@@ -480,7 +490,8 @@ const AuctionScheduleDetail = ()=>{
                                         <div className="card-text">{auction.workCategory}</div>
                                         <div className="text-end mt-4">
                                         <button type="button" className="btn btn-outline-dark card-text ms-2 rounded-1" 
-                                                    onClick={e=>navigate(`/auction/detail/${auction.auctionNo}`)}>입찰상세</button>
+                                                    onClick={e=>navigate(`/auction/detail/${auction.auctionNo}`)}
+                                                    disabled={auction.auctionState=='종료경매'}>입찰상세</button>
                                         <button type="button" className="btn btn-warning card-text ms-2 rounded-1" onClick={e => cancelLot(auction)}>취소</button>
                                         <button type="button" className="btn btn-danger card-text ms-2 rounded-1" onClick={e => deleteLot(auction)}>삭제</button>
                                         </div>
