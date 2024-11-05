@@ -71,13 +71,13 @@ const Mypage = () => {
     return (<>
         <div className="row">
             <div className="col-md-6 offset-md-3">
-        <div className="row mt-4">
-            <div className="col mb-4">
-                <span style={{ fontWeight: 'bold', fontSize: '50px' }}>
-                    {`${member[0]?.memberName || ''} 님의 정보`}
-                </span>
-            </div>
-        </div>
+                <div className="row mt-4">
+                    <div className="col mb-4">
+                        <span style={{ fontWeight: 'bold', fontSize: '50px' }}>
+                            {`${member[0]?.memberName || ''} 님의 정보`}
+                        </span>
+                    </div>
+                </div>
 
                 <div className="container my-4">
                     <div className="row mt-4">
@@ -112,7 +112,7 @@ const Mypage = () => {
                             <strong>포인트</strong>
                         </div>
                         <div className="col-8 border p-2">
-                            {member[0]?.memberPoint}
+                            {member[0]?.memberPoint.toLocaleString() || '0'}
                         </div>
                         <div className="col-4 border p-2">
                             <strong>우편번호</strong>
