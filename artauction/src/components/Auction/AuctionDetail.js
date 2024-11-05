@@ -7,8 +7,9 @@ import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import moment from "moment";
 import styles from './auction.module.css';
-import { GiPayMoney } from "react-icons/gi";
-import { TbZoomMoney } from "react-icons/tb";
+import { FaArrowUp } from "react-icons/fa";
+import { FaArrowDown } from "react-icons/fa";
+import { TbRadar2, TbRadioactiveOff, TbZoomMoney } from "react-icons/tb";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { Modal } from "bootstrap";
 import Time from "../time/Time";
@@ -293,8 +294,10 @@ const Auction = () => {
                                 {/* 작품 상세내용  */}
                                 <div className="row my-2 text-center">
                                     <div className="col">
-                                        <img src={`http://localhost:8080/attach/download/${workImage.attachment}`} 
-                                        className="img-thumbnail rounded-1" alt="" height='250px' width='450px' />
+                                        {workImage.attachment?<img src={`http://localhost:8080/attach/download/${workImage.attachment}`} 
+                                        className="img-thumbnail rounded-1" alt="" height='250px' width='450px' />:
+                                        <img src={`https://picsum.photos/450/250`} 
+                                        className="img-thumbnail rounded-1" alt="" height='250px' width='450px' />}
                                     </div>
                                 </div>
                                 <div className="row my-2">
@@ -353,7 +356,7 @@ const Auction = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-5">
+                            <div className="col-5 m-0 p-0">
                                 <h2>LOT {auctionAndWork.auctionLot}</h2>
                                 <div className="row mt-2">
                                     <div className="col-6">
@@ -363,52 +366,46 @@ const Auction = () => {
                                         작품번호 : {auctionAndWork.workNo}
                                     </div>
                                 </div>
-                                <table className="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>경매 진행 상황</th>
-                                            <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
+                                        <div className="col">
+                                            <div className="col">경매 진행 상황</div>
+                                            <div className="col"></div>
+                                    </div>
+                                    <div className="col">
+                                        <div className="row">
                                             <div className="row">
                                                 <div className="col-4">추정가</div>
                                                 <div className="col-8 text-end">{auctionAndWork.auctionLowPrice}원</div>
                                             </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
+                                        </div>
+                                    </div>
+                                    <div className="col">
+                                        <div className="row">
                                             <div className="row">
                                                 <div className="col-4">~</div>
                                                 <div className="col-8 text-end">{auctionAndWork.auctionHighPrice}원</div>
                                             </div>
-                                        </td>
-                                    </tr>
-                                        <tr>
-                                            <td>
+                                        </div>
+                                    </div>
+                                        <div className="col">
+                                            <div className="row">
                                                 <div className="row">
                                                     <div className="col-4">시작가</div>
                                                     <div className="col-8 text-end">{auctionAndWork.auctionStartPrice}원</div>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                        {/* {input.bid.bidPrice>0&&( */}
-                                        <tr>
-                                            <td>
+                                            </div>
+                                        </div>
+                                        <div className="col">
+                                            <div className="row">
                                                 <div className="row">
                                                     <div className="col-4">현재가</div>
                                                     <div className="col-3">{auctionAndWork.auctionBidCnt}회</div>
                                                     <div className="col-5 text-end">
                                                         {input.bid.bidPrice}원</div>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                        {/* )} */}
-                                        <tr>
-                                            <td>
+                                            </div>
+                                        </div>
+                                        <div className="col">
+                                            <div className="row">
                                                 <div className="row">
                                                     <div className="col-4">호가 단위</div>
                                                     <div className="col-3">
@@ -417,68 +414,85 @@ const Auction = () => {
                                                     </div>
                                                     <div className="col-5 text-end">{bidIncrement}원</div>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
+                                            </div>
+                                        </div>
+                                        <div className="col">
+                                            <div className="row">
                                                 <div className="row">
                                                     <div className="col-4">마감 시간</div>
                                                     <div className="col-8 text-end">{moment(auctionAndWork.auctionEndDate).format('yyyy년 MM월 DD일 H:mm:ss')}</div>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
+                                            </div>
+                                        </div>
+                                        <div className="col">
+                                            <div className="row">
                                                 <div className="row">
                                                     <div className="col-4">남은 시간</div>
                                                     <div className="col-8 text-end"><Time endDate={auctionAndWork.auctionEndDate}/></div>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                {login && (
-                                    <div className="row mt-3">
-                                        <div className="col-md-10 affset-md-1">
-                                            {blocked ? (
-                                                <div className="text-danger mb-2" style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '10px' }}>
-                                                    차단된 회원입니다.
-                                                </div>
-                                            ) : (
-
-                                                <div className=" input-group w-100">
-                                                    <button type="button" className="btn btn-success"
-                                                        onClick={increaseBidIncrement}><GiPayMoney /></button>
-                                                    <button type="button" className="btn btn-danger"
-                                                        onClick={decreaseBidIncrement}><GiPayMoney /></button>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        value={input.bid.bidPrice !== 0 ? input.bid.bidPrice + input.bid.bidIncrement
-                                                            : auctionAndWork.auctionStartPrice + auctionAndWork.auctionBidIncrement
-                                                        }
-                                                        onChange={e => setInput(prev => ({
-                                                            ...prev,
-                                                            bid: {
-                                                                ...prev.content,
-                                                                bidPrice: e.target.value > 0 ? e.target.value : 0,
-                                                            }
-                                                        }))}
-
-                                                        placeholder="응찰 가격을 입력하세요"></input>
-                                                    <button type="button" className="btn btn-success"
-                                                        onClick={sendMessage}><TbZoomMoney /></button>
-                                                </div>
-                                            )}
+                                            </div>
                                         </div>
-                                    </div>
-                                    )}
+                                        <div className="col">
+                                            <div className="p-0">
+                                                    {login && (
+                                                        <>
+                                                                {blocked ? (
+                                                                    <div className="text-danger mb-2" style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '10px' }}>
+                                                                        응찰 금지된 회원입니다.
+                                                                    </div>
+                                                                ) : (
+                                                                        <div className="input-group flex-nowrap">
+                                                                            {/* 버튼 */}
+                                                                            <button 
+                                                                                type="button" 
+                                                                                className="btn btn-dark rounded-0" 
+                                                                                onClick={increaseBidIncrement}>
+                                                                                <FaArrowUp />
+                                                                            </button>
+                                                                                <button 
+                                                                                    type="button" 
+                                                                                    className="btn btn-light rounded-0" 
+                                                                                    onClick={decreaseBidIncrement}>
+                                                                                    <FaArrowDown />
+                                                                                </button>
+                                                                                <input
+                                                                                    type="text"
+                                                                                    className="flex-grow-1 text-center"
+                                                                                    value={
+                                                                                        input.bid.bidPrice !== 0 
+                                                                                            ? input.bid.bidPrice + input.bid.bidIncrement
+                                                                                            : auctionAndWork.auctionStartPrice + auctionAndWork.auctionBidIncrement
+                                                                                    }
+                                                                                    onChange={e =>
+                                                                                        setInput(prev => ({
+                                                                                            ...prev,
+                                                                                            bid: {
+                                                                                                ...prev.bid,
+                                                                                                bidPrice: e.target.value > 0 ? e.target.value : 0,
+                                                                                            },
+                                                                                        }))
+                                                                                    }
+                                                                                    placeholder="응찰 가격을 입력하세요"
+                                                                                />
+                                                                                <button 
+                                                                                    type="button" 
+                                                                                    className="btn btn-dark rounded-0" 
+                                                                                    onClick={sendMessage}>
+                                                                                    응찰
+                                                                                </button>
+                                                                            {/* 버튼 끝 */}
+                                                                        </div>
+                                                                )}
+                                                        </>
+                                                        )}
+                                            </div>
+                                        </div>
                                         {messageList && messageList.slice().reverse().map((message, index) => (<>
                                     <div className="row" key={index}>
                                     <div className="col">
                                     <p>{message.content.contentForLot}</p>
                                     <p className="text-muted">
-                                    {moment(message.content.bidTime).format('HH:mm:ss:SSS')}
+                                    {moment(message.content.bidTime).format('HH:mm:ss')}
                                     </p>
                                     </div>
                                     </div>
@@ -500,7 +514,7 @@ const Auction = () => {
                                     <div className="col">
                                     <p>{message.content.contentForLot}</p>
                                     <p className="text-muted">
-                                    {moment(message.time).format('HH:mm:ss:SSS')}
+                                    {moment(message.time).format('HH:mm:ss')}
                                     </p>
                                     </div>
                                     </div>
@@ -521,22 +535,46 @@ const Auction = () => {
                                         </button>
                                     </div>
                                     <div className="modal-body">
-                                        <table className="table table-striped">
-                                            <thead>
+                                        <table className="table table-striped table-bordered text-center" style={{ width: '100%', marginTop: '20px' }}>
+                                            <thead className="table-dark">
                                                 <tr>
                                                     <th>현재가</th>
                                                     <th>호가 단위</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr><td>300,000~999,999원</td><td>50,000원</td></tr>
-                                                <tr><td>1,000,000~2,999,999원</td><td>100,000원</td></tr>
-                                                <tr><td>3,000,000~4,999,999원</td><td>200,000원</td></tr>
-                                                <tr><td>5,000,000~9,999,999원</td><td>500,000원</td></tr>
-                                                <tr><td>10,000,000~29,999,999원</td><td>1,000,000원</td></tr>
-                                                <tr><td>30,000,000~49,999,999원</td><td>2,000,000원</td></tr>
-                                                <tr><td>50,000,000~199,999,999원</td><td>5,000,000원</td></tr>
-                                                <tr><td>200,000,000~499,999,999원</td><td>10,000,000원</td></tr>
+                                                <tr>
+                                                    <td>300,000~999,999원</td>
+                                                    <td>50,000원</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>1,000,000~2,999,999원</td>
+                                                    <td>100,000원</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>3,000,000~4,999,999원</td>
+                                                    <td>200,000원</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>5,000,000~9,999,999원</td>
+                                                    <td>500,000원</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>10,000,000~29,999,999원</td>
+                                                    <td>1,000,000원</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>30,000,000~49,999,999원</td>
+                                                    <td>2,000,000원</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>50,000,000~199,999,999원</td>
+                                                    <td>5,000,000원</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>200,000,000~499,999,999원</td>
+                                                    <td>10,000,000원</td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>

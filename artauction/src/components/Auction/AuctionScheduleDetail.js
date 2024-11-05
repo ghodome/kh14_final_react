@@ -240,15 +240,16 @@ const AuctionScheduleDetail = ()=>{
     //출품 등록
     const registPresentInput=useCallback(async ()=>{
         try {
-        const resp=await axios.post(`http://localhost:8080/auction/`, presentInput);
-        console.log(presentInput.auctionLot===null)
-        if(resp.status===200) 
-            window.alert("출품작 등록 완료");
-        clearPresentInput();
+            const resp=await axios.post(`http://localhost:8080/auction/`, presentInput);
+            console.log(presentInput.auctionLot===null)
+            if(resp.status===200) 
+                window.alert("출품작 등록 완료");
+            console.log("!!");
+            clearPresentInput();
         closePresentModal();
         loadAuctionList();
     } catch (error) {
-        alert("누락된 항목 발생. 전체 항목을 입력해주세요");
+        window.alert("누락된 항목 발생. 전체 항목을 입력해주세요");
     }
     },[presentInput])
 

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 const Time = ({endDate})=>{
     const [time, setTime] = useState();
     const [timeToShow, setTimeToShow] = useState();
+    const [isEnd,setIsEnd]=useState(false);
 
     const getTime = useCallback(async () => {
         try {
@@ -11,6 +12,7 @@ const Time = ({endDate})=>{
             const currentTime = resp.data;
             const date = new Date(endDate).getTime() - new Date(currentTime).getTime();
             const days = Math.floor(date / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');; // 일수
+            if(days<0) setIsEnd(true);
             const hours = Math.floor((date / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');; // 남은 시간
             const minutes = Math.floor((date / (1000 * 60)) % 60).toString().padStart(2, '0');; // 남은 분
             const seconds = Math.floor((date / 1000) % 60).toString().padStart(2, '0');; // 남은 초
@@ -28,6 +30,7 @@ const Time = ({endDate})=>{
             const date = new Date(prevTime);
             date.setMilliseconds(date.getMilliseconds() - 10);
             const days = Math.floor(date / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');; // 일수
+            if(days<0) setIsEnd(true);
             const hours = Math.floor((date / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');; // 남은 시간
             const minutes = Math.floor((date / (1000 * 60)) % 60).toString().padStart(2, '0');; // 남은 분
             const seconds = Math.floor((date / 1000) % 60).toString().padStart(2, '0');; // 남은 초
@@ -52,7 +55,7 @@ const Time = ({endDate})=>{
         return () => clearInterval(intervalId);
     }, [afterTime]);
     return (<>
-        {timeToShow && (<div>{timeToShow}</div>)}
+        {!isEnd?timeToShow && (<div>{timeToShow}</div>):(<div>경매가 종료되었습니다</div>)}
     </>)
 }
 
