@@ -101,7 +101,7 @@ const Payment = () => {
    
     return (
         <>
-            <Jumbotron title="결제 하기" />
+            
             <table className="table">
                 <thead>
                     <tr>
@@ -124,7 +124,8 @@ const Payment = () => {
                             <td>
                                 <input type="checkbox" className="form-check-input"
                                     checked={deal.select}
-                                    onChange={e => selectDeal(deal, e.target.checked)} />
+                                    onChange={e => selectDeal(deal, e.target.checked)}
+                                    disabled={calculateDay(deal.dealTime)==='마감일 지남'} />
                             </td>
                             <td>{deal.workTitle}</td>
                             <td>{deal.artistName}</td>
@@ -135,8 +136,8 @@ const Payment = () => {
                             <td>{calculateDay(deal.dealTime)}</td>
                             <td>
                                 <button className="btn btn-dark text-light" onClick={() => {
-                                    sendPurchaseRequest([deal]); // 해당 항목만 결제
-                                }}>결제</button>
+                                    sendPurchaseRequest([deal]); // 해당 항목만 결제 
+                                }} disabled={calculateDay(deal.dealTime)==='마감일 지남'}>결제</button>
                             </td>
                             <td>
                                 <button className="btn btn-light text-dark" onClick={e=>sendGiveUp(deal.dealNo)}>결제 포기</button>

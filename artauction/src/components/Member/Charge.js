@@ -97,7 +97,7 @@ const Charge = ()=>{
 
     //view
     return(<>
-    <Jumbotron title="포인트 충전/환불"/>
+   
         <div className="row mt-4">
             <div className="col-6">
             <h2>포인트 충전</h2>
