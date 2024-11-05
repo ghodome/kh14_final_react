@@ -76,7 +76,7 @@ const Container = () => {
                         <Route path="/faq" element={<Faq />} />
                         <Route path="/payment" element={<Payment />} />
                         <Route path="/payment/success/:partnerOrderId" element={<PaymentSuccess />} />
-                        <Route path="/charge" element={<Charge />} />
+                        <Route path="/charge" element={<PrivateRoute element={ <Charge />}/>} />
                         <Route path="/charge/success/:partnerOrderId" element={<ChargeSuccess />} />
                         <Route path="/room" element={<PrivateRoute element={<Room />} />} />
                         <Route path="/randomBox" element={<PrivateRoute element={<Items />}/>} />
