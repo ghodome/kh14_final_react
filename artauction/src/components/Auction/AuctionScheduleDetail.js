@@ -252,24 +252,6 @@ const AuctionScheduleDetail = ()=>{
     }
     },[presentInput])
 
-
-    //출품 데이터 서버로 전송
-    // const savePresentInput=useCallback(async ()=>{
-    //     const resp = await axios.post("http://localhost:8080/auction/", presentInput, {
-    //         headers:  { 
-    //             "Content-Type": "multipart/form-data",
-    //         },
-    //     });
-    //     // console.log(presentInput.auctionLot===null)
-    //     if(resp.status===200) 
-    //         window.alert("등록이완료되었습니다.");
-        
-    //     clearPresentInput();
-    //     closePresentModal();
-    //     loadAuctionList();
-    // },[]);
-
-
     //출품작 삭제
     const deleteLot=useCallback(async (auction)=>{
         if(window.confirm("출품 작품을 삭제하시겠습니까?")){
