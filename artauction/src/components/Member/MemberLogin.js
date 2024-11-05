@@ -80,12 +80,12 @@ const MemberLogin = () => {
     }, []);
 
     return (
-        <>
-            <div className="row">
-                <div className="col-md-6 offset-md-3">
+        <div className="row justify-content-center">
+            <div className="col-md-4">
+                <div className="text-center">
                     <div className="row mt-4">
-                        <div className="col mb-4">
-                            <span style={{ fontWeight: 'bold', fontSize: '50px' }}>로그인</span>
+                        <div className="col">
+                            <span style={{ fontWeight: 'bold', fontSize: '30px' }}>로그인</span>
                         </div>
                     </div>
                     <div className="row mt-4">
@@ -109,8 +109,14 @@ const MemberLogin = () => {
                                 value={input.memberPw} onChange={changeInput}
                                 onKeyUp={e => e.key === 'Enter' && sendLoginRequest()} />
                             <span
-                                className="position-absolute "
-                                style={{ right: '10px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', fontSize: '1.25rem' }} // 크기 조정
+                                className="position-absolute"
+                                style={{
+                                    right: '10px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    cursor: 'pointer',
+                                    fontSize: '1.25rem'
+                                }} // 크기 조정
                                 onMouseDown={() => setDisplay(true)}
                                 onMouseUp={() => setDisplay(false)}
                                 onMouseLeave={() => setDisplay(false)}
@@ -126,24 +132,21 @@ const MemberLogin = () => {
                     </div>
 
                     <div className="row mt-4">
-                        <div className="col">
-                            <label>
+                        <div className="col d-flex justify-content-start">
+                            <label className="me-3">
                                 <input type="checkbox" className="form-check-input rounded-0"
                                     checked={display}
                                     onChange={e => setDisplay(e.target.checked)} />
                                 <span className="form-check-label ms-2">비밀번호 표시</span>
                             </label>
                             <label>
-                                <input type="checkbox" className="form-check-input rounded-0 ms-3"
+                                <input type="checkbox" className="form-check-input rounded-0"
                                     checked={stay}
                                     onChange={e => setStay(e.target.checked)} />
                                 <span className="form-check-label ms-2">아이디 저장</span>
                             </label>
                         </div>
                     </div>
-
-
-
                     <div className="row mt-4">
                         <div className="col">
                             <button className="btn btn-dark w-100 rounded-0"
@@ -168,7 +171,7 @@ const MemberLogin = () => {
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 

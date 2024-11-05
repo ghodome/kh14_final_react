@@ -1,6 +1,5 @@
 import axios from "axios";
 import { useCallback, useState } from "react";
-import Jumbotron from "../Jumbotron";
 
 const FindPw = () => {
     const [memberId, setMemberId] = useState("");
@@ -26,49 +25,52 @@ const FindPw = () => {
     }, [memberId, memberEmail]);
 
     return (
-        <>
-            <div className="row">
-                <div className="col-md-6 offset-md-3">
-                <div className="row mt-4">
-                        <div className="col mb-4">
-                            <span style={{ fontWeight: 'bold', fontSize: '50px' }}>
-                               비밀번호 찾기
-                            </span>
-                        </div>
+        <div className="container">
+            <div className="row justify-content-center">
+                <div className="col-12 col-md-5">
+                    <div className="text-center mt-4">
+                        <h2 style={{ fontWeight: 'bold', fontSize: '2.5rem' }}>
+                            비밀번호 찾기
+                        </h2>
                     </div>
-                    <div className="row mt-4">
-                        <div className="col">
-                            <input type="text"
-                                className="form-control rounded-0"
-                                placeholder="아이디 입력"
-                                value={memberId}
-                                onChange={(e) => setMemberId(e.target.value)} />
-                        </div>
+
+                    <div className="mt-4">
+                        <input
+                            type="text"
+                            className="form-control rounded-0"
+                            placeholder="아이디 입력"
+                            value={memberId}
+                            onChange={(e) => setMemberId(e.target.value)} 
+                        />
                     </div>
-                    <div className="row mt-4">
-                        <div className="col">
-                            <input type="email"
-                                className="form-control rounded-0"
-                                placeholder="이메일 입력"
-                                value={memberEmail}
-                                onChange={(e) => setMemberEmail(e.target.value)} />
-                        </div>
+
+                    <div className="mt-4">
+                        <input
+                            type="email"
+                            className="form-control rounded-0"
+                            placeholder="이메일 입력"
+                            value={memberEmail}
+                            onChange={(e) => setMemberEmail(e.target.value)} 
+                        />
                     </div>
-                    <div className="row mt-4">
-                        <div className="col">
-                            <button className="btn btn-dark w-100 mt-2 rounded-0" onClick={handleFindPw}>
-                                비밀번호 재설정 이메일 전송
-                            </button>
-                        </div>
+
+                        {message && (
+                            <div style={{ color: 'red', marginTop: '1rem' }}>
+                                {message}
+                            </div>
+                        )}
+                    <div className="mt-2">
+                        <button 
+                            className="btn btn-dark w-100 mt-2 rounded-0" 
+                            onClick={handleFindPw}
+                        >
+                            비밀번호 재설정 이메일 전송
+                        </button>
                     </div>
-                    {message && (
-                        <div style={{ color: 'red', marginTop: '1rem' }}>
-                            {message}
-                        </div>
-                    )}
+
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 
