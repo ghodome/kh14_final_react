@@ -163,8 +163,8 @@ const MemberEdit = () => {
                             />
                         </div>
                         <div className="d-flex justify-content-between">
-                            <button className="btn btn-dark rounded-0">수정 완료</button>
-                            <button type="button" className="btn btn-secondary rounded-0" onClick={() => navigate(`/admin/member/detail/${memberId}`)}>
+                            <button className="btn btn-dark rounded-0 mt-3" style={{ width: "25%", height: '40px' }}>수정 완료</button>
+                            <button type="button" className="btn btn-secondary rounded-0" style={{ width: "25%", height: '40px' }} onClick={() => navigate(`/admin/member/detail/${memberId}`)}>
                                 취소
                             </button>
                         </div>
