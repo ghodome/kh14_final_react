@@ -95,78 +95,83 @@ const MemberEdit = () => {
         <>
             <div className="row">
                 <div className="col-md-6 offset-md-3">
-                    <Jumbotron title={`${member.memberName} 님의 정보 수정`} />
-                    
-                            <form onSubmit={handleSubmit}>
-                                <div className="mb-3">
-                                    <input type="text"
-                                        name="memberName"
-                                        value={member.memberName}
-                                        onChange={changeInput}
-                                        placeholder="이름"
-                                        className="form-control rounded-0"
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <input type="email"
-                                        name="memberEmail"
-                                        value={member.memberEmail}
-                                        onChange={changeInput}
-                                        placeholder="이메일"
-                                        className="form-control rounded-0"
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <input type="text"
-                                        name="memberContact"
-                                        value={member.memberContact}
-                                        onChange={changeInput}
-                                        placeholder="전화번호"
-                                        className="form-control rounded-0"
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <input type="text"
-                                        name="memberPost"
-                                        value={member.memberPost}
-                                        placeholder="우편번호"
-                                        className="form-control rounded-0"
-                                        readOnly
-                                    />
-                                    <button type="button" onClick={sample6_execDaumPostcode} className="btn btn-dark mt-2 rounded-0">우편번호 찾기</button>
-                                </div>
-                                <div className="mb-3">
-                                    <input type="text"
-                                        name="memberAddress1"
-                                        value={member.memberAddress1}
-                                        onChange={changeInput}
-                                        placeholder="일반주소"
-                                        className="form-control rounded-0"
-                                        readOnly
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <input type="text"
-                                        name="memberAddress2"
-                                        value={member.memberAddress2}
-                                        onChange={changeInput}
-                                        placeholder="상세주소"
-                                        className="form-control rounded-0"
-                                    />
-                                </div>
-                                <div className="d-flex justify-content-between">
-                                    <button className="btn btn-dark rounded-0">수정 완료</button>
-                                    <button type="button" className="btn btn-secondary rounded-0" onClick={() => navigate(`/admin/member/detail/${memberId}`)}>
-                                        취소
-                                    </button>
-                                </div>
-                            </form>
+                    <div className="row mt-4">
+                        <div className="col mb-4">
+                            <span style={{ fontWeight: 'bold', fontSize: '50px' }}>
+                                {`${member.memberName} 님의 정보 수정`}
+                            </span>
                         </div>
                     </div>
-                
+                    <form onSubmit={handleSubmit}>
+                        <div className="mb-3">
+                            <input type="text"
+                                name="memberName"
+                                value={member.memberName}
+                                onChange={changeInput}
+                                placeholder="이름"
+                                className="form-control rounded-0"
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <input type="email"
+                                name="memberEmail"
+                                value={member.memberEmail}
+                                onChange={changeInput}
+                                placeholder="이메일"
+                                className="form-control rounded-0"
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <input type="text"
+                                name="memberContact"
+                                value={member.memberContact}
+                                onChange={changeInput}
+                                placeholder="전화번호"
+                                className="form-control rounded-0"
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <input type="text"
+                                name="memberPost"
+                                value={member.memberPost}
+                                placeholder="우편번호"
+                                className="form-control rounded-0"
+                                readOnly
+                            />
+                            <button type="button" onClick={sample6_execDaumPostcode} className="btn btn-dark mt-2 rounded-0">우편번호 찾기</button>
+                        </div>
+                        <div className="mb-3">
+                            <input type="text"
+                                name="memberAddress1"
+                                value={member.memberAddress1}
+                                onChange={changeInput}
+                                placeholder="일반주소"
+                                className="form-control rounded-0"
+                                readOnly
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <input type="text"
+                                name="memberAddress2"
+                                value={member.memberAddress2}
+                                onChange={changeInput}
+                                placeholder="상세주소"
+                                className="form-control rounded-0"
+                            />
+                        </div>
+                        <div className="d-flex justify-content-between">
+                            <button className="btn btn-dark rounded-0">수정 완료</button>
+                            <button type="button" className="btn btn-secondary rounded-0" onClick={() => navigate(`/admin/member/detail/${memberId}`)}>
+                                취소
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
         </>
     );
 };

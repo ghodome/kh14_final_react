@@ -68,7 +68,13 @@ const ChangePw = () => {
         <>
             <div className="row">
                 <div className="col-md-6 offset-md-3">
-                    <Jumbotron title="비밀번호 재설정" />
+                <div className="row mt-4">
+                        <div className="col mb-4">
+                            <span style={{ fontWeight: 'bold', fontSize: '50px' }}>
+                              비밀번호 재설정
+                            </span>
+                        </div>
+                    </div>
                     <div className="row mt-4">
                         <div className="col">
                             <input

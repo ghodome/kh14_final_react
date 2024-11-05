@@ -83,8 +83,11 @@ const MemberLogin = () => {
         <>
             <div className="row">
                 <div className="col-md-6 offset-md-3">
-                    <Jumbotron title="회원 로그인" />
-
+                    <div className="row mt-4">
+                        <div className="col mb-4">
+                            <span style={{ fontWeight: 'bold', fontSize: '50px' }}>로그인</span>
+                        </div>
+                    </div>
                     <div className="row mt-4">
                         <div className="col">
                             <input type="text" name="memberId" className="form-control rounded-0"
@@ -138,8 +141,8 @@ const MemberLogin = () => {
                             </label>
                         </div>
                     </div>
-                    
-                        
+
+
 
                     <div className="row mt-4">
                         <div className="col">
