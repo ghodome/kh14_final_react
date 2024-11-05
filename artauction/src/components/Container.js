@@ -50,7 +50,7 @@ const Container = () => {
     return (<>
         <div className="container-fluid">
             <div className="row my-5 pt-3">
-                <div className="col-sm-10 offset-sm-1">
+                <div className="col-sm-10 offset-sm-1" style={{marginTop:'2cm'}}>
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/join" element={<OfflineRoute element={<MemberJoin />} />} />

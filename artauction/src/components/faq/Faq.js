@@ -147,7 +147,8 @@ const Faq = () => {
                             borderBottom: '1px solid black',
                             color: 'black',
                             borderRadius: '0',
-                            boxShadow: 'none'
+                            boxShadow: 'none',
+                            backgroundColor: 'white'
                         }}
                     />
                     <button

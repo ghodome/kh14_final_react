@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import Jumbotron from "./Jumbotron";
 import axios from "axios";
 import ImageSlider from "./ImageSlider";
 
@@ -19,7 +18,6 @@ const Home=()=>{
 
     //view
     return (<>
-        <Jumbotron title="홈페이지"/>
         
         <div className="mt-4">
             <ImageSlider/>
