@@ -39,11 +39,13 @@ const Auction = () => {
             bidPrice: "",
             bidIncrement: "",
         }
-    });
+    }); 
 
     const [wholeMessageList, setWholeMessageList] = useState([]);
     const [member, setMember] = useState({});
     const [bidIncrementUnit, setBidIncrementUnit]=useState();
+
+    const [workImage, setWorkImage] = useState({});
 
     const [workImage, setWorkImage] = useState({});
 
@@ -85,6 +87,17 @@ const Auction = () => {
             });
         }
     },[auctionNo,bidIncrement,auctionAndWork,transferTime]);
+
+    const loadWorkImage = useCallback(async()=>{
+        try{
+            const resp = await axios.get(`http://localhost:8080/auction/workImage/${auctionNo}`);
+            // console.log("resp=", resp.data);
+            setWorkImage(resp.data[0]);
+            } 
+            catch (error) {
+                console.error("Failed to load auction data:", error);
+            }
+    },[auctionNo]);
 
     const loadWorkImage = useCallback(async()=>{
         try{
