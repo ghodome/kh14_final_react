@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import { blockedState, loginState, memberIdState, memberRankState } from "../../utils/recoil";
+import { blockedState, loginState, memberIdState, memberPointState, memberRankState } from "../../utils/recoil";
 import { useRecoilState, useRecoilValue } from "recoil";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
@@ -15,6 +15,9 @@ import { Modal } from "bootstrap";
 import Time from "../time/Time";
 
 const Auction = () => {
+    //recoil
+    const memberPoint=useRecoilValue(memberPointState);
+
     //ref
     const bidModal = useRef();
     const loading = useRef(false);
@@ -23,6 +26,7 @@ const Auction = () => {
     //navigate
     const navigate = useNavigate();
     // state
+    const [point,setPoint]=useState(0);
     const [transferTime, setTranferTime]=useState();
     const [auctionAndWork, setAuctionAndWork] = useState({
         auctionStartPrice: 0,
@@ -133,6 +137,11 @@ const Auction = () => {
         setBidIncrementUnit(increment);
     }, [bidIncrement]);
 
+    const loadMemberPoint=useCallback(async ()=>{
+        const resp=await axios.get(`http://localhost:8080/member/point`);
+        setPoint(resp.data);
+    },[point])
+
     const connectToServer = useCallback(() => {
         const socket = new SockJS("http://localhost:8080/ws");
         const client = new Client({
@@ -174,6 +183,7 @@ const Auction = () => {
     }, [client]);
 
     const sendMessage = useCallback(async () => {
+        loadMemberPoint();
         const json = { content: input };
 
         if (client === null || !connect) {
@@ -245,6 +255,7 @@ const Auction = () => {
     }, [auctionNo]);
 
     useEffect(() => {
+        
         if (auctionAndWork) {
             setInput((prev) => ({
                 ...prev,
@@ -256,7 +267,7 @@ const Auction = () => {
                     bidIncrement: bidIncrement,
                 },
             }));
-        }
+        };
     }, [auctionAndWork]);
     
     useEffect(() => {
@@ -387,7 +398,7 @@ const Auction = () => {
                                         <div className="row">
                                             <div className="row">
                                                 <div className="col-4">추정가</div>
-                                                <div className="col-8 text-end">{auctionAndWork.auctionLowPrice}원</div>
+                                                <div className="col-8 text-end">{auctionAndWork.auctionLowPrice.toLocaleString('ko-KR')} 원</div>
                                             </div>
                                         </div>
                                     </div>
@@ -395,7 +406,7 @@ const Auction = () => {
                                         <div className="row">
                                             <div className="row">
                                                 <div className="col-4">~</div>
-                                                <div className="col-8 text-end">{auctionAndWork.auctionHighPrice}원</div>
+                                                <div className="col-8 text-end">{auctionAndWork.auctionHighPrice.toLocaleString('ko-KR')} 원</div>
                                             </div>
                                         </div>
                                     </div>
@@ -403,7 +414,7 @@ const Auction = () => {
                                             <div className="row">
                                                 <div className="row">
                                                     <div className="col-4">시작가</div>
-                                                    <div className="col-8 text-end">{auctionAndWork.auctionStartPrice}원</div>
+                                                    <div className="col-8 text-end">{auctionAndWork.auctionStartPrice.toLocaleString('ko-KR')} 원</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -411,9 +422,9 @@ const Auction = () => {
                                             <div className="row">
                                                 <div className="row">
                                                     <div className="col-4">현재가</div>
-                                                    <div className="col-3">{auctionAndWork.auctionBidCnt}회</div>
+                                                    <div className="col-3">{auctionAndWork.auctionBidCnt} 회</div>
                                                     <div className="col-5 text-end">
-                                                        {input.bid.bidPrice}원</div>
+                                                        {input.bid.bidPrice.toLocaleString('ko-KR')} 원</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -425,7 +436,7 @@ const Auction = () => {
                                                         <div onClick={e => openBidIncrementModal()}>
                                                             <IoMdInformationCircleOutline /></div>
                                                     </div>
-                                                    <div className="col-5 text-end">{bidIncrement}원</div>
+                                                    <div className="col-5 text-end">{bidIncrement.toLocaleString('ko-KR')} 원</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -442,6 +453,14 @@ const Auction = () => {
                                                 <div className="row">
                                                     <div className="col-4">남은 시간</div>
                                                     <div className="col-8 text-end"><Time endDate={auctionAndWork.auctionEndDate}/></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col">
+                                            <div className="row">
+                                                <div className="row">
+                                                    <div className="col-4">보유 포인트</div>
+                                                    <div className="col-8 text-end">{point?point.toLocaleString('ko-KR'):memberPoint.toLocaleString('ko-KR')}</div>
                                                 </div>
                                             </div>
                                         </div>
