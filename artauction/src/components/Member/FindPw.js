@@ -29,8 +29,13 @@ const FindPw = () => {
         <>
             <div className="row">
                 <div className="col-md-6 offset-md-3">
-                    <Jumbotron title="비밀번호 찾기"
-                        content="비밀번호를 찾고자 하는 아이디와 이메일을 적으십시오" />
+                <div className="row mt-4">
+                        <div className="col mb-4">
+                            <span style={{ fontWeight: 'bold', fontSize: '50px' }}>
+                               비밀번호 찾기
+                            </span>
+                        </div>
+                    </div>
                     <div className="row mt-4">
                         <div className="col">
                             <input type="text"

@@ -146,77 +146,82 @@ const MemberPwChange = () => {
         <>
             <div className="row">
                 <div className="col-md-6 offset-md-3">
-                    <Jumbotron title={`${member.memberName} 님의 비밀번호 변경`} />
-                    
-                            <form onSubmit={handleSubmit} style={{ display: modalIsOpen ? 'none' : 'block' }}>
-                                <div className="mb-3">
-                                    <input
-                                        type="password"
-                                        value={newPw}
-                                        onChange={handleNewPwChange}
-                                        placeholder="새 비밀번호"
-                                        className="form-control rounded-0"
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <input
-                                        type="password"
-                                        value={confirmPw}
-                                        onChange={handleConfirmPwChange}
-                                        placeholder="새 비밀번호 확인"
-                                        className="form-control rounded-0"
-                                    />
-                                </div>
-                                {error && <div className="text-danger">{error}</div>}
-                                {success && <div className="text-success">{success}</div>}
-                                <div className="d-flex justify-content-between">
-                                    <button className="btn btn-dark rounded-0">수정 완료</button>
-                                    <button type="button" className="btn btn-secondary rounded-0" onClick={() => navigate(`/member/mypage`)}>
-                                        취소
-                                    </button>
-                                </div>
-                            </form>
+                    <div className="row mt-4">
+                        <div className="col mb-4">
+                            <span style={{ fontWeight: 'bold', fontSize: '50px' }}>
+                                {`${member.memberName} 님의 비밀번호 변경`}
+                            </span>
                         </div>
                     </div>
-
-                    {/* 비밀번호 확인 모달 */}
-                    <Modal
-                        isOpen={modalIsOpen}
-                        onRequestClose={() => { }} // 배경 클릭 시 모달 닫히지 않도록 설정
-                        shouldCloseOnOverlayClick={false}
-                        style={{
-                            overlay: { zIndex: 1000 },
-                            content: {
-                                top: '50%',
-                                left: '50%',
-                                right: 'auto',
-                                bottom: 'auto',
-                                transform: 'translate(-50%, -50%)',
-                                width: '500px',
-                                height: 'auto',
-                                padding: '20px'
-                            }
-                        }}
-                    >
-                        <h5 className="modal-title">현재 비밀번호 확인</h5>
-                        <input
-                            type="password"
-                            value={currentPw}
-                            onChange={handleCurrentPwChange}
-                            placeholder="현재 비밀번호"
-                            className="form-control rounded-0"
-                        />
-                        {error && <div className="text-danger mt-2">{error}</div>}
-                        <div className="modal-footer" style={{ display: "flex", justifyContent: "space-between", marginTop: "10px" }}>
-                            <button type="button" className="btn btn-secondary rounded-0 me-2" onClick={() => navigate(`/member/mypage`)}>
+                    <form onSubmit={handleSubmit} style={{ display: modalIsOpen ? 'none' : 'block' }}>
+                        <div className="mb-3">
+                            <input
+                                type="password"
+                                value={newPw}
+                                onChange={handleNewPwChange}
+                                placeholder="새 비밀번호"
+                                className="form-control rounded-0"
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <input
+                                type="password"
+                                value={confirmPw}
+                                onChange={handleConfirmPwChange}
+                                placeholder="새 비밀번호 확인"
+                                className="form-control rounded-0"
+                            />
+                        </div>
+                        {error && <div className="text-danger">{error}</div>}
+                        {success && <div className="text-success">{success}</div>}
+                        <div className="d-flex justify-content-between">
+                            <button className="btn btn-dark rounded-0 mt-3" style={{ width: "25%", height: '40px' }}>수정 완료</button>
+                            <button type="button" className="btn btn-secondary rounded-0" style={{ width: "25%", height: '40px' }} onClick={() => navigate(`/member/mypage`)}>
                                 취소
                             </button>
-                            <button type="button" className="btn btn-dark rounded-0" onClick={handlePasswordVerification}>
-                                확인
-                            </button>
                         </div>
-                    </Modal>
-               
+                    </form>
+                </div>
+            </div>
+
+            {/* 비밀번호 확인 모달 */}
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={() => { }} // 배경 클릭 시 모달 닫히지 않도록 설정
+                shouldCloseOnOverlayClick={false}
+                style={{
+                    overlay: { zIndex: 1000 },
+                    content: {
+                        top: '50%',
+                        left: '50%',
+                        right: 'auto',
+                        bottom: 'auto',
+                        transform: 'translate(-50%, -50%)',
+                        width: '500px',
+                        height: 'auto',
+                        padding: '20px'
+                    }
+                }}
+            >
+                <h5 className="modal-title">현재 비밀번호 확인</h5>
+                <input
+                    type="password"
+                    value={currentPw}
+                    onChange={handleCurrentPwChange}
+                    placeholder="현재 비밀번호"
+                    className="form-control rounded-0"
+                />
+                {error && <div className="text-danger mt-2">{error}</div>}
+                <div className="modal-footer" style={{ display: "flex", justifyContent: "space-between", marginTop: "10px" }}>
+                    <button type="button" className="btn btn-secondary rounded-0 me-2" onClick={() => navigate(`/member/mypage`)}>
+                        취소
+                    </button>
+                    <button type="button" className="btn btn-dark rounded-0" onClick={handlePasswordVerification}>
+                        확인
+                    </button>
+                </div>
+            </Modal>
+
         </>
     );
 };

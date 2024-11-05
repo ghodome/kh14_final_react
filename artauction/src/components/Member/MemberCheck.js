@@ -102,7 +102,13 @@ const MemberCheck = () => {
         <>
             <div className="row">
                 <div className="col-md-6 offset-md-3">
-            <Jumbotron title="이용약관" />
+                <div className="row mt-4">
+                        <div className="col mb-4">
+                            <span style={{ fontWeight: 'bold', fontSize: '50px' }}>
+                               회원가입
+                            </span>
+                        </div>
+                    </div>
                     <div className="mt-4">
                         <div className="mb-3">
                             <div style={{ marginBottom: '10px', border: '1px solid #ccc', padding: '10px', maxHeight: '150px', overflowY: 'auto' }}>

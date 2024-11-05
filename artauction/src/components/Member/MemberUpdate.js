@@ -137,116 +137,121 @@ const MemberUpdate = () => {
         <>
             <div className="row">
                 <div className="col-md-6 offset-md-3">
-                    <Jumbotron title={`${member.memberName} 님의 정보수정`} />
-                   
-                            <form onSubmit={handleSubmit} style={{ display: isEditing ? 'block' : 'none' }}>
-                                <div className="mb-3">
-                                    <input type="text"
-                                        name="memberName"
-                                        value={member.memberName}
-                                        onChange={changeInput}
-                                        placeholder="이름"
-                                        className="form-control rounded-0"
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <input type="email"
-                                        name="memberEmail"
-                                        value={member.memberEmail}
-                                        onChange={changeInput}
-                                        placeholder="이메일"
-                                        className="form-control rounded-0"
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <input type="text"
-                                        name="memberContact"
-                                        value={member.memberContact}
-                                        onChange={changeInput}
-                                        placeholder="전화번호"
-                                        className="form-control rounded-0"
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <input type="text"
-                                        name="memberPost"
-                                        value={member.memberPost}
-                                        placeholder="우편번호"
-                                        className="form-control rounded-0"
-                                        readOnly
-                                    />
-                                    <button type="button" onClick={sample6_execDaumPostcode} className="btn btn-dark mt-2 rounded-0">우편번호 찾기</button>
-                                </div>
-                                <div className="mb-3">
-                                    <input type="text"
-                                        name="memberAddress1"
-                                        value={member.memberAddress1}
-                                        onChange={changeInput}
-                                        placeholder="일반주소"
-                                        className="form-control rounded-0"
-                                        readOnly
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <input type="text"
-                                        name="memberAddress2"
-                                        value={member.memberAddress2}
-                                        onChange={changeInput}
-                                        placeholder="상세주소"
-                                        className="form-control rounded-0"
-                                    />
-                                </div>
-                                <div className="d-flex justify-content-between">
-                                    <button className="btn btn-dark rounded-0">수정 완료</button>
-                                    <button type="button" className="btn btn-secondary rounded-0" onClick={() => navigate(`/member/mypage`)}>
-                                        취소
-                                    </button>
-                                </div>
-                            </form>
+            <div className="row mt-4">
+                <div className="col mb-4">
+                    <span style={{ fontWeight: 'bold', fontSize: '50px' }}>
+                        {`${member[0]?.memberName || ''} 님의 정보수정`}
+                    </span>
+                </div>
+            </div>
+                    <form onSubmit={handleSubmit} style={{ display: isEditing ? 'block' : 'none' }}>
+                        <div className="mb-3">
+                            <input type="text"
+                                name="memberName"
+                                value={member.memberName}
+                                onChange={changeInput}
+                                placeholder="이름"
+                                className="form-control rounded-0"
+                            />
                         </div>
-                    </div>
-
-                    {/* 비밀번호 확인 모달 */}
-                    <Modal
-                        isOpen={modalIsOpen}
-                        onRequestClose={() => { }} // 배경 클릭 시 모달 닫히지 않도록 설정
-                        shouldCloseOnOverlayClick={false}
-                        style={{
-                            overlay: { zIndex: 1000 },
-                            content: {
-                                top: '50%',
-                                left: '50%',
-                                right: 'auto',
-                                bottom: 'auto',
-                                transform: 'translate(-50%, -50%)',
-                                width: '500px',
-                                height: 'auto',
-                                padding: '20px'
-                            }
-                        }}
-                    >
-                        <h5 className="modal-title">현재 비밀번호 확인</h5>
-                        <input
-                            type="password"
-                            value={currentPw}
-                            onChange={handleCurrentPwChange}
-                            placeholder="현재 비밀번호"
-                            className={`form-control rounded-0 ${!isPwValid ? "is-invalid" : ""}`}
-                        />
-                        {/* 비밀번호가 유효하지 않을 때 에러 메시지 표시 */}
-                        {errorMessage && <div className="text-danger mt-2">{errorMessage}</div>}
-                        <div className="modal-footer" style={{ display: "flex", justifyContent: "space-between", marginTop: "10px" }}>
-                            <button type="button" className="btn btn-secondary rounded-0 me-2" onClick={() => {
-                                navigate(`/member/mypage`); // 마이페이지로 이동
-                            }}>
+                        <div className="mb-3">
+                            <input type="email"
+                                name="memberEmail"
+                                value={member.memberEmail}
+                                onChange={changeInput}
+                                placeholder="이메일"
+                                className="form-control rounded-0"
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <input type="text"
+                                name="memberContact"
+                                value={member.memberContact}
+                                onChange={changeInput}
+                                placeholder="전화번호"
+                                className="form-control rounded-0"
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <input type="text"
+                                name="memberPost"
+                                value={member.memberPost}
+                                placeholder="우편번호"
+                                className="form-control rounded-0"
+                                readOnly
+                            />
+                            <button type="button" onClick={sample6_execDaumPostcode} className="btn btn-dark mt-2 rounded-0">우편번호 찾기</button>
+                        </div>
+                        <div className="mb-3">
+                            <input type="text"
+                                name="memberAddress1"
+                                value={member.memberAddress1}
+                                onChange={changeInput}
+                                placeholder="일반주소"
+                                className="form-control rounded-0"
+                                readOnly
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <input type="text"
+                                name="memberAddress2"
+                                value={member.memberAddress2}
+                                onChange={changeInput}
+                                placeholder="상세주소"
+                                className="form-control rounded-0"
+                            />
+                        </div>
+                        <div className="d-flex justify-content-between">
+                            <button className="btn btn-dark rounded-0 mt-3" style={{ width: "25%", height: '40px' }}>수정 완료</button>
+                            <button type="button" className="btn btn-secondary rounded-0" style={{ width: "25%", height: '40px' }} onClick={() => navigate(`/member/mypage`)}>
                                 취소
                             </button>
-                            <button type="button" className="btn btn-dark rounded-0" onClick={handlePasswordSubmit}>
-                                확인
-                            </button>
                         </div>
-                    </Modal>
-               
+                    </form>
+                </div>
+            </div>
+
+            {/* 비밀번호 확인 모달 */}
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={() => { }} // 배경 클릭 시 모달 닫히지 않도록 설정
+                shouldCloseOnOverlayClick={false}
+                style={{
+                    overlay: { zIndex: 1000 },
+                    content: {
+                        top: '50%',
+                        left: '50%',
+                        right: 'auto',
+                        bottom: 'auto',
+                        transform: 'translate(-50%, -50%)',
+                        width: '500px',
+                        height: 'auto',
+                        padding: '20px'
+                    }
+                }}
+            >
+                <h5 className="modal-title">현재 비밀번호 확인</h5>
+                <input
+                    type="password"
+                    value={currentPw}
+                    onChange={handleCurrentPwChange}
+                    placeholder="현재 비밀번호"
+                    className={`form-control rounded-0 ${!isPwValid ? "is-invalid" : ""}`}
+                />
+                {/* 비밀번호가 유효하지 않을 때 에러 메시지 표시 */}
+                {errorMessage && <div className="text-danger mt-2">{errorMessage}</div>}
+                <div className="modal-footer" style={{ display: "flex", justifyContent: "space-between", marginTop: "10px" }}>
+                    <button type="button" className="btn btn-secondary rounded-0 me-2" onClick={() => {
+                        navigate(`/member/mypage`); // 마이페이지로 이동
+                    }}>
+                        취소
+                    </button>
+                    <button type="button" className="btn btn-dark rounded-0" onClick={handlePasswordSubmit}>
+                        확인
+                    </button>
+                </div>
+            </Modal>
+
         </>
     );
 };

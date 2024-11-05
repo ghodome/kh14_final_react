@@ -731,10 +731,10 @@ const clearEState = useCallback(()=>{
                         <div className="invalid-feedback"></div>
                       {/* </>) : (<p>{detailArtist.artistName}</p>)} */}
                     </div>
-                    <div className="col-2">
+                    {/* <div className="col-2">
                       <input type="checkbox" name="artistName"
                         onChange={e => changeStatus(e)}></input>
-                    </div>
+                    </div> */}
                   </div>
 
                 </div>
@@ -756,10 +756,10 @@ const clearEState = useCallback(()=>{
                         <div className="invalid-feedback"></div>
                       {/* </>) : (<p>{detailArtist.artistDescription}</p>)} */}
                     </div>
-                    <div className="col-2">
+                    {/* <div className="col-2">
                       <input type="checkbox" name="artistDescription"
                         onChange={e => changeStatus(e)}></input>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
@@ -780,10 +780,10 @@ const clearEState = useCallback(()=>{
                         <div className="invalid-feedback"></div>
                       {/* </>) : (<p>{detailArtist.artistHistory}</p>)} */}
                     </div>
-                    <div className="col-2">
+                    {/* <div className="col-2">
                       <input type="checkbox" name='artistHistory'
                         onChange={e => changeStatus(e)}></input>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
@@ -804,10 +804,10 @@ const clearEState = useCallback(()=>{
                         <div className="invalid-feedback"></div>
                       {/* </>) : (<p>{detailArtist.artistBirth}</p>)} */}
                     </div>
-                    <div className="col-2">
+                    {/* <div className="col-2">
                       <input type="checkbox" name='artistBirth'
                         onChange={e => changeStatus(e)}></input>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
@@ -828,10 +828,10 @@ const clearEState = useCallback(()=>{
                         <div className="invalid-feedback"></div>
                       {/* </>) : (<p>{detailArtist.artistDeath}</p>)}{ } */}
                     </div>
-                    <div className="col-2">
+                    {/* <div className="col-2">
                       <input type="checkbox" name='artistDeath'
                         onChange={e => changeStatus(e)}></input>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>

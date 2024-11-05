@@ -206,7 +206,11 @@ const MemberJoin = () => {
         <>
             <div className="row">
                 <div className="col-md-6 offset-md-3">
-                    <Jumbotron title="회원가입" />
+                <div className="row mt-4">
+                <div className="col mb-4">
+                    <span style={{ fontWeight: 'bold', fontSize: '50px' }}>회원가입</span>
+                </div>
+            </div>
                     <div className='row mt-4'>
                         <div className='col'>
                             <label className="form-label">아이디 <FaAsterisk style={{ color: 'red', fontSize: '0.7rem', verticalAlign: 'super', marginLeft: '0.2rem' }} /></label>

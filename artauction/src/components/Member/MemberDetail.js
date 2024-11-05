@@ -100,7 +100,13 @@ const MemberDetail = () => {
         <>
             <div className="row">
                 <div className="col-md-6 offset-md-3">
-                    <Jumbotron title={`${member.memberName}님의 정보`} />
+                <div className="row mt-4">
+                        <div className="col mb-4">
+                            <span style={{ fontWeight: 'bold', fontSize: '50px' }}>
+                                {`${member.memberName} 님의 정보`}
+                            </span>
+                        </div>
+                    </div>
                     <div className="container my-4">
 
 
@@ -138,18 +144,18 @@ const MemberDetail = () => {
 
                         <div className="row mt-4">
                             <div className="col text-center">
-                                <button type="button" className="btn btn-dark rounded-0" onClick={() => navigate(`/admin/member/edit/${memberId}`)}>
+                                <button type="button" className="btn btn-dark rounded-0" onClick={() => navigate(`/admin/member/edit/${memberId}`)} style={{ width: "25%", height: '40px' }}>
                                     수정 하기
                                 </button>
-                                <button type="button" className="btn btn-danger ms-3 rounded-0" onClick={handleDelete}>
+                                <button type="button" className="btn btn-danger ms-3 rounded-0" onClick={handleDelete} style={{ width: "25%", height: '40px' }}>
                                     계정 삭제
                                 </button>
                                 {!blocked ? (
-                                    <button type="button" className="btn btn-secondary ms-3 rounded-0" onClick={handleBlock}>
+                                    <button type="button" className="btn btn-secondary ms-3 rounded-0 mb-3" onClick={handleBlock} style={{ width: "25%", height: '40px' }}>
                                         회원 차단
                                     </button>
                                 ) : (
-                                    <button type="button" className="btn btn-light ms-3 rounded-0" onClick={handleUnblock}>
+                                    <button type="button" className="btn btn-light ms-3 rounded-0" onClick={handleUnblock} style={{ width: "25%", height: '40px' }}> 
                                         차단 해제
                                     </button>
                                 )}
