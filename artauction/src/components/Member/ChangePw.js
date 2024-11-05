@@ -12,15 +12,46 @@ const ChangePw = () => {
     const navigate = useNavigate();
     const [message, setMessage] = useState("");
 
+    const isValidPassword = (password) => {
+        const lengthPattern = /^.{8,16}$/; // 길이 8-16자
+        const upperCasePattern = /[A-Z]/; // 대문자 포함
+        const lowerCasePattern = /[a-z]/; // 소문자 포함
+        const numberPattern = /[0-9]/; // 숫자 포함
+        const specialCharPattern = /[!@#$]/; // 특수 문자 포함
+
+        return (
+            lengthPattern.test(password) &&
+            upperCasePattern.test(password) &&
+            lowerCasePattern.test(password) &&
+            numberPattern.test(password) &&
+            specialCharPattern.test(password)
+        );
+    };
+
     const handleChangePw = useCallback(async () => {
+        setMessage(""); // 에러 메시지 초기화
+
+        // 비밀번호 유효성 검사
+        if (!newPw) {
+            setMessage('새 비밀번호를 입력하세요.');
+            return;
+        }
+        if (!confirmPw) {
+            setMessage('비밀번호 확인을 입력하세요.');
+            return;
+        }
+        if (!isValidPassword(newPw)) {
+            setMessage('새 비밀번호는 8-16자, 대문자, 소문자, 숫자, 특수문자를 포함해야 합니다.');
+            return;
+        }
         if (newPw !== confirmPw) {
             setMessage('비밀번호가 일치하지 않습니다.');
             return;
         }
-    
+
         try {
-            const resp = await axios.post(`http://localhost:8080/member/changePw?token=${token}`, { 
-                newPw : newPw 
+            const resp = await axios.post(`http://localhost:8080/member/changePw?token=${token}`, {
+                newPw: newPw
             });
             // 성공적으로 비밀번호가 변경된 후 리다이렉트
             if (resp.status === 200) {
@@ -38,11 +69,11 @@ const ChangePw = () => {
             <div className="row">
                 <div className="col-md-6 offset-md-3">
                     <Jumbotron title="비밀번호 재설정" />
-                    {message && <div className="alert alert-danger">{message}</div>} {/* 메시지 표시 */}
                     <div className="row mt-4">
                         <div className="col">
-                            <input type="password"
-                                className="form-control"
+                            <input
+                                type="password"
+                                className="form-control rounded-0"
                                 placeholder="새 비밀번호"
                                 value={newPw}
                                 onChange={(e) => setNewPw(e.target.value)} />
@@ -50,8 +81,9 @@ const ChangePw = () => {
                     </div>
                     <div className="row mt-4">
                         <div className="col">
-                            <input type="password"
-                                className="form-control"
+                            <input
+                                type="password"
+                                className="form-control rounded-0"
                                 placeholder="비밀번호 확인"
                                 value={confirmPw}
                                 onChange={(e) => setConfirmPw(e.target.value)} />
@@ -59,11 +91,17 @@ const ChangePw = () => {
                     </div>
                     <div className="row mt-4">
                         <div className="col">
-                            <button className="btn btn-primary w-100 mt-2" onClick={handleChangePw}>
+                            <button className="btn btn-dark w-100 mt-2 rounded-0" onClick={handleChangePw}>
                                 비밀번호 재설정
                             </button>
                         </div>
                     </div>
+
+                    {message && (
+                        <div style={{ color: 'red', marginTop: '1rem' }}>
+                            {message}
+                        </div>
+                    )}
                 </div>
             </div>
         </>

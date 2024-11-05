@@ -3,12 +3,15 @@ import Jumbotron from "../Jumbotron";
 import axios from "axios";
 import { Modal } from "bootstrap";
 import { NavLink } from "react-router-dom";
+import { useRecoilState } from "recoil";
+import { memberRankState } from "../../utils/recoil";
 
 const Items = () => {
     const [item, setItem] = useState([]);
     const [result, setResult] = useState(null);
     const [isButtonDisabled, setIsButtonDisabled] = useState(false); // 버튼 비활성화 상태
-
+    const [isLoading, setIsLoading] = useState(false);
+    const [memberRank, setMemberRank] = useRecoilState(memberRankState);
     useEffect(() => {
         loadItems();
     }, []);
@@ -30,7 +33,7 @@ const Items = () => {
             // 3초 후 버튼 활성화
             setTimeout(() => {
                 setIsButtonDisabled(false);
-            }, 1000);
+            }, 10);
         }
     },[result,isButtonDisabled]);
 
@@ -82,9 +85,11 @@ const Items = () => {
         <>
             <Jumbotron title="랜덤 뽑기" />
             <div className="row mt-3">
+                {memberRank==='관리자' && (
                 <div className="col text-end">
                     <button className="btn btn-secondary" onClick={openInsertModal}>아이템 추가하기</button>
                 </div>
+                )}
             </div>
             <table className="table">
                 <thead>
@@ -107,7 +112,7 @@ const Items = () => {
                 </tbody>
             </table>
             <button
-                className="btn btn-success w-100"
+                className="btn btn-dark text-light w-100"
                 onClick={openRandomBox}
                 disabled={isButtonDisabled} // 버튼 비활성화 상태에 따라 비활성화
             >

@@ -11,6 +11,7 @@ import { GiPayMoney } from "react-icons/gi";
 import { TbZoomMoney } from "react-icons/tb";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { Modal } from "bootstrap";
+import Time from "../time/Time";
 
 const Auction = () => {
     //ref
@@ -21,6 +22,7 @@ const Auction = () => {
     //navigate
     const navigate = useNavigate();
     // state
+    const [transferTime, setTranferTime]=useState();
     const [auctionAndWork, setAuctionAndWork] = useState({
         auctionStartPrice: 0,
         auctionBidIncrement: 0,
@@ -41,6 +43,9 @@ const Auction = () => {
 
     const [wholeMessageList, setWholeMessageList] = useState([]);
     const [member, setMember] = useState({});
+    const [bidIncrementUnit, setBidIncrementUnit]=useState();
+
+    const [workImage, setWorkImage] = useState({});
 
     const [workImage, setWorkImage] = useState({});
 
@@ -64,12 +69,13 @@ const Auction = () => {
                 bidIncrement: "",
             }
         });
-    }, [input])
-    const loadAuctionAndWork = useCallback(async () => {
+    },[])
+    const loadAuctionAndWork=useCallback(async ()=>{
         const resp = await axios.get(`http://localhost:8080/auction/work/${auctionNo}`);
         setAuctionAndWork(resp.data);
-        setBidIncrementByPrice(resp.data.auctionBidPrice > 0 ? resp.data.auctionBidPrice : resp.data.auctionStartPrice);
-        if (resp) {
+        setTranferTime(resp.data.auctionEndDate);
+        setBidIncrementByPrice(resp.data.auctionBidPrice>0?resp.data.auctionBidPrice:resp.data.auctionStartPrice);
+        if(resp){
             setInput({
                 type: "bid",
                 bid: {
@@ -80,7 +86,18 @@ const Auction = () => {
                 },
             });
         }
-    }, [auctionAndWork, input, auctionNo, bidIncrement]);
+    },[auctionNo,bidIncrement,auctionAndWork,transferTime]);
+
+    const loadWorkImage = useCallback(async()=>{
+        try{
+            const resp = await axios.get(`http://localhost:8080/auction/workImage/${auctionNo}`);
+            // console.log("resp=", resp.data);
+            setWorkImage(resp.data[0]);
+            } 
+            catch (error) {
+                console.error("Failed to load auction data:", error);
+            }
+    },[auctionNo]);
 
     const loadWorkImage = useCallback(async()=>{
         try{
@@ -121,6 +138,7 @@ const Auction = () => {
                 increment = 10000000;
         }
         setBidIncrement(increment);
+        setBidIncrementUnit(increment);
     }, [bidIncrement]);
 
     const connectToServer = useCallback(() => {
@@ -175,14 +193,12 @@ const Auction = () => {
         }
         else {
             const bidResp = await axios.patch(`http://localhost:8080/auctionchat/${auctionNo}`, json.content);
-
             if (bidResp.data.success) {
                 window.alert(`LOT ${json.content.bid.auctionLot} ${json.content.bid.bidPrice + json.content.bid.bidIncrement}원 응찰에 성공하셨습니다.`);
             } else {
                 window.alert(`동일 가격 차순위 응찰되었습니다.`);
             }
         }
-
         // 응찰 성공 후 새 bidPrice 업데이트를 위해 loadAuctionAndWork 호출
         loadAuctionAndWork();
     }, [input, client, connect, auctionAndWork, blocked]);
@@ -195,7 +211,7 @@ const Auction = () => {
                 bidIncrement: input.bid.bidIncrement + bidIncrement
             }
         })
-    }, [input, bidIncrement])
+    },[input,bidIncrement])
 
     const decreaseBidIncrement = useCallback(() => {
         setInput({
@@ -206,7 +222,7 @@ const Auction = () => {
                     input.bid.bidIncrement - bidIncrement : input.bid.bidIncrement
             }
         })
-    }, [input, bidIncrement]);
+    },[input,bidIncrement]);
 
     const loadMessageList = useCallback(async () => {
         const resp = await axios.get(`http://localhost:8080/bid/bidMessageList/${auctionNo}`);
@@ -245,7 +261,7 @@ const Auction = () => {
                 },
             }));
         }
-    }, [auctionAndWork, bidIncrement]);
+    }, [auctionAndWork]);
     
     useEffect(() => {
         const loadMember = async () => {
@@ -365,59 +381,76 @@ const Auction = () => {
                                         <tr>
                                             <th>경매 진행 상황</th>
                                             <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <div className="row">
-                                                    <div className="col-4">추정가</div>
-                                                    <div className="col-8">{auctionAndWork.auctionLowPrice}원</div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="row">
-                                                    <div className="col-4">~</div>
-                                                    <div className="col-8">{auctionAndWork.auctionHighPrice}원</div>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div className="row">
+                                                <div className="col-4">추정가</div>
+                                                <div className="col-8 text-end">{auctionAndWork.auctionLowPrice}원</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div className="row">
+                                                <div className="col-4">~</div>
+                                                <div className="col-8 text-end">{auctionAndWork.auctionHighPrice}원</div>
+                                            </div>
+                                        </td>
+                                    </tr>
                                         <tr>
                                             <td>
                                                 <div className="row">
                                                     <div className="col-4">시작가</div>
-                                                    <div className="col-8">{auctionAndWork.auctionStartPrice}원</div>
+                                                    <div className="col-8 text-end">{auctionAndWork.auctionStartPrice}원</div>
                                                 </div>
                                             </td>
                                         </tr>
-                                        {input.bid.bidPrice > 0 && (
-                                            <tr>
-                                                <td>
-                                                    <div className="row">
-                                                        <div className="col-4">현재가</div>
-                                                        <div className="col-5">{input.bid.bidPrice}원</div>
-                                                        <div className="col-3">{auctionAndWork.auctionBidCnt}회</div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        )}
+                                        {/* {input.bid.bidPrice>0&&( */}
+                                        <tr>
+                                            <td>
+                                                <div className="row">
+                                                    <div className="col-4">현재가</div>
+                                                    <div className="col-3">{auctionAndWork.auctionBidCnt}회</div>
+                                                    <div className="col-5 text-end">
+                                                        {input.bid.bidPrice}원</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {/* )} */}
                                         <tr>
                                             <td>
                                                 <div className="row">
                                                     <div className="col-4">호가 단위</div>
-                                                    <div className="col-5">{bidIncrement}원</div>
                                                     <div className="col-3">
                                                         <div onClick={e => openBidIncrementModal()}>
                                                             <IoMdInformationCircleOutline /></div>
                                                     </div>
+                                                    <div className="col-5 text-end">{bidIncrement}원</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div className="row">
+                                                    <div className="col-4">마감 시간</div>
+                                                    <div className="col-8 text-end">{moment(auctionAndWork.auctionEndDate).format('yyyy년 MM월 DD일 H:mm:ss')}</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div className="row">
+                                                    <div className="col-4">남은 시간</div>
+                                                    <div className="col-8 text-end"><Time endDate={auctionAndWork.auctionEndDate}/></div>
                                                 </div>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
-                                {login ? (
+                                {login && (
                                     <div className="row mt-3">
                                         <div className="col-md-10 affset-md-1">
                                             {blocked ? (
@@ -452,14 +485,17 @@ const Auction = () => {
                                             )}
                                         </div>
                                     </div>
-                                ) : (
-                                    <div className="row mt-3">
-                                        <div className="col-md-10 affset-md-1">
-                                            <button type="button" className="btn btn-primary"
-                                                onClick={e => navigate("/login")}>로그인 후 응찰이 가능합니다.</button>
-                                        </div>
+                                    )}
+                                        {messageList && messageList.slice().reverse().map((message, index) => (<>
+                                    <div className="row" key={index}>
+                                    <div className="col">
+                                    <p>{message.content.contentForLot}</p>
+                                    <p className="text-muted">
+                                    {moment(message.content.bidTime).format('HH:mm:ss:SSS')}
+                                    </p>
                                     </div>
-                                )}
+                                    </div>
+                                </>))}
                                 <ul className="list-group">
                                     {messageList && messageList.slice().reverse().map((message, index) => (
                                         <div className="row" key={index}>
@@ -474,18 +510,18 @@ const Auction = () => {
                                 </ul>
                                 {wholeMessageList && wholeMessageList.slice().reverse().map((message, index) => (
                                     <div className="row" key={index}>
-                                        <div className="col">
-                                            <p>{message.content.contentForLot}</p>
-                                            <p className="text-muted">
-                                                {moment(message.time).format('HH:mm:ss')}
-                                            </p>
-                                        </div>
+                                    <div className="col">
+                                    <p>{message.content.contentForLot}</p>
+                                    <p className="text-muted">
+                                    {moment(message.time).format('HH:mm:ss:SSS')}
+                                    </p>
+                                    </div>
                                     </div>
                                 ))}
-                            </div>
-                            <hr />
-                        </div>
-                        <div className="modal fade" ref={bidModal}>
+                                </div>
+                                <hr />
+                                </div>
+                                <div className="modal fade" ref={bidModal}>
                             <div className="modal-dialog">
                                 <div className="modal-content">
                                     <div className="modal-header">
@@ -522,6 +558,7 @@ const Auction = () => {
                         </div>
                     </>
                 ) : (
+                
                     <h1>로딩 중...</h1>
                 )}
             </div>

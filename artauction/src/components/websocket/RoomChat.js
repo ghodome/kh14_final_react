@@ -1,6 +1,6 @@
 import { useLocation, useNavigate, useParams } from "react-router";
 import Jumbotron from "../Jumbotron";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { loginState, memberIdState, memberLoadingState } from "../../utils/recoil";
 import SockJS from "sockjs-client";
@@ -12,25 +12,21 @@ const RoomChat = () => {
     const { roomNo } = useParams();
     const navigate = useNavigate();
 
-    // state
     const [input, setInput] = useState("");
     const [messageList, setMessageList] = useState([]);
     const [client, setClient] = useState(null);
     const [connect, setConnect] = useState(false);
 
-    // recoil
     const login = useRecoilValue(loginState);
     const memberId = useRecoilValue(memberIdState);
     const memberLoading = useRecoilValue(memberLoadingState);
 
-    // token
     const accessToken = axios.defaults.headers.common["Authorization"];
-    const refreshToken = window.localStorage.getItem("refreshToken")
-        || window.sessionStorage.getItem("refreshToken");
+    const refreshToken = window.localStorage.getItem("refreshToken") || window.sessionStorage.getItem("refreshToken");
 
-    // effect: 메시지 불러오기 및 웹소켓 연결
+    const messageEndRef = useRef(null);
+
     useEffect(() => {
-        // 로컬 스토리지에서 메시지 불러오기
         const savedMessages = localStorage.getItem(`messages_${roomNo}`);
         if (savedMessages) {
             setMessageList(JSON.parse(savedMessages));
@@ -43,7 +39,12 @@ const RoomChat = () => {
         };
     }, [roomNo]);
 
-    // callback: 서버 연결
+    useEffect(() => {
+        if (messageEndRef.current) {
+            messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messageList]);
+
     const connectToServer = useCallback(() => {
         const socket = new SockJS(process.env.REACT_APP_BASE_URL + "/ws");
         const client = new Client({
@@ -57,7 +58,7 @@ const RoomChat = () => {
                     const data = JSON.parse(message.body);
                     setMessageList(prev => {
                         const updatedList = [...prev, data];
-                        localStorage.setItem(`messages_${roomNo}`, JSON.stringify(updatedList)); // 로컬 스토리지에 저장
+                        localStorage.setItem(`messages_${roomNo}`, JSON.stringify(updatedList));
                         return updatedList;
                     });
                 });
@@ -96,71 +97,134 @@ const RoomChat = () => {
         setInput("");
     }, [input, client, connect, roomNo, accessToken, refreshToken]);
 
-    // view
     return (
-        <>
-            <Jumbotron title={"방 제목"} content={`채팅방 ${roomNo}`} />
-
-            <div className="row mt-4">
-                <div className="col">
-                    <div className="input-group">
-                        <input type="text" value={input}
-                            onChange={e => setInput(e.target.value)}
-                            onKeyUp={e => e.key === 'Enter' && sendMessage()}
-                            className="form-control" />
-                        <button className="btn btn-primary" onClick={sendMessage}>보내기</button>
-                    </div>
-                </div>
-            </div>
-
-            <div className="row mt-4">
-                <div className="col-9">
-                    <ul className="list-group">
-                        {messageList.map((message, index) => (
-                            <li className="list-group-item" key={index}>
-                                {message.type === "chat" && (
-                                    <div className="row">
-                                        <div className={`col-5${(login && memberId === message.senderMemberId) && ' offset-7'}`}>
-                                            {(login && memberId !== message.senderMemberId) && (
-                                                <h3>
-                                                    {message.senderMemberId}
-                                                    <small>({message.senderMemberLevel})</small>
-                                                </h3>
+        <div style={styles.chatContainer}>
+            <div style={styles.chatWindow}>
+                <ul className="list-group" style={styles.messageList}>
+                    {messageList.map((message, index) => (
+                        <li className="list-group-item" key={index} style={styles.messageItem}>
+                            {message.type === "chat" && (
+                                <div className="row">
+                                    <div className={`col-5${(login && memberId === message.senderMemberId) ? ' offset-7' : ''}`}>
+                                        <div style={{
+                                            ...styles.bubble,
+                                            backgroundColor: (login && memberId === message.senderMemberId) ? '#dcf8c6' : '#f1f1f1',
+                                            display: 'flex',
+                                            justifyContent: (login && memberId === message.senderMemberId) ? 'flex-end' : 'flex-start',
+                                        }}>
+                                            {(login && message.senderMemberLevel === "admin") && (
+                                                <h3>관리자</h3>
                                             )}
                                             <p>{message.content}</p>
-                                            <p className="text-muted">
-                                                {moment(message.time).format("a h:mm")}
-                                            </p>
                                         </div>
+                                        <span style={styles.timestamp}>
+                                            {moment(message.time).format("a h:mm")}
+                                        </span>
                                     </div>
-                                )}
-                                {message.type === "dm" && (
-                                    <div className="row">
-                                        <div className={`col-5${(login && memberId === message.senderMemberId) && ' offset-7'}`}>
+                                </div>
+                            )}
+                            {message.type === "dm" && (
+                                <div className="row">
+                                    <div className={`col-5${(login && memberId === message.senderMemberId) ? ' offset-7' : ''}`}>
+                                        <div style={{
+                                            ...styles.bubble,
+                                            backgroundColor: (login && memberId === message.senderMemberId) ? '#dcf8c6' : '#f1f1f1',
+                                            marginLeft: (login && memberId === message.senderMemberId) ? 'auto' : '0',
+                                            marginRight: 'auto',
+                                            display: 'flex',
+                                            justifyContent: (login && memberId === message.senderMemberId) ? 'flex-end' : 'flex-start',
+                                        }}>
                                             {(memberId === message.receiverMemberId) && (
-                                                <h3 className="text-danger">
-                                                    {message.senderMemberId} 님으로부터 온 메시지
-                                                </h3>
+                                                <h3 className="text-danger"> {message.senderMemberId} 님으로부터 온 메시지</h3>
                                             )}
                                             {(memberId === message.senderMemberId) && (
-                                                <h3 className="text-danger">
-                                                    {message.receiverMemberId} 님에게 보낸 메시지
-                                                </h3>
+                                                <h3 className="text-danger">{message.receiverMemberId} 님에게 보낸 메시지</h3>
                                             )}
                                             <p className="text-danger">{message.content}</p>
-                                            <p className="text-muted">
-                                                {moment(message.time).format("a h:mm")}
-                                            </p>
                                         </div>
+                                        <span style={styles.timestamp}>
+                                            {moment(message.time).format("a h:mm")}
+                                        </span>
                                     </div>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                                </div>
+                            )}
+                        </li>
+                    ))}
+                    <div ref={messageEndRef} />
+                </ul>
             </div>
-        </>
+
+            <div style={styles.inputGroup}>
+                <input
+                    type="text"
+                    value={input}
+                    onChange={e => setInput(e.target.value)}
+                    onKeyUp={e => e.key === 'Enter' && sendMessage()}
+                    className="form-control"
+                    style={styles.input}
+                />
+                <button className="btn" onClick={sendMessage} style={styles.sendButton}>보내기</button>
+            </div>
+        </div>
     );
+};
+
+const styles = {
+    chatContainer: {
+        width: '66.67%',
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        backgroundColor: '#fff',
+    },
+    messageItem: {
+        border: 'none',
+        padding: '5px 0',
+    },
+    chatWindow: {
+        flex: 1,
+        overflowY: 'auto',
+        border: '1px solid #ccc',
+        borderRadius: '5px',
+        padding: '10px',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+        scrollbarWidth: 'none',
+        '-ms-overflow-style': 'none',
+    },
+    messageList: {
+        padding: '0',
+        listStyleType: 'none',
+    },
+    bubble: {
+        display: 'inline-block',
+        padding: '10px 15px',
+        margin: '5px',
+        borderRadius: '10px',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+        position: 'relative',
+        wordWrap: 'break-word',
+        whiteSpace: 'normal',
+        maxWidth: '75%',
+    },
+    timestamp: {
+        textAlign: 'right',
+        fontSize: '12px',
+        color: 'gray',
+        marginTop: '-10px',
+    },
+    inputGroup: {
+        marginTop: '10px',
+        display: 'flex',
+    },
+    input: {
+        flex: 1,
+    },
+    sendButton: {
+        backgroundColor: 'black',
+        color: 'white',
+        border: 'none',
+    },
 };
 
 export default RoomChat;

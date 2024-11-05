@@ -490,7 +490,8 @@ const AuctionScheduleDetail = ()=>{
                                         <div className="card-text">{auction.workCategory}</div>
                                         <div className="text-end mt-4">
                                         <button type="button" className="btn btn-outline-dark card-text ms-2 rounded-1" 
-                                                    onClick={e=>navigate(`/auction/detail/${auction.auctionNo}`)}>입찰상세</button>
+                                                    onClick={e=>navigate(`/auction/detail/${auction.auctionNo}`)}
+                                                    disabled={auction.auctionState=='종료경매'}>입찰상세</button>
                                         <button type="button" className="btn btn-warning card-text ms-2 rounded-1" onClick={e => cancelLot(auction)}>취소</button>
                                         <button type="button" className="btn btn-danger card-text ms-2 rounded-1" onClick={e => deleteLot(auction)}>삭제</button>
                                         </div>

@@ -39,6 +39,7 @@ import RoomChat from "./websocket/RoomChat";
 import Room from "./websocket/Room";
 import Giveup from "./Payment/Giveup";
 import OfflineRoute from "./router/OfflineRoute";
+import MemberJoinFinish from "./Member/MemberJoinFinish";
 
 
 
@@ -53,6 +54,7 @@ const Container = () => {
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/join" element={<OfflineRoute element={<MemberJoin />} />} />
+                        <Route path="/join/finish" element={<OfflineRoute element={<MemberJoinFinish />} />} />
                         <Route path="/check" element={<OfflineRoute element={<MemberCheck />} />} />
                         <Route path="/login" element={<OfflineRoute element={<MemberLogin />} />} />
                         <Route path="/member/update" element={<PrivateRoute element={<MemberUpdate />} />} />
@@ -77,7 +79,7 @@ const Container = () => {
                         <Route path="/charge" element={<Charge />} />
                         <Route path="/charge/success/:partnerOrderId" element={<ChargeSuccess />} />
                         <Route path="/room" element={<PrivateRoute element={<Room />} />} />
-                        <Route path="/randomBox" element={<Items />} />
+                        <Route path="/randomBox" element={<PrivateRoute element={<Items />}/>} />
                         <Route path="/roomchat/:roomNo" element={<PrivateRoute element={<RoomChat />} />} />
                         <Route path="/giveup" element={<PrivateRoute element={<Giveup />} />} />
 

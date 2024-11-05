@@ -1,8 +1,7 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
-import Jumbotron from "../Jumbotron";
 
-const Time = ()=>{
+const Time = ({endDate})=>{
     const [time, setTime] = useState();
     const [timeToShow, setTimeToShow] = useState();
 
@@ -10,28 +9,30 @@ const Time = ()=>{
         try {
             const resp = await axios.get("http://localhost:8080/time/");
             const currentTime = resp.data;
-            const date = new Date(currentTime);
-            const hours = date.getHours().toString().padStart(2, '0');
-            const minutes = date.getMinutes().toString().padStart(2, '0');
-            const seconds = date.getSeconds().toString().padStart(2, '0');
+            const date = new Date(endDate).getTime() - new Date(currentTime).getTime();
+            const days = Math.floor(date / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');; // 일수
+            const hours = Math.floor((date / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');; // 남은 시간
+            const minutes = Math.floor((date / (1000 * 60)) % 60).toString().padStart(2, '0');; // 남은 분
+            const seconds = Math.floor((date / 1000) % 60).toString().padStart(2, '0');; // 남은 초
             setTime(date);
-            setTimeToShow(`${hours}:${minutes}:${seconds}`);
+            setTimeToShow(`${days}일 ${hours}:${minutes}:${seconds}`);
         } catch (error) {
-            console.error("시간 요청 오류:", error);
+            console.log(error)
         }
-    }, []);
+    }, [endDate]);
 
-    const afterSecond = useCallback(() => {
+    const afterTime = useCallback(() => {
         setTime((prevTime) => {
             if (!prevTime) return;
 
             const date = new Date(prevTime);
-            date.setSeconds(date.getSeconds() + 1);
-            const hours = date.getHours().toString().padStart(2, '0');
-            const minutes = date.getMinutes().toString().padStart(2, '0');
-            const seconds = date.getSeconds().toString().padStart(2, '0');
+            date.setMilliseconds(date.getMilliseconds() - 10);
+            const days = Math.floor(date / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');; // 일수
+            const hours = Math.floor((date / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');; // 남은 시간
+            const minutes = Math.floor((date / (1000 * 60)) % 60).toString().padStart(2, '0');; // 남은 분
+            const seconds = Math.floor((date / 1000) % 60).toString().padStart(2, '0');; // 남은 초
 
-            setTimeToShow(`${hours}:${minutes}:${seconds}`);
+            setTimeToShow(`${days}일 ${hours}:${minutes}:${seconds}`);
             return date;
         });
     }, []);
@@ -46,12 +47,12 @@ const Time = ()=>{
 
     useEffect(() => {
         const intervalId = setInterval(() => {
-            afterSecond();
-        }, 1000);
+            afterTime();
+        }, 10);
         return () => clearInterval(intervalId);
-    }, [afterSecond]);
+    }, [afterTime]);
     return (<>
-        <Jumbotron title={timeToShow && (<div>{timeToShow}</div>)}/>
+        {timeToShow && (<div>{timeToShow}</div>)}
     </>)
 }
 

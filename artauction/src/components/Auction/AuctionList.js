@@ -56,7 +56,6 @@ const AuctionList = ()=>{
     const detail = useCallback((target)=>{
         navigate(`/auction/detail/${target}`); 
     },[navigate])
-    
 
     const paginatedData = auctionDataCollectionList.slice((page - 1) * 10, page * 10);
     
