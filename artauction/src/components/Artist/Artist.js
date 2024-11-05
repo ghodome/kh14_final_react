@@ -114,6 +114,7 @@ const Artist = () => {
         tag.hide();
         setUpdateStatus({});
         setUpdateInput({});
+        setAttachImages([]); // 미리보기 이미지 초기화
         clearInput();//입력창 청소
       }
     }
@@ -204,7 +205,7 @@ const Artist = () => {
   const changeUpdateInput = useCallback((e) => {
     if (e.target.type === "file") {
       const files = Array.from(e.target.files);
-      setInput(prevInput => ({
+      setUpdateInput(prevInput => ({
         ...prevInput,
         attachList: files
       }));
@@ -237,12 +238,39 @@ const Artist = () => {
   }, [updateInput]);
 
 
+  // const updateArtist = useCallback(async () => {
+  //   const formData = new FormData();
+  //   const fileList = inputFileRef.current.files;
+
+  //   for (let i = 0; i < fileList.length; i++) {
+  //     formData.append("attachList", fileList[i]);
+  //   }
+  //   formData.append("artistNo", updateInput.artistNo);
+  //   formData.append("artistName", updateInput.artistName);
+  //   formData.append("artistDescription", updateInput.artistDescription);
+  //   formData.append("artistHistory", updateInput.artistHistory);
+  //   formData.append("artistBirth", updateInput.artistBirth);
+  //   formData.append("artistDeath", updateInput.artistDeath);
+
+  //   formData.append("originList", updateInput.attachment); //updateInput.attachment /  loadImages
+
+  //   await axios.post("http://localhost:8080/artist/edit", formData, {
+  //     headers: {
+  //       'Content-Type': 'multipart/form-data',
+  //     },
+  //   });
+
+  //   setImages(loadImages);
+
+  //   loadArtistList();
+  //   closeDetailModal();
+  // }, [updateInput, loadImages])
   const updateArtist = useCallback(async () => {
     const formData = new FormData();
     const fileList = inputFileRef.current.files;
 
     for (let i = 0; i < fileList.length; i++) {
-      formData.append("attachList", fileList[i]);
+        formData.append("attachList", fileList[i]);
     }
     formData.append("artistNo", updateInput.artistNo);
     formData.append("artistName", updateInput.artistName);
@@ -251,19 +279,23 @@ const Artist = () => {
     formData.append("artistBirth", updateInput.artistBirth);
     formData.append("artistDeath", updateInput.artistDeath);
 
-    formData.append("originList", updateInput.attachment); //updateInput.attachment /  loadImages
+    // 파일이 새로 첨부된 경우 loadImages를, 그렇지 않다면 updateInput.attachment를 사용
+    const originList = fileList.length > 0 ? loadImages : updateInput.attachment;
+    formData.append("originList", originList);
 
     await axios.post("http://localhost:8080/artist/edit", formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
     });
 
-    setImages(loadImages);
+    // 새로 첨부된 파일이 없을 경우, 기존 이미지를 유지하거나 빈 배열로 설정
+    setImages(fileList.length > 0 ? loadImages : (updateInput.attachment ? [updateInput.attachment] : []));
 
     loadArtistList();
+    clearEState();
     closeDetailModal();
-  }, [updateInput, loadImages])
+}, [updateInput, loadImages]);
 
   const deleteAttachImage = useCallback((img) => {
     //이미지 미리보기에서 삭제
@@ -602,8 +634,8 @@ const clearEState = useCallback(()=>{
 
       <div className="row mt-3 mx-3">
         <div className="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
-          {artistList.length > 0 && pageArtist().map((artist) => (
-            <div className="mb-3 shadow-sm" key={artist.artistNo}>
+          {artistList.length > 0 && pageArtist().map((artist, index) => (
+            <div className="mb-3 shadow-sm" key={`${artist.artistNo}-${index}`}>
               <div className="row g-0">
                 <div className="col-md-2 d-flex">
                   <div className="list-group-item text-center">
