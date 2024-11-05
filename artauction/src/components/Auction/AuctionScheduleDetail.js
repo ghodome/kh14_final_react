@@ -116,77 +116,39 @@ const AuctionScheduleDetail = ()=>{
     const [attachImages, setAttachImages] = useState([]);//보낼 추가첨부사진이미지
 
     // 수정내용 저장
-    // const saveTarget = useCallback(async ()=>{
-    //     const formData = new FormData();
-    //     const fileList = inputFileRef.current.files;
-        
-    //     if (fileList.length > 0) {
-    //         for (let i = 0; i < fileList.length; i++) {
-    //             formData.append("attachList", fileList[i]);
-    //         }
-    //     }
-        
-    //     formData.append("auctionScheduleNo", target.auctionScheduleNo); 
-    //     formData.append("auctionScheduleTitle", target.auctionScheduleTitle);
-    //     formData.append("auctionScheduleStartDate", target.auctionScheduleStartDate);
-    //     formData.append("auctionScheduleEndDate", target.auctionScheduleEndDate);
-    //     formData.append("auctionScheduleState", target.auctionScheduleState);
-    //     formData.append("auctionScheduleNotice", target.auctionScheduleNotice);
-
-    //     formData.append("originList", target.attachment);
-
-    //     await axios.post("http://localhost:8080/auctionSchedule/edit", formData,
-    //     { 
-    //         headers:  { 
-    //             "Content-Type": "multipart/form-data",
-    //         },
-    //     });
-        
-    //     setImages(loadImages);
-      
-    //     clearTarget();
-    //     loadAuctionSchedule();
-    //     closeEditModal();
-    //     setImages([]);
-    // }, [target]);
-
-    const saveTarget = useCallback(async () => {
+    const saveTarget = useCallback(async ()=>{
         const formData = new FormData();
         const fileList = inputFileRef.current.files;
-    
-        // 파일이 새로 첨부된 경우만 attachList에 추가
+        
         if (fileList.length > 0) {
             for (let i = 0; i < fileList.length; i++) {
                 formData.append("attachList", fileList[i]);
             }
         }
-    
+        
         formData.append("auctionScheduleNo", target.auctionScheduleNo); 
         formData.append("auctionScheduleTitle", target.auctionScheduleTitle);
         formData.append("auctionScheduleStartDate", target.auctionScheduleStartDate);
         formData.append("auctionScheduleEndDate", target.auctionScheduleEndDate);
         formData.append("auctionScheduleState", target.auctionScheduleState);
         formData.append("auctionScheduleNotice", target.auctionScheduleNotice);
-    
-        // 이미지가 새로 첨부되지 않은 경우 기존 attachment를 유지
-        const originList = fileList.length > 0 ? loadImages : (target.attachment ? [target.attachment] : []);
-        formData.append("originList", originList);
-    
-        await axios.post("http://localhost:8080/auctionSchedule/edit", formData, {
-            headers: {
+
+        formData.append("originList", target.attachment);
+
+        await axios.post("http://localhost:8080/auctionSchedule/edit", formData,
+        { 
+            headers:  { 
                 "Content-Type": "multipart/form-data",
             },
         });
-    
-        // 이미지가 새로 첨부되지 않으면 기존 이미지를 유지하거나 빈 배열로 설정
-        setImages(fileList.length > 0 ? loadImages : (target.attachment ? [target.attachment] : []));
-    
+        
+        setImages(loadImages);
+      
         clearTarget();
-        setImages([]); // 미리보기 이미지 초기화
-        setAttachImages([]); // 추가 첨부 이미지 초기화
         loadAuctionSchedule();
         closeEditModal();
-    }, [target, loadImages]);
+        setImages([]);
+    }, [target]);
 
     //일정삭제
     const deleteAuctionSchedule = useCallback(async ()=>{
@@ -459,9 +421,9 @@ const AuctionScheduleDetail = ()=>{
                                 <label>사진 첨부</label><br/>
                                     <input type="file" className="form-control" name="attachList" multiple accept="image/*"
                                            onChange={changeTarget} ref={inputFileRef} />
-                                    {/* {images.map((image, index) => (
+                                    {images.map((image, index) => (
                                         <img key={index} src={image} alt={`미리보기 ${index + 1}`} style={{ maxWidth: '100px', margin: '5px' }} />
-                                    ))} */}
+                                    ))}
 
                             </div>
                         </div>
