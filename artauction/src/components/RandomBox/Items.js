@@ -29,6 +29,9 @@ const Items = () => {
 
             setTimeout(async () => {
                 const resp = await axios.get("http://localhost:8080/item/randomBox");
+                if(resp.data.length===0){
+                    alert("포인트 부족");
+                }
                 setResult(resp.data);
 
                 if (resp.data.isWin === "Y") {
