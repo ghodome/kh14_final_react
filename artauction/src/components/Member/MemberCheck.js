@@ -1,6 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Jumbotron from "../Jumbotron";
+import Modal from "react-modal";
+
+Modal.setAppElement('#root');
+const customStyles = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        transform: 'translate(-50%, -50%)',
+        width: '41%',
+        maxHeight: '80%',
+        overflowY: 'auto',
+    },
+};
 
 const MemberCheck = () => {
     const navigate = useNavigate();
@@ -11,6 +26,17 @@ const MemberCheck = () => {
         promotionalConsent: false,
     });
     const [allAgreed, setAllAgreed] = useState(false);
+    const [modalContent, setModalContent] = useState("");
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+
+    const openModal = (content) => {
+        setModalContent(content);
+        setModalIsOpen(true);
+    };
+
+    const closeModal = () => {
+        setModalIsOpen(false);
+    };
 
     // 약관 내용
     const serviceTermsContent = `
@@ -74,98 +100,103 @@ const MemberCheck = () => {
 
     return (
         <>
+            <div className="row">
+                <div className="col-md-6 offset-md-3">
             <Jumbotron title="이용약관" />
-            <div className="mt-4">
-                <div className="mb-3">
-                    <div style={{ marginBottom: '10px', border: '1px solid #ccc', padding: '10px', maxHeight: '150px', overflowY: 'auto' }}>
-                        <h4>제 1 조 (목적)</h4>
-                        <div dangerouslySetInnerHTML={{ __html: serviceTermsContent }} />
+                    <div className="mt-4">
+                        <div className="mb-3">
+                            <div style={{ marginBottom: '10px', border: '1px solid #ccc', padding: '10px', maxHeight: '150px', overflowY: 'auto' }}>
+                                <h4 onClick={() => openModal(serviceTermsContent)} style={{ cursor: 'pointer', color: 'black' }}>제 1 조 (목적)</h4>
+                                <div dangerouslySetInnerHTML={{ __html: serviceTermsContent }} />
+                            </div>
+                            <label>
+                                <input
+                                    type='checkbox'
+                                    name='serviceTerms'
+                                    className="form-check-input rounded-0"
+                                    checked={agreed.serviceTerms}
+                                    onChange={handleCheckboxChange}
+                                />
+                                <span className="form-check-label ms-2">이용약관 동의 (필수)</span>
+                            </label>
+                        </div>
+                        <div className="mb-3">
+                            <div style={{ marginBottom: '10px', border: '1px solid #ccc', padding: '10px', maxHeight: '150px', overflowY: 'auto' }}>
+                                <h4 onClick={() => openModal(privacyPolicyContent)} style={{ cursor: 'pointer', color: 'black' }}>제 2 조 (개인정보 처리방침)</h4>
+                                <div dangerouslySetInnerHTML={{ __html: privacyPolicyContent }} />
+                            </div>
+                            <label>
+                                <input
+                                    type='checkbox'
+                                    name='privacyPolicy'
+                                    className="form-check-input rounded-0"
+                                    checked={agreed.privacyPolicy}
+                                    onChange={handleCheckboxChange}
+                                />
+                                <span className="form-check-label ms-2">개인정보 처리방침 동의 (필수)</span>
+                            </label>
+                        </div>
+                        <div className="mb-3">
+                            <div style={{ marginBottom: '10px', border: '1px solid #ccc', padding: '10px', maxHeight: '150px', overflowY: 'auto' }}>
+                                <h4 onClick={() => openModal(marketingConsentContent)} style={{ cursor: 'pointer', color: 'black' }}>제 3 조 (마케팅 정보 수신 동의)</h4>
+                                <div dangerouslySetInnerHTML={{ __html: marketingConsentContent }} />
+                            </div>
+                            <label>
+                                <input
+                                    type='checkbox'
+                                    name='marketingConsent'
+                                    className="form-check-input rounded-0"
+                                    checked={agreed.marketingConsent}
+                                    onChange={handleCheckboxChange}
+                                />
+                                <span className="form-check-label ms-2">마케팅 정보 수신 동의 (필수)</span>
+                            </label>
+                        </div>
+                        <div className="mb-3">
+                            <div style={{ marginBottom: '10px', border: '1px solid #ccc', padding: '10px', maxHeight: '150px', overflowY: 'auto' }}>
+                                <h4 onClick={() => openModal(promotionalConsentContent)} style={{ cursor: 'pointer', color: 'black' }}>제 4 조 (이벤트 및 프로모션 정보 수신 동의)</h4>
+                                <div dangerouslySetInnerHTML={{ __html: promotionalConsentContent }} />
+                            </div>
+                            <label>
+                                <input
+                                    type='checkbox'
+                                    name='promotionalConsent'
+                                    className="form-check-input rounded-0"
+                                    checked={agreed.promotionalConsent}
+                                    onChange={handleCheckboxChange}
+                                />
+                                <span className="form-check-label ms-2">이벤트 및 프로모션 정보 수신 동의 (선택)</span>
+                            </label>
+                        </div>
+                        <div className="mb-4">
+                            <label>
+                                <input
+                                    type='checkbox'
+                                    className="form-check-input rounded-0"
+                                    checked={allAgreed}
+                                    onChange={handleAllCheckboxChange}
+                                />
+                                <span className="form-check-label ms-2">모든 항목 동의하기</span>
+                            </label>
+                        </div>
+                        <button className="btn btn-dark w-100 rounded-0" onClick={handleSubmit}>
+                            동의
+                        </button>
                     </div>
-                    <label>
-                        <input
-                            type='checkbox'
-                            name='serviceTerms'
-                            className="form-check-input rounded-0"
-                            checked={agreed.serviceTerms}
-                            onChange={handleCheckboxChange}
-                        />
-                        <span className="form-check-label ms-2">
-
-                            이용약관 동의 (필수)
-                        </span>
-                    </label>
                 </div>
-                <div className="mb-3">
-                    <div style={{ marginBottom: '10px', border: '1px solid #ccc', padding: '10px', maxHeight: '150px', overflowY: 'auto' }}>
-                        <h4>제 2 조 (개인정보 처리방침)</h4>
-                        <div dangerouslySetInnerHTML={{ __html: privacyPolicyContent }} />
-                    </div>
-                    <label>
-                        <input
-                            type='checkbox'
-                            name='privacyPolicy'
-                            className="form-check-input rounded-0"
-                            checked={agreed.privacyPolicy}
-                            onChange={handleCheckboxChange}
-                        />
-                        <span className="form-check-label ms-2">
-                            개인정보 처리방침 동의 (필수)
-                        </span>
-                    </label>
-                </div>
-                <div className="mb-3">
-                    <div style={{ marginBottom: '10px', border: '1px solid #ccc', padding: '10px', maxHeight: '150px', overflowY: 'auto' }}>
-                        <h4>제 3 조 (마케팅 정보 수신 동의)</h4>
-                        <div dangerouslySetInnerHTML={{ __html: marketingConsentContent }} />
-                    </div>
-                    <label>
-                        <input
-                            type='checkbox'
-                            name='marketingConsent'
-                            className="form-check-input rounded-0"
-                            checked={agreed.marketingConsent}
-                            onChange={handleCheckboxChange}
-                        />
-                        <span className="form-check-label ms-2">
-                            마케팅 정보 수신 동의 (필수)
-                        </span>
-                    </label>
-                </div>
-                <div className="mb-3">
-                    <div style={{ marginBottom: '10px', border: '1px solid #ccc', padding: '10px', maxHeight: '150px', overflowY: 'auto' }}>
-                        <h4>제 4 조 (이벤트 및 프로모션 정보 수신 동의)</h4>
-                        <div dangerouslySetInnerHTML={{ __html: promotionalConsentContent }} />
-                    </div>
-                    <label>
-                        <input
-                            type='checkbox'
-                            name='promotionalConsent'
-                            className="form-check-input rounded-0"
-                            checked={agreed.promotionalConsent}
-                            onChange={handleCheckboxChange}
-                        />
-                        <span className="form-check-label ms-2">
-                            이벤트 및 프로모션 정보 수신 동의 (선택)
-                        </span>
-                    </label>
-                </div>
-                <div className="mb-4">
-                    <label>
-                        <input
-                            type='checkbox'
-                            className="form-check-input rounded-0"
-                            checked={allAgreed}
-                            onChange={handleAllCheckboxChange}
-                        />
-                        <span className="form-check-label ms-2">
-                            모든 항목 동의하기
-                        </span>
-                    </label>
-                </div>
-                <button className="btn btn-dark w-100 rounded-0" onClick={handleSubmit}>
-                    동의
-                </button>
             </div>
+
+            {/* 모달 */}
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                style={customStyles}
+                contentLabel="약관 내용"
+            >
+                <h2>약관 내용</h2>
+                <div dangerouslySetInnerHTML={{ __html: modalContent }} />
+                <button onClick={closeModal} className="btn btn-secondary rounded-0 mt-4">닫기</button>
+            </Modal>
         </>
     );
 };
