@@ -99,12 +99,15 @@ const Charge = ()=>{
     return(<>
    
         <div className="row mt-4">
+            
             <div className="col-6">
             <h2>포인트 충전</h2>
                 <input className="form-control w-100" value={money.toLocaleString()} readOnly/>
                 <button className="btn btn-secondary m-3"onClick={e=>setMoney(money + 10000)}>+10,000</button>
                 <button className="btn btn-secondary m-3"onClick={e=>setMoney(money + 100000)}>+100,000</button>
                 <button className="btn btn-secondary m-3"onClick={e=>setMoney(money + 1000000)}>+1,000,000</button>
+                <button className="btn btn-secondary m-3"onClick={e=>setMoney(money + 10000000)}>+10,000,000</button>
+                <button className="btn btn-secondary m-3"onClick={e=>setMoney(money + 100000000)}>+100,000,000</button>
                 <button className="btn btn-dark text-light float-end m-3" onClick={sendPurchaseRequest}>충전하기</button>
                 <button className="btn  btn-light text-dark float-end m-3"onClick={e=>setMoney(0)}>초기화하기</button>
             </div>
@@ -114,12 +117,15 @@ const Charge = ()=>{
                 <button className="btn btn-secondary m-3"onClick={e=>setRefund(refund + 10000)}>+10,000</button>
                 <button className="btn btn-secondary m-3"onClick={e=>setRefund(refund + 100000)}>+100,000</button>
                 <button className="btn btn-secondary m-3"onClick={e=>setRefund(refund + 1000000)}>+1,000,000</button>
+                <button className="btn btn-secondary m-3"onClick={e=>setRefund(refund + 10000000)}>+10,000,000</button>
+                <button className="btn btn-secondary m-3"onClick={e=>setRefund(refund + 100000000)}>+100,000,000</button>
 
                 <button className="btn btn-dark text-light float-end m-3" onClick={handleShow}>환불하기</button>
                 <button className="btn  btn-light text-dark float-end m-3"onClick={e=>setRefund(0)}>초기화하기</button>
 
             </div>
         </div>
+        <h4 className="text-danger">최대 충전/환불 금액은 21억입니다.</h4>
 
          {/* 비밀번호 인증 모달 추가 */}
         <Modal
