@@ -40,13 +40,15 @@ const Auction = () => {
             bidPrice: "",
             bidIncrement: "",
         }
-    });
+    }); 
 
     const [wholeMessageList, setWholeMessageList] = useState([]);
     const [member, setMember] = useState({});
     const [bidIncrementUnit, setBidIncrementUnit]=useState();
 
-    const [workImage, setWorkImage] = useState({});
+    const [workImage, setWorkImage] = useState({
+        attachment : null
+    });
 
     //recoil
     const login = useRecoilValue(loginState);
@@ -87,16 +89,18 @@ const Auction = () => {
         }
     },[auctionNo,bidIncrement,auctionAndWork,transferTime]);
 
-    const loadWorkImage = useCallback(async()=>{
-        try{
+    const loadWorkImage = useCallback(async () => {
+        try {
             const resp = await axios.get(`http://localhost:8080/auction/workImage/${auctionNo}`);
-            // console.log("resp=", resp.data);
-            setWorkImage(resp.data[0]);
-            } 
-            catch (error) {
-                console.error("Failed to load auction data:", error);
-            }
-    },[auctionNo]);
+            const data = resp.data[0] || {}; // data[0]가 없는 경우 빈 객체로 설정
+            setWorkImage({
+                ...data,
+                attachment: data.attachment || null // attachment가 없으면 null로 설정
+            });
+        } catch (error) {
+            console.error("Failed to load work image:", error);
+        }
+    }, [auctionNo]);
 
     const setBidIncrementByPrice = useCallback((price) => {
         let increment;
@@ -231,11 +235,15 @@ const Auction = () => {
         loadAuctionAndWork();
         connectToServer();
         loadMessageList();
-        loadWorkImage();
         return () => {
             disconnectToServer(client);
         };
     }, [])
+
+    useEffect(() => {
+        loadWorkImage();
+    }, [auctionNo]);
+
     useEffect(() => {
         if (auctionAndWork) {
             setInput((prev) => ({
@@ -294,10 +302,15 @@ const Auction = () => {
                                 {/* 작품 상세내용  */}
                                 <div className="row my-2 text-center">
                                     <div className="col">
-                                        {workImage.attachment?<img src={`http://localhost:8080/attach/download/${workImage.attachment}`} 
-                                        className="img-thumbnail rounded-1" alt="" height='250px' width='450px' />:
-                                        <img src={`https://picsum.photos/450/250`} 
-                                        className="img-thumbnail rounded-1" alt="" height='250px' width='450px' />}
+                                    {workImage.attachment === null || workImage.attachment === undefined ? (
+                                        <img src="https://placehold.co/300x200"
+                                        className="img-thumbnail rounded-1" alt="" 
+                                        height='250px' width='450px' />
+                                    ) : (
+                                        <img src={`http://localhost:8080/attach/download/${workImage.attachment}`} 
+                                                className="img-thumbnail rounded-1" alt="이미지 정보 없음" 
+                                                height='250px' width='450px' />
+                                     )}
                                     </div>
                                 </div>
                                 <div className="row my-2">
