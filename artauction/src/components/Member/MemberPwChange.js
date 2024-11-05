@@ -157,10 +157,10 @@ const MemberPwChange = () => {
     return (
         <>
             <div className="row">
-                <div className="col-md-6 offset-md-3">
+                <div className="col-md-4 offset-md-4 col-12">
                     <div className="row mt-4">
                         <div className="col mb-4">
-                            <span style={{ fontWeight: 'bold', fontSize: '50px' }}>
+                            <span style={{ fontWeight: 'bold', fontSize: '2rem' }}>
                                 {`${member.memberName} 님의 비밀번호 변경`}
                             </span>
                         </div>
@@ -209,7 +209,8 @@ const MemberPwChange = () => {
                         right: 'auto',
                         bottom: 'auto',
                         transform: 'translate(-50%, -50%)',
-                        width: '500px',
+                        width: '90%',
+                        maxWidth: '500px',
                         height: 'auto',
                         padding: '20px'
                     }

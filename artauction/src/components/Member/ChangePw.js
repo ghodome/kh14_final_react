@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useCallback, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Jumbotron from "../Jumbotron";
 
 const ChangePw = () => {
     const { token } = useParams(); // 토큰 추출
@@ -65,52 +64,52 @@ const ChangePw = () => {
     }, [newPw, confirmPw, token, navigate]);
 
     return (
-        <>
-            <div className="row">
-                <div className="col-md-6 offset-md-3">
-                <div className="row mt-4">
-                        <div className="col mb-4">
-                            <span style={{ fontWeight: 'bold', fontSize: '50px' }}>
-                              비밀번호 재설정
-                            </span>
-                        </div>
-                    </div>
-                    <div className="row mt-4">
-                        <div className="col">
-                            <input
-                                type="password"
-                                className="form-control rounded-0"
-                                placeholder="새 비밀번호"
-                                value={newPw}
-                                onChange={(e) => setNewPw(e.target.value)} />
-                        </div>
-                    </div>
-                    <div className="row mt-4">
-                        <div className="col">
-                            <input
-                                type="password"
-                                className="form-control rounded-0"
-                                placeholder="비밀번호 확인"
-                                value={confirmPw}
-                                onChange={(e) => setConfirmPw(e.target.value)} />
-                        </div>
-                    </div>
-                    <div className="row mt-4">
-                        <div className="col">
-                            <button className="btn btn-dark w-100 mt-2 rounded-0" onClick={handleChangePw}>
-                                비밀번호 재설정
-                            </button>
-                        </div>
+        <div className="container">
+            <div className="row justify-content-center">
+                <div className="col-12 col-md-5">
+                    <div className="text-center mt-4">
+                        <h2 style={{ fontWeight: 'bold', fontSize: '2.5rem' }}>
+                            비밀번호 재설정
+                        </h2>
                     </div>
 
-                    {message && (
-                        <div style={{ color: 'red', marginTop: '1rem' }}>
-                            {message}
-                        </div>
-                    )}
+                    <div className="mt-4">
+                        <input
+                            type="password"
+                            className="form-control rounded-0"
+                            placeholder="새 비밀번호"
+                            value={newPw}
+                            onChange={(e) => setNewPw(e.target.value)} 
+                        />
+                    </div>
+
+                    <div className="mt-4">
+                        <input
+                            type="password"
+                            className="form-control rounded-0"
+                            placeholder="비밀번호 확인"
+                            value={confirmPw}
+                            onChange={(e) => setConfirmPw(e.target.value)} 
+                        />
+                    </div>
+
+                        {message && (
+                            <div style={{ color: 'red', marginTop: '1rem' }}>
+                                {message}
+                            </div>
+                        )}
+                    <div className="mt-2">
+                        <button 
+                            className="btn btn-dark w-100 mt-2 rounded-0" 
+                            onClick={handleChangePw}
+                        >
+                            비밀번호 재설정
+                        </button>
+                    </div>
+
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

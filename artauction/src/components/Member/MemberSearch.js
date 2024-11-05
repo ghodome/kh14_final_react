@@ -118,28 +118,31 @@ const MemberSearch = () => {
     return (
         <div className="row">
             {/* 왼쪽 - 검색 결과 */}
-            <div className="col-md-6">
-                {/* 검색 결과 테이블 */}
-                <table className="table mt-4 table-hover">
-                    <thead>
-                        <tr>
-                            <th>아이디</th>
-                            <th>이름</th>
-                            <th>이메일</th>
-                            <th>가입일</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {result.memberList.map(member => (
-                            <tr key={member.memberId} onClick={() => handleMemberClick(member.memberId)}>
-                                <td>{member.memberId}</td>
-                                <td>{member.memberName}</td>
-                                <td>{member.memberEmail}</td>
-                                <td>{member.memberJoinDate}</td>
+            <div className="col-12 col-md-6">
+                {/* 반응형 테이블 */}
+                <div className="table-responsive">
+                    <table className="table mt-4 table-hover">
+                        <thead>
+                            <tr>
+                                <th>아이디</th>
+                                <th>이름</th>
+                                <th>이메일</th>
+                                <th>가입일</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {result.memberList.map(member => (
+                                <tr key={member.memberId} onClick={() => handleMemberClick(member.memberId)}>
+                                    <td>{member.memberId}</td>
+                                    <td>{member.memberName}</td>
+                                    <td>{member.memberEmail}</td>
+                                    <td>{member.memberJoinDate}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
                 {/* 페이지네이션 */}
                 {result.memberList.length > 0 && (
                     <div className="row mt-4">
@@ -228,7 +231,8 @@ const MemberSearch = () => {
                 )}
             </div>
             {/* 오른쪽 - 검색 조건 */}
-            <div className="col-md-6 mt-5">
+            <div className="col-12 col-md-6 mt-5">
+                {/* 조건들 */}
                 <div className="col-sm-12 advanced-filters-container">
                     {/* 상세 조건 버튼들 */}
                     <div className="advanced-filters-buttons text-center d-flex justify-content-center">
@@ -387,9 +391,8 @@ const MemberSearch = () => {
                             </div>
                         </div>
                     )}
-                    {/* "찾기" 버튼 */}
                     <div className="text-end mt-4">
-                        <button className="btn btn-dark rounded-0" style={{ width: "15%", height: '40px' }} onClick={handleFindClick}>찾기</button>
+                        <button className="btn btn-dark rounded-0" style={{ width: "100%", maxWidth: "200px", height: '40px' }} onClick={handleFindClick}>찾기</button>
                     </div>
                 </div>
             </div>

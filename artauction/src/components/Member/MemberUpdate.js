@@ -118,8 +118,8 @@ const MemberUpdate = () => {
         new window.daum.Postcode({
             oncomplete: function (data) {
                 const addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
-                const extraAddr = data.userSelectedType === 'R' ?
-                    (data.bname ? data.bname : '') + (data.buildingName ? `, ${data.buildingName}` : '') :
+                const extraAddr = data.userSelectedType === 'R' ? 
+                    (data.bname ? data.bname : '') + (data.buildingName ? `, ${data.buildingName}` : '') : 
                     '';
 
                 setMember(prev => ({
@@ -142,10 +142,10 @@ const MemberUpdate = () => {
     return (
         <>
             <div className="row">
-                <div className="col-md-6 offset-md-3">
+                <div className="col-md-4 offset-md-4 col-12">
                     <div className="row mt-4">
                         <div className="col mb-4">
-                            <span style={{ fontWeight: 'bold', fontSize: '50px' }}>
+                            <span style={{ fontWeight: 'bold', fontSize: '2.5rem' }}>
                                 {`${member[0]?.memberName || ''} 님의 정보수정`}
                             </span>
                         </div>
@@ -183,7 +183,7 @@ const MemberUpdate = () => {
                                 name="memberPost"
                                 value={member.memberPost}
                                 placeholder="우편번호"
-                                className="form-control rounded-0"
+                                className="form-control rounded-0 md-4"
                                 readOnly
                             />
                             <button type="button" onClick={sample6_execDaumPostcode} className="btn btn-dark mt-2 rounded-0">우편번호 찾기</button>
@@ -230,7 +230,8 @@ const MemberUpdate = () => {
                         right: 'auto',
                         bottom: 'auto',
                         transform: 'translate(-50%, -50%)',
-                        width: '500px',
+                        width: '90%',
+                        maxWidth: '500px',
                         height: 'auto',
                         padding: '20px'
                     }
