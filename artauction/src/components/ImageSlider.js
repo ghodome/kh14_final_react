@@ -32,7 +32,7 @@ const ImageSlider = () => {
     const loadAuctionScheduleList = useCallback(async () => {
 
         try {
-            const resp = await axios.post("http://localhost:8080/auctionSchedule/", {
+            const resp = await axios.post("http://localhost:8080/auctionSchedule/home", {
 
             });
             const list = resp.data.auctionScheduleList;
