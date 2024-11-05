@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Jumbotron from "./Jumbotron";
 import axios from "axios";
+import ImageSlider from "./ImageSlider";
 
 
 const Home=()=>{
@@ -20,13 +21,11 @@ const Home=()=>{
     return (<>
         <Jumbotron title="홈페이지"/>
         
-        <div className="row mt-4">
-            <div className="row mt-2 mb-5">
-                <div className="col">
-                
-                </div>
-            </div>
+        <div className="mt-4">
+            <ImageSlider/>
+        </div>
 
+        <div className="row mt-4">
             <div className="col-6">d</div>
             <div className="col-6">
                 <ul className="navbar-nav me-auto">
