@@ -6,6 +6,9 @@ import { FaMagnifyingGlass } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import Modal from "react-modal";
 
+import './MemberSearch.css';
+
+
 Modal.setAppElement('#root');
 
 const MemberSearch = () => {
@@ -65,7 +68,7 @@ const MemberSearch = () => {
             orderList: [],
             isBlocked: false,
         });
-
+        setSearchColumn("member_id");
         setPage(1);
         await sendRequest();
     };
@@ -76,7 +79,8 @@ const MemberSearch = () => {
 
     useEffect(() => {
         sendRequest();
-    }, [input, page]);
+    }, [page]);
+
 
     const changeInputString = useCallback(e => {
         setInput({
@@ -146,55 +150,40 @@ const MemberSearch = () => {
     const startPage = Math.max(1, page - 4);
     const endPage = Math.min(totalPages, page + 4);
 
-    // 호버 효과 함수
-    const handleMouseOver = (memberId) => {
-        const listItem = document.querySelector(`li[data-member-id='${memberId}']`);
-        if (listItem) {
-            listItem.style.backgroundColor = '#d0d0d0'; // 호버 시 색상 변경
-        }
-    };
-
-    const handleMouseOut = (memberId) => {
-        const listItem = document.querySelector(`li[data-member-id='${memberId}']`);
-        if (listItem) {
-            listItem.style.backgroundColor = ''; // 원래 색상으로 복원
-        }
-    };
-
     return (
         <>
             <div className="row">
                 <div className="col-md-6 offset-md-3">
                     <Jumbotron title="회원 조회" />
-                   
-                        <div className="col-sm-12 d-flex mt-3">
-                            <select className="form-select form-select-sm rounded-0" style={{ width: '30%' }}
-                                onChange={handleSearchColumnChange} value={searchColumn}>
-                                <option value="member_id">아이디</option>
-                                <option value="member_name">이름</option>
-                                <option value="member_email">이메일</option>
-                            </select>
-                            <div className="input-group">
-                                <input
-                                    type="text"
-                                    className="form-control rounded-0"
-                                    value={basicSearch.keyword}
-                                    onChange={handleBasicSearchChange}
-                                    style={{ width: '70%', backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }}
-                                />
-                                <button className="btn btn-dark rounded-0" onClick={handleBasicSearch}>
-                                    <FaMagnifyingGlass />
-                                </button>
-                            </div>
-                        </div>
-                    
-                  
-                        <div className="col-sm-12 d-flex">
-                            <button className="btn btn-secondary w-100 rounded-0 mt" onClick={openModal}>
-                                상세 조건
+
+                    <div className="col-sm-12 d-flex mt-3">
+                        <select className="form-select form-select-sm rounded-0" style={{ width: '30%' }}
+                            onChange={handleSearchColumnChange} value={searchColumn}>
+                            <option value="member_id">아이디</option>
+                            <option value="member_name">이름</option>
+                            <option value="member_email">이메일</option>
+                        </select>
+                        <div className="input-group">
+                            <input
+                                type="text"
+                                className="form-control rounded-0"
+                                value={basicSearch.keyword}
+                                onChange={handleBasicSearchChange}
+                                style={{ width: '70%', backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }}
+                            />
+                            <button className="btn btn-dark rounded-0" onClick={handleBasicSearch}>
+                                <FaMagnifyingGlass />
                             </button>
                         </div>
-                    
+                    </div>
+
+
+                    <div className="col-sm-12 d-flex">
+                        <button className="btn btn-secondary w-100 rounded-0 mt" onClick={openModal}>
+                            상세 조건
+                        </button>
+                    </div>
+
 
                     <Modal
                         isOpen={modalIsOpen}
@@ -210,8 +199,8 @@ const MemberSearch = () => {
                                 bottom: 'auto',
                                 marginRight: '-50%',
                                 transform: 'translate(-50%, -50%)',
-                                width: 'auto',
-                                height: '810px',
+                                width: '650px',
+                                height: 'auto',
                                 border: 'none',
                                 borderRadius: '8px',
                                 boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
@@ -219,8 +208,8 @@ const MemberSearch = () => {
                         }}>
                         <h2>복합검색</h2>
                         <form onSubmit={handleComplexSearch}>
-                           
-                            <div className="row mt-4">
+
+                            <div className="row mt-2">
                                 <label className="col-sm-3 col-form-label">아이디</label>
                                 <div className="col-sm-9">
                                     <input type="text" className="form-control rounded-0"
@@ -229,7 +218,7 @@ const MemberSearch = () => {
                                         style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
                                 </div>
                             </div>
-                            <div className="row mt-4">
+                            <div className="row mt-2">
                                 <label className="col-sm-3 col-form-label">이름</label>
                                 <div className="col-sm-9">
                                     <input type="text" className="form-control rounded-0"
@@ -238,7 +227,7 @@ const MemberSearch = () => {
                                         style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
                                 </div>
                             </div>
-                            <div className="row mt-4">
+                            <div className="row mt-2">
                                 <label className="col-sm-3 col-form-label">연락처</label>
                                 <div className="col-sm-9">
                                     <input type="tel" className="form-control rounded-0"
@@ -247,7 +236,7 @@ const MemberSearch = () => {
                                         style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
                                 </div>
                             </div>
-                            <div className="row mt-4">
+                            <div className="row mt-2">
                                 <label className="col-sm-3 col-form-label">이메일</label>
                                 <div className="col-sm-9">
                                     <input type="email" className="form-control rounded-0"
@@ -256,7 +245,7 @@ const MemberSearch = () => {
                                         style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
                                 </div>
                             </div>
-                            <div className="row mt-4">
+                            <div className="row mt-2">
                                 <label className="col-sm-3 col-form-label">포인트</label>
                                 <div className="col-sm-9 d-flex">
                                     <input type="text" className="form-control rounded-0"
@@ -272,7 +261,7 @@ const MemberSearch = () => {
                                         style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
                                 </div>
                             </div>
-                            <div className="row mt-4">
+                            <div className="row mt-2">
                                 <label className="col-sm-3 col-form-label">주소</label>
                                 <div className="col-sm-9">
                                     <input type="text" className="form-control rounded-0"
@@ -281,7 +270,7 @@ const MemberSearch = () => {
                                         style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
                                 </div>
                             </div>
-                            <div className="row mt-4">
+                            <div className="row mt-2">
                                 <label className="col-sm-3 col-form-label">가입일</label>
                                 <div className="col-sm-9 d-flex">
                                     <input type="date" className="form-control rounded-0"
@@ -297,7 +286,7 @@ const MemberSearch = () => {
                                         style={{ backgroundColor: '#f5f5f5', border: '1px solid #888', color: '#333' }} />
                                 </div>
                             </div>
-                            <div className="row mt-4">
+                            <div className="row mt-2">
                                 <label className="col-sm-3 col-form-label ">차단 여부</label>
                                 <div className="col-sm-9">
                                     <input
@@ -312,7 +301,7 @@ const MemberSearch = () => {
                                 </div>
                             </div>
 
-                            <div className="row mt-4">
+                            <div className="row mt-2">
                                 <label className="col-sm-3 col-form-label">정렬방식</label>
                                 <div className="col-sm-9">
                                     <div className="row">
@@ -355,33 +344,40 @@ const MemberSearch = () => {
                             </div>
 
                             <div className="row mt-4">
-                                <div className="col">
-                                    <button type="submit" className="btn btn-dark rounded-0">
+                                <div className="col d-flex justify-content-between">
+                                    <button className="btn btn-light rounded-0" onClick={closeModal} style={{ minWidth: '100px' }}>
+                                        닫기
+                                    </button>
+                                    <button type="submit" className="btn btn-dark rounded-0" style={{ minWidth: '100px' }}>
                                         검색
                                     </button>
                                 </div>
                             </div>
                         </form>
-                        <button className="btn btn-secondary rounded-0" onClick={closeModal}>
-                            닫기
-                        </button>
+
                     </Modal>
 
-                    <ul className="list-group mt-4" style={{ boxSizing: 'border-box', margin: '0 auto' }}>
-                        {result.memberList.map(member => (
-                            <li
-                                className="list-group-item rounded-0"
-                                key={member.memberId}
-                                data-member-id={member.memberId}
-                                onClick={() => handleMemberClick(member.memberId)}
-                                onMouseOver={() => handleMouseOver(member.memberId)}
-                                onMouseOut={() => handleMouseOut(member.memberId)}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                <h3>{member.memberId} ({member.memberName})</h3>
-                            </li>
-                        ))}
-                    </ul>
+                    <table className="table mt-4">
+                        <thead>
+                            <tr>
+                                <th>아이디</th>
+                                <th>이름</th>
+                                <th>이메일</th>
+                                <th>가입일</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {result.memberList.map(member => (
+                                <tr key={member.memberId} onClick={() => handleMemberClick(member.memberId)}>
+                                    <td>{member.memberId}</td>
+                                    <td>{member.memberName}</td>
+                                    <td>{member.memberEmail}</td>
+                                    <td>{member.memberJoinDate}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+
 
 
                     {result.memberList.length > 0 && !modalIsOpen && (
