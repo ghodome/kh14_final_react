@@ -37,7 +37,7 @@ const Auction = () => {
             bidPrice: "",
             bidIncrement: "",
         }
-    });
+    }); 
 
     const [wholeMessageList, setWholeMessageList] = useState([]);
     const [member, setMember] = useState({});
