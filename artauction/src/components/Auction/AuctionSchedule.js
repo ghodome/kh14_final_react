@@ -45,6 +45,7 @@ const AuctionSchedule = () => {
                 beginRow: Number(row.beginRow),
                 endRow: Number(row.endRow)
             });
+            
             const list = resp.data.auctionScheduleList;
             setAuctionScheduleList(list);
             setAllAuctionScheduleList(list);
@@ -157,16 +158,18 @@ const AuctionSchedule = () => {
             console.log('FormData entries:', Array.from(formData.entries()));
     
             // 서버로 요청 전송
-            const resp = await axios.post("http://localhost:8080/auctionSchedule/", formData, {
+            const resp = await axios.post("http://localhost:8080/auctionSchedule/", formData, 
+            {
                 headers: { "Content-Type": "multipart/form-data" },
             });
     
             // 성공 시 초기화
+            loadAuctionScheduleList();
             clearInsert();
             closeInsertModal();
-            loadAuctionScheduleList();
             setImages([]);
             alert("경매일정 등록 완료");
+            console.log("등록", resp.data);
         } catch (error) {
             alert("누락된 항목 발생. 전체 항목을 입력해주세요");
         }
@@ -190,7 +193,8 @@ const AuctionSchedule = () => {
                         <button className="btn btn-outline-secondary me-2 rounded-1" 
                             onClick={e=>{setAuctionState("종료경매"); setPage(1);}}>종료경매</button>
 
-                        {/* 관리자 기능 */}
+
+                        {/* 여기서부터 쭉 관리자 기능 */}
                         <button className="btn btn-primary ms-auto rounded-1"
                                 onClick={openInsertModal}>경매등록
                         </button>

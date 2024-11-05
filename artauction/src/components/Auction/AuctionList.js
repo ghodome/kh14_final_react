@@ -24,7 +24,7 @@ const AuctionList = ()=>{
     const loadAuctionDataCollectionList = useCallback(async()=>{
         try{
         const resp = await axios.get(`http://localhost:8080/auction/auctionLotList/${auctionScheduleNo}`);
-        // console.log("resp=", resp.data);
+        console.log("resp=", resp.data);
         setAuctionDataCollectionList(resp.data);
         } 
         catch (error) {
@@ -78,7 +78,6 @@ const AuctionList = ()=>{
                         <div className="card-header" 
                                 style={{ height: '200px', overflow: 'hidden' }}>
                             {auctionData.attachment === null ? (
-                               
                                      <img src="https://placehold.co/300x200"
                                             className="card-img-top" alt="" 
                                             style={{ height: '100%', width: '100%', objectFit: 'cover' }}/>

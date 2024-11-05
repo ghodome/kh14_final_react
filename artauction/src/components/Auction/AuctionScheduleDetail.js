@@ -5,6 +5,7 @@ import axios from "axios";
 import moment from "moment";
 import "moment/locale/ko";  //moment 한국어 정보 불러오기
 import { Modal } from "bootstrap";
+import { MdCancel } from "react-icons/md";
 moment.locale("ko");  //moment에 한국어를 기본 언어로 설정
 
 
@@ -19,7 +20,8 @@ const AuctionScheduleDetail = ()=>{
      //state
      const [auctionSchedule, setAuctionSchedule] = useState({});
      const [images, setImages] = useState([]); // 이미지 미리보기 URL 목록
-     const [target, setTarget] = useState({    //수정
+     
+     const [change, setChange] = useState({     //수정
         auctionScheduleNo : "",
         auctionScheduleTitle : "",
         auctionScheduleStartDate : "",
@@ -27,8 +29,12 @@ const AuctionScheduleDetail = ()=>{
         auctionScheduleState : "",
         auctionScheduleNotice : "",
         attachment : "",
-        attachList: []
+        // attachList: []
     });
+
+    const [changeImages, setChangeImages] = useState([]); // 이미지 수정
+    const [updateStatus, setUpdateStatus] = useState({});
+    const [isEditing, setIsEditing] = useState(false);
 
     const [presentInput, setPresentInput]= useState({   //출품등록
         auctionScheduleNo: auctionScheduleNo,
@@ -42,7 +48,7 @@ const AuctionScheduleDetail = ()=>{
         auctionNetProceeds: "",
     });
 
-    const [auctionList, setAuctionList] =useState([]);
+    const [auctionList, setAuctionList] =useState([]);  //출품목록
 
     //effect
     useEffect(()=>{
@@ -61,7 +67,7 @@ const AuctionScheduleDetail = ()=>{
         })
         setPresentInput({
             ...presentInput,
-            auctionStartDate:new Date(resp.data.auctionScheduleStartDate).toISOString().slice(0,16),
+            auctionStartDate:new Date(resp.data.auctionScheduleEndDate).toISOString().slice(0,16),
             auctionEndDate:new Date(resp.data.auctionScheduleEndDate).toISOString().slice(0,16),
         });
     }, [auctionSchedule,presentInput]);
@@ -69,12 +75,11 @@ const AuctionScheduleDetail = ()=>{
     const inputFileRef = useRef(null);
 
     //수정내용 작성
-    const changeTarget = useCallback(e=>{
-        const { name, value } = e.target;
+    const changeInput = useCallback((e)=>{
         if (e.target.type === "file") {
             const files = Array.from(e.target.files);
-            setTarget( prevTarget=>({
-                ...prevTarget, 
+            setChange(prevChange => ({
+                ...prevChange, 
                 attachList: files 
             }));
             // 새로 선택한 파일의 미리보기 URL 생성
@@ -88,52 +93,57 @@ const AuctionScheduleDetail = ()=>{
                 });
             });
             Promise.all(imageUrls).then(urls => {
-                setAttachImages(urls);
+                setImages(urls);
             });
         }
         else{
-            setTarget(prevTarget => ({
-                ...prevTarget,
-                [name] : value
+            setChange(prevChange => ({
+                ...prevChange,
+                product: {
+                    ...prevChange.auctionSchedule,
+                    [e.target.name]: e.target.value
+                }
             }));
         }
-    }, [target]);
+        setChange({
+            ...change,
+            [e.target.name]: e.target.value
+        })
+    }, [change]);
 
-    const clearTarget = useCallback(e=>{
-        setTarget({
+    const clearChange = useCallback(e=>{
+        setChange({
             auctionScheduleNo : "",
             auctionScheduleTitle : "",
             auctionScheduleStartDate : "",
             auctionScheduleEndDate : "",
             auctionScheduleState : "",
             auctionScheduleNotice : "",
-            attachment : "",
+            // attachment : "",
             attachList: []
         })
-    }, [target])
+    }, [])
 
     const [loadImages, setLoadImages] = useState([]);
     const [attachImages, setAttachImages] = useState([]);//보낼 추가첨부사진이미지
 
     // 수정내용 저장
-    const saveTarget = useCallback(async ()=>{
+    const saveChange = useCallback(async ()=>{
         const formData = new FormData();
         const fileList = inputFileRef.current.files;
         
-        if (fileList.length > 0) {
-            for (let i = 0; i < fileList.length; i++) {
-                formData.append("attachList", fileList[i]);
-            }
+        for (let i = 0; i < fileList.length; i++) {
+            formData.append("attachList", fileList[i]);
         }
         
-        formData.append("auctionScheduleNo", target.auctionScheduleNo); 
-        formData.append("auctionScheduleTitle", target.auctionScheduleTitle);
-        formData.append("auctionScheduleStartDate", target.auctionScheduleStartDate);
-        formData.append("auctionScheduleEndDate", target.auctionScheduleEndDate);
-        formData.append("auctionScheduleState", target.auctionScheduleState);
-        formData.append("auctionScheduleNotice", target.auctionScheduleNotice);
+        formData.append("auctionScheduleNo", change.auctionScheduleNo); 
+        formData.append("auctionScheduleTitle", change.auctionScheduleTitle);
+        formData.append("auctionScheduleStartDate", change.auctionScheduleStartDate);
+        formData.append("auctionScheduleEndDate", change.auctionScheduleEndDate);
+        formData.append("auctionScheduleState", change.auctionScheduleState);
+        formData.append("auctionScheduleNotice", change.auctionScheduleNotice);
 
-        formData.append("originList", target.attachment);
+        formData.append("originList", change.attachment);
 
         await axios.post("http://localhost:8080/auctionSchedule/edit", formData,
         { 
@@ -144,11 +154,16 @@ const AuctionScheduleDetail = ()=>{
         
         setImages(loadImages);
       
-        clearTarget();
         loadAuctionSchedule();
+        loadAuctionList()
+        clearChange();
         closeEditModal();
-        setImages([]);
-    }, [target]);
+    }, [change, loadImages]);
+
+      const deleteImage = useCallback((img) => {
+    //이미지 미리보기에서 삭제
+    setImages(prevImages => prevImages.filter(image => image !== img));
+  }, []);
 
     //일정삭제
     const deleteAuctionSchedule = useCallback(async ()=>{
@@ -171,7 +186,7 @@ const AuctionScheduleDetail = ()=>{
             inputFileRef.current.value = "";
         }
 
-        setTarget({
+        setChange({
             ...auctionSchedule, 
         });
         // 기존 첨부파일 이미지 URL 설정
@@ -183,14 +198,14 @@ const AuctionScheduleDetail = ()=>{
     const closeEditModal = useCallback(()=>{
         const tag = Modal.getInstance(editModal.current);
         tag.hide();
-        clearTarget(); 
+        clearChange(); 
     }, [editModal]);
 
     
     //출품작 목록
     const loadAuctionList=useCallback(async ()=>{   //출품작 불러오기
         const resp=await axios.get(`http://localhost:8080/auction/${auctionScheduleNo}`);
-        // console.log(resp.data.auctionList);
+        console.log(resp.data.auctionList);
         setAuctionList([
             ...resp.data
         ]);
@@ -253,27 +268,11 @@ const AuctionScheduleDetail = ()=>{
     },[presentInput])
 
 
-    //출품 데이터 서버로 전송
-    // const savePresentInput=useCallback(async ()=>{
-    //     const resp = await axios.post("http://localhost:8080/auction/", presentInput, {
-    //         headers:  { 
-    //             "Content-Type": "multipart/form-data",
-    //         },
-    //     });
-    //     // console.log(presentInput.auctionLot===null)
-    //     if(resp.status===200) 
-    //         window.alert("등록이완료되었습니다.");
-        
-    //     clearPresentInput();
-    //     closePresentModal();
-    //     loadAuctionList();
-    // },[]);
-
-
     //출품작 삭제
     const deleteLot=useCallback(async (auction)=>{
         if(window.confirm("출품 작품을 삭제하시겠습니까?")){
             const resp=await axios.delete("http://localhost:8080/auction/"+auction.auctionNo)
+            console.log("delete=", resp);
             if(resp.status===200)
             window.alert(`LOT : ${auction.auctionLot}, ${auction.workTitle}이(가) 삭제되었습니다`);
             loadAuctionList();
@@ -369,7 +368,8 @@ const AuctionScheduleDetail = ()=>{
                 </div>
             </div>
 
-            {/* 관리자 기능 */}
+
+            {/* 여기서부터 쭉 관리자 기능 */}
             <div className="row mt-2">    
                 <div className="col text-end">
                     <button className="btn btn-primary ms-2 rounded-1" 
@@ -385,7 +385,6 @@ const AuctionScheduleDetail = ()=>{
 
         </div>
 
-        {/* 관리자 기능 */}
         {/* 경매 일정 수정 모달 */}
         <div className="modal fade" tabIndex="-1"
                 ref={editModal} data-bs-backdrop="static">
@@ -408,22 +407,22 @@ const AuctionScheduleDetail = ()=>{
                             <div className="col">
                                 <label>경매 일정명</label>
                                 <input type="text" className="form-control mb-4" 
-                                        name="auctionScheduleTitle" value={target.auctionScheduleTitle} 
-                                        onChange={changeTarget}/>
+                                        name="auctionScheduleTitle" value={change.auctionScheduleTitle} 
+                                        onChange={changeInput}/>
                                                 
                                 <label>일정 시작일</label>
                                 <input type="datetime-local" className="form-control mb-4" 
-                                    name="auctionScheduleStartDate" value={target.auctionScheduleStartDate} 
-                                    onChange={changeTarget}/>
+                                    name="auctionScheduleStartDate" value={change.auctionScheduleStartDate} 
+                                    onChange={changeInput}/>
 
                                 <label>일정 종료일</label>
                                 <input type="datetime-local" className="form-control mb-4" 
-                                        name="auctionScheduleEndDate" value={target.auctionScheduleEndDate} 
-                                        onChange={changeTarget}/>
+                                        name="auctionScheduleEndDate" value={change.auctionScheduleEndDate} 
+                                        onChange={changeInput}/>
                                                 
                                 <label>일정 상태</label>
                                 <select className="form-select mb-4" name="auctionScheduleState" 
-                                        value={target.auctionScheduleState} onChange={changeTarget}>
+                                        value={change.auctionScheduleState} onChange={changeInput}>
                                     <option value="">선택하세요</option>
                                     <option>예정경매</option>
                                     <option>진행경매</option>
@@ -432,14 +431,26 @@ const AuctionScheduleDetail = ()=>{
 
                                 <label>안내사항</label>
                                 <textarea type="text" className="form-control mb-4" 
-                                    name="auctionScheduleNotice" value={target.auctionScheduleNotice} 
-                                    onChange={changeTarget}/>
+                                    name="auctionScheduleNotice" value={change.auctionScheduleNotice} 
+                                    onChange={changeInput}/>
 
                                 <label>사진 첨부</label><br/>
                                     <input type="file" className="form-control" name="attachList" multiple accept="image/*"
-                                           onChange={changeTarget} ref={inputFileRef} />
+                                           onChange={changeInput} ref={inputFileRef} />
                                     {images.map((image, index) => (
                                         <img key={index} src={image} alt={`미리보기 ${index + 1}`} style={{ maxWidth: '100px', margin: '5px' }} />
+                                    ))}
+
+                                    {/* 새로운 첨부 이미지 미리보기 */}
+                                    {changeImages.map((image, index) => (
+                                        <div key={index} style={{ position: "relative", display: "inline-block" }}>
+                                        <img src={image} alt={`미리보기 ${index + 1}`} style={{ maxWidth: '100px', margin: '5px', display: "block" }} />
+                                        <MdCancel
+                                            style={{ position: "absolute", top: "10px", right: "10px", color: "red" }}
+                                            size={20}
+                                            onClick={() => deleteImage(image)}
+                                        />
+                                        </div>
                                     ))}
 
                             </div>
@@ -448,7 +459,7 @@ const AuctionScheduleDetail = ()=>{
 
                     <div className="modal-footer">
                         <button type="button" className="btn btn-success rounded-1"
-                                    onClick={saveTarget}>수정</button>
+                                    onClick={saveChange}>수정</button>
                         <button type="button" className="btn btn-secondary btn-manual-close rounded-1" 
                                     onClick={closeEditModal}>취소</button>
                                     
