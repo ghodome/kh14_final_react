@@ -1,0 +1,36 @@
+/* 드롭다운 메뉴의 초기 상태 (숨겨져 있는 상태) */
+.navbar .dropdown-menu {
+    display: block;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(-10px); /* 메뉴를 처음에 화면 위로 숨겨둠 */
+    transition: max-height 0.5s ease-in-out, opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+/* 드롭다운이 열릴 때 (슬라이딩 + 내려오기) */
+.navbar .dropdown-menu.show {
+    max-height: 500px; /* 충분히 큰 값으로 설정하여 모든 메뉴가 보이도록 */
+    opacity: 1;
+    transform: translateY(0); /* 메뉴가 내려옴 */
+}
+
+/* 메뉴가 마우스를 올리면 열리는 상태 */
+.navbar .nav-item:hover .dropdown-menu {
+    max-height: 500px;
+    opacity: 1;
+    transform: translateY(0);
+    transition: max-height 0.2s ease-in-out, opacity 0.3s ease-in-out, transform 0.3s ease-in-out; /* 부드러운 트랜지션 */
+}
+.nav-link.active-link {
+    background-color: white;  /* 배경색을 whitesmoke로 변경 */
+    color: black;  /* 텍스트 색상도 바꿀 수 있음, 기본 텍스트 색상 */
+}
+
+/* 드롭다운 메뉴 항목이 마우스 hover 상태일 때 */
+.navbar .nav-item .dropdown-item:hover {
+    background-color: #f8f9fa; /* 메뉴 항목이 마우스를 올렸을 때 색상 */
+    color: #000;
+}
+
+
