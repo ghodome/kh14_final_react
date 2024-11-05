@@ -199,7 +199,7 @@ const Notice = () => {
                                 className="form-control"
                                 onChange={e => setKeyword(e.target.value)}
                                 onKeyDown={handleKeyDown}
-                                style={{ borderRight: 'none', boxShadow: 'none' }}
+                                style={{ borderRight: 'none', boxShadow: 'none', backgroundColor: 'white' }}
                             />
                             <button
                                 className="btn"
