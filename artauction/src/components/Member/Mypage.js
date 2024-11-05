@@ -19,7 +19,7 @@ const Mypage = () => {
         try {
             const resp = await axios.get("http://localhost:8080/member/find");
             setMember(resp.data);
-            console.log(resp.data);
+            
         } catch (error) {
             console.error("Failed to load member data:", error);
             navigate("/login"); // 로그인 페이지로 리다이렉트
@@ -107,20 +107,18 @@ const Mypage = () => {
                             {member[0]?.memberRank || ''}
                         </div>
 
-
-                        <div className="col-4 border p-2">
-                            <strong>포인트</strong>
-                        </div>
-                        <div className="col-8 border p-2">
-                            {member[0]?.memberPoint.toLocaleString() || '0'}
-                        </div>
-                        <div className="col-4 border p-2">
-                            <strong>우편번호</strong>
-                        </div>
-                        <div className="col-8 border p-2">
-                            [{member[0]?.memberPost || ''}]
-                        </div>
-
+                            <div className="col-4 border p-2">
+                                <strong>포인트</strong>
+                            </div>
+                            <div className="col-8 border p-2">
+                                {member[0]?.memberPoint.toLocaleString()}
+                            </div>
+                            <div className="col-4 border p-2">
+                                <strong>우편번호</strong>
+                            </div>
+                            <div className="col-8 border p-2">
+                                [{member[0]?.memberPost || ''}]
+                            </div>
 
                         <div className="col-4 border p-2">
                             <strong>주소</strong>
