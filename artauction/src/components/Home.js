@@ -4,6 +4,7 @@ import ImageSlider from "./ImageSlider";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { NavLink } from "react-router-dom";
 
 
 const Home = () => {
@@ -49,8 +50,11 @@ const Home = () => {
 
         <div className="row mt-4">
             <div className="col-6">
-                <div>
+                <div className="d-flex justify-content-between align-items-center">
                     <h3>작품 목록</h3>
+                    <NavLink className="nav-link me-3" to="/work/list" style={{ textDecoration: 'none', color: 'black', fontSize:12}}>
+                        더보기
+                    </NavLink>
                 </div>
                 <div className="slider-container" style={{ overflowX: 'scroll', whiteSpace: 'nowrap' }}>
                     {workList.map((work, index) => (

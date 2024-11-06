@@ -4,8 +4,13 @@ import axios from "axios";
 import { Modal } from "bootstrap";
 import { a } from "hangul-js";
 import { MdCancel } from "react-icons/md";
+import { useRecoilValue } from "recoil";
+import { memberRankState } from "../../utils/recoil";
 
 const Artist = () => {
+  //recoil
+  const memberRank = useRecoilValue(memberRankState);
+
   //state
   const [input, setInput] = useState({
     artistName: "",
@@ -16,7 +21,7 @@ const Artist = () => {
     attachList: []
   });
   const [artistList, setArtistList] = useState([]);
-  const [images,  setImages] = useState([]);
+  const [images, setImages] = useState([]);
   const [detailArtist, setDetailArtist] = useState({
     artistName: "",
     artistDescription: "",
@@ -41,7 +46,7 @@ const Artist = () => {
     beginRow: "",
     endRow: ""
   });
-  
+
   const [updateInput, setUpdateInput] = useState({
     artistNo: "",
     artistName: "",
@@ -58,17 +63,17 @@ const Artist = () => {
   const inputFileRef = useRef(null);
   const [loadImages, setLoadImages] = useState([]);
   const [attachImages, setAttachImages] = useState([]);//보낼 추가 첨부사진 이미지
-  
+
   // 모달 관련
   const modal = useRef();
   const detailModal = useRef();
-  
+
   //페이지
   const sortedArtistList = [...artistList].sort();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(15);
   const totalPage = Math.ceil(sortedArtistList.length / pageSize);
-  
+
   const pageClick = useCallback((pageNumber) => {
     setPage(pageNumber);
   }, []);
@@ -115,6 +120,7 @@ const Artist = () => {
         setUpdateStatus({});
         setUpdateInput({});
         setAttachImages([]); // 미리보기 이미지 초기화
+        clearEState();
         clearInput();//입력창 청소
       }
     }
@@ -203,39 +209,31 @@ const Artist = () => {
   }, [updateStatus, updateInput]);
 
   const changeUpdateInput = useCallback((e) => {
-    if (e.target.type === "file") {
-      const files = Array.from(e.target.files);
-      setUpdateInput(prevInput => ({
+    const { name, value, type, files } = e.target;
+    
+    if (type === "file") {
+      const fileArray = Array.from(files);
+      setUpdateInput((prevInput) => ({
         ...prevInput,
-        attachList: files
+        attachList: fileArray,
       }));
-      const imageUrls = files.map(file => {
+      
+      // 파일 이미지 미리보기 로직
+      const imageUrls = fileArray.map((file) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         return new Promise((resolve) => {
-          reader.onloadend = () => {
-            resolve(reader.result);
-          };
+          reader.onloadend = () => resolve(reader.result);
         });
       });
-      Promise.all(imageUrls).then(urls => {
-        setAttachImages(urls);
-      });
-    }
-    else {
-      setInput(prevInput => ({
+      Promise.all(imageUrls).then((urls) => setAttachImages(urls));
+    } else {
+      setUpdateInput((prevInput) => ({
         ...prevInput,
-        product: {
-          ...prevInput.work,
-          [e.target.name]: e.target.value
-        }
+        [name]: value,
       }));
     }
-    setUpdateInput({
-      ...updateInput,
-      [e.target.name]: e.target.value
-    })
-  }, [updateInput]);
+  }, [setUpdateInput]);
 
 
   // const updateArtist = useCallback(async () => {
@@ -270,7 +268,7 @@ const Artist = () => {
     const fileList = inputFileRef.current.files;
 
     for (let i = 0; i < fileList.length; i++) {
-        formData.append("attachList", fileList[i]);
+      formData.append("attachList", fileList[i]);
     }
     formData.append("artistNo", updateInput.artistNo);
     formData.append("artistName", updateInput.artistName);
@@ -284,9 +282,9 @@ const Artist = () => {
     formData.append("originList", originList);
 
     await axios.post("http://localhost:8080/artist/edit", formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
 
     // 새로 첨부된 파일이 없을 경우, 기존 이미지를 유지하거나 빈 배열로 설정
@@ -295,7 +293,7 @@ const Artist = () => {
     loadArtistList();
     clearEState();
     closeDetailModal();
-}, [updateInput, loadImages]);
+  }, [updateInput, loadImages]);
 
   const deleteAttachImage = useCallback((img) => {
     //이미지 미리보기에서 삭제
@@ -321,188 +319,187 @@ const Artist = () => {
     setIsEditing(!isEditing);
   };
 
-//------------------작가 등록 형식검사-----------------------------
-const [artistFileValid, setArtistFileValid] = useState(false);
-const [artistNameValid, setArtistNameValid] = useState(false);
-const [artistDescriptionValid, setArtistDescriptionValid] = useState(false);
-const [artistHistoryValid, setArtistHistoryValid] = useState(false);
-const [artistBirthValid, setArtistBirthValid] = useState(false);
-const [artistDeathValid, setArtistDeathValid] = useState(false);
+  //------------------작가 등록 형식검사-----------------------------
+  const [artistFileValid, setArtistFileValid] = useState(false);
+  const [artistNameValid, setArtistNameValid] = useState(false);
+  const [artistDescriptionValid, setArtistDescriptionValid] = useState(false);
+  const [artistHistoryValid, setArtistHistoryValid] = useState(false);
+  const [artistBirthValid, setArtistBirthValid] = useState(false);
+  const [artistDeathValid, setArtistDeathValid] = useState(false);
 
-const [artistFileClass, setArtistFileClass] = useState("");
-const [artistNameClass, setArtistNameClass] = useState("");
-const [artistDescriptionClass, setArtistDescriptionClass] = useState("");
-const [artistHistoryClass, setArtistHistoryClass] = useState("");
-const [artistBirthClass, setArtistBirthClass] = useState("");
-const [artistDeathClass, setArtistDeathClass] = useState("");
+  const [artistFileClass, setArtistFileClass] = useState("");
+  const [artistNameClass, setArtistNameClass] = useState("");
+  const [artistDescriptionClass, setArtistDescriptionClass] = useState("");
+  const [artistHistoryClass, setArtistHistoryClass] = useState("");
+  const [artistBirthClass, setArtistBirthClass] = useState("");
+  const [artistDeathClass, setArtistDeathClass] = useState("");
 
-const checkArtistFile = useCallback(()=> {
-  const valid = input.attachList.length > 0;
-  setArtistFileValid(valid);
-  if(input.attachList.length===0)  setArtistFileClass("");
-  else setArtistFileClass(valid ? "is-valid" : "is-invalid");
-}, [input]);
+  const checkArtistFile = useCallback(() => {
+    const valid = input.attachList.length > 0;
+    setArtistFileValid(valid);
+    if (input.attachList.length === 0) setArtistFileClass("");
+    else setArtistFileClass(valid ? "is-valid" : "is-invalid");
+  }, [input]);
 
-const checkArtistName = useCallback(()=>{
-  const regex = /^([가-힣]{2,7}|[a-zA-Z ]{1,30})$/;
-  const valid = regex.test(input.artistName);
-  setArtistNameValid(valid);
-  if(input.artistName.length === 0) setArtistNameClass("");
-  else setArtistNameClass(valid ? "is-valid" : "is-invalid");
-}, [input]);
+  const checkArtistName = useCallback(() => {
+    const regex = /^([가-힣]{2,7}|[a-zA-Z ]{1,30})$/;
+    const valid = regex.test(input.artistName);
+    setArtistNameValid(valid);
+    if (input.artistName.length === 0) setArtistNameClass("");
+    else setArtistNameClass(valid ? "is-valid" : "is-invalid");
+  }, [input]);
 
-const checkArtistDescription = useCallback(()=>{
-  const regex = /^.{1,300}$/;
-  const valid = regex.test(input.artistDescription);
-  setArtistDescriptionValid(valid);
-  if(input.artistDescription.length === 0) setArtistDescriptionClass("");
-  else setArtistDescriptionClass(valid ? "is-valid" : "is-invalid");
-}, [input]);
+  const checkArtistDescription = useCallback(() => {
+    const regex = /^.{1,300}$/;
+    const valid = regex.test(input.artistDescription);
+    setArtistDescriptionValid(valid);
+    if (input.artistDescription.length === 0) setArtistDescriptionClass("");
+    else setArtistDescriptionClass(valid ? "is-valid" : "is-invalid");
+  }, [input]);
 
-const checkArtistHistory = useCallback(()=> {
-  const regex = /^.{1,300}$/;
-  const valid = regex.test(input.artistHistory);
-  setArtistHistoryValid(valid);
-  if(input.artistHistory.length ===0) setArtistHistoryClass("");
-  else setArtistHistoryClass(valid ? "is-valid" : "is-invalid");
-}, [input]);
+  const checkArtistHistory = useCallback(() => {
+    const regex = /^.{1,300}$/;
+    const valid = regex.test(input.artistHistory);
+    setArtistHistoryValid(valid);
+    if (input.artistHistory.length === 0) setArtistHistoryClass("");
+    else setArtistHistoryClass(valid ? "is-valid" : "is-invalid");
+  }, [input]);
 
-const checkArtistBirth = useCallback(()=> {
-  const regex = /^([0-9]{4})-(02-(0[1-9]|1[0-9]|2[0-8])|(0[469]|11)-(0[1-9]|1[0-9]|2[0-9]|30)|(0[13578]|1[02])-(0[1-9]|1[0-9]|2[0-9]|3[01]))$/;
-  const valid = regex.test(input.artistBirth);
-  setArtistBirthValid(valid);
-  if(input.artistBirth.length ===0) setArtistBirthClass("");
-  else setArtistBirthClass(valid ? "is-valid" : "is-invalid");
-}, [input]);
+  const checkArtistBirth = useCallback(() => {
+    const regex = /^([0-9]{4})-(02-(0[1-9]|1[0-9]|2[0-8])|(0[469]|11)-(0[1-9]|1[0-9]|2[0-9]|30)|(0[13578]|1[02])-(0[1-9]|1[0-9]|2[0-9]|3[01]))$/;
+    const valid = regex.test(input.artistBirth);
+    setArtistBirthValid(valid);
+    if (input.artistBirth.length === 0) setArtistBirthClass("");
+    else setArtistBirthClass(valid ? "is-valid" : "is-invalid");
+  }, [input]);
 
-const checkArtistDeath = useCallback(()=> {
-  const regex = /^([0-9]{4})-(02-(0[1-9]|1[0-9]|2[0-8])|(0[469]|11)-(0[1-9]|1[0-9]|2[0-9]|30)|(0[13578]|1[02])-(0[1-9]|1[0-9]|2[0-9]|3[01]))$/;
-  const valid = regex.test(input.artistDeath);
-  setArtistDeathValid(valid);
-  if(input.artistDeath.length ===0) setArtistDeathClass("");
-  else setArtistDeathClass(valid ? "is-valid" : "is-invalid");
-}, [input]);
+  const checkArtistDeath = useCallback(() => {
+    const regex = /^([0-9]{4})-(02-(0[1-9]|1[0-9]|2[0-8])|(0[469]|11)-(0[1-9]|1[0-9]|2[0-9]|30)|(0[13578]|1[02])-(0[1-9]|1[0-9]|2[0-9]|3[01]))$/;
+    const valid = regex.test(input.artistDeath);
+    setArtistDeathValid(valid);
+    if (input.artistDeath.length === 0) setArtistDeathClass("");
+    else setArtistDeathClass(valid ? "is-valid" : "is-invalid");
+  }, [input]);
 
-const isAllValid = useMemo(()=>{
-  return artistFileValid && artistNameValid && artistDescriptionValid && artistHistoryValid
-              && artistBirthValid && artistDeathValid
-}, [artistFileValid, artistNameValid, artistDescriptionValid, artistHistoryValid, artistBirthValid, artistDeathValid]);
+  const isAllValid = useMemo(() => {
+    return artistFileValid && artistNameValid && artistDescriptionValid && artistHistoryValid
+      && artistBirthValid && artistDeathValid
+  }, [artistFileValid, artistNameValid, artistDescriptionValid, artistHistoryValid, artistBirthValid, artistDeathValid]);
 
-const clearState = useCallback(()=>{
-  setArtistFileValid(false);
-  setArtistNameValid(false);
-  setArtistDescriptionValid(false);
-  setArtistHistoryValid(false);
-  setArtistBirthValid(false);
-  setArtistDeathValid(false);
+  const clearState = useCallback(() => {
+    setArtistFileValid(false);
+    setArtistNameValid(false);
+    setArtistDescriptionValid(false);
+    setArtistHistoryValid(false);
+    setArtistBirthValid(false);
+    setArtistDeathValid(false);
 
-  setArtistFileClass("");
-  setArtistNameClass("");
-  setArtistDescriptionClass("");
-  setArtistHistoryClass("");
-  setArtistBirthClass("");
-  setArtistDeathClass("");
-}, []);
+    setArtistFileClass("");
+    setArtistNameClass("");
+    setArtistDescriptionClass("");
+    setArtistHistoryClass("");
+    setArtistBirthClass("");
+    setArtistDeathClass("");
+  }, []);
 
-//-------------------------------------------- 작가 수정 형식 검사 ------------------------------------------------
-const [artistFileEValid, setArtistFileEValid] = useState(true);
-const [artistNameEValid, setArtistNameEValid] = useState(true);
-const [artistDescriptionEValid, setArtistDescriptionEValid] = useState(true);
-const [artistHistoryEValid, setArtistHistoryEValid] = useState(true);
-const [artistBirthEValid, setArtistBirthEValid] = useState(true);
-const [artistDeathEValid, setArtistDeathEValid] = useState(true);
+  //-------------------------------------------- 작가 수정 형식 검사 ------------------------------------------------
+  const [artistFileEValid, setArtistFileEValid] = useState(true);
+  const [artistNameEValid, setArtistNameEValid] = useState(true);
+  const [artistDescriptionEValid, setArtistDescriptionEValid] = useState(true);
+  const [artistHistoryEValid, setArtistHistoryEValid] = useState(true);
+  const [artistBirthEValid, setArtistBirthEValid] = useState(true);
+  const [artistDeathEValid, setArtistDeathEValid] = useState(true);
 
-const [artistFileEClass, setArtistFileEClass] = useState("");
-const [artistNameEClass, setArtistNameEClass] = useState("");
-const [artistDescriptionEClass, setArtistDescriptionEClass] = useState("");
-const [artistHistoryEClass, setArtistHistoryEClass] = useState("");
-const [artistBirthEClass, setArtistBirthEClass] = useState("");
-const [artistDeathEClass, setArtistDeathEClass] = useState("");
+  const [artistFileEClass, setArtistFileEClass] = useState("");
+  const [artistNameEClass, setArtistNameEClass] = useState("");
+  const [artistDescriptionEClass, setArtistDescriptionEClass] = useState("");
+  const [artistHistoryEClass, setArtistHistoryEClass] = useState("");
+  const [artistBirthEClass, setArtistBirthEClass] = useState("");
+  const [artistDeathEClass, setArtistDeathEClass] = useState("");
 
-const checkArtistFileE = useCallback(() => {
-  const valid = (input.attachList && input.attachList.length > 0);
-  setArtistFileValid(valid);
+  const checkArtistFileE = useCallback(() => {
+    const valid = (input.attachList && input.attachList.length > 0);
+    setArtistFileValid(valid);
 
-  // updateInput.attachList가 정의되어 있는지 먼저 확인
-  if (!updateInput.attachList || updateInput.attachList.length === 0) {
+    // updateInput.attachList가 정의되어 있는지 먼저 확인
+    if (!updateInput.attachList || updateInput.attachList.length === 0) {
       setArtistFileClass("");
-  } else {
+    } else {
       setArtistFileClass(valid ? "is-valid" : "is-invalid");
-  }
-}, [updateInput]);
+    }
+  }, [updateInput]);
 
-const checkArtistNameE = useCallback(()=>{
-  const regex = /^([가-힣]{2,7}|[a-zA-Z ]{1,30})$/;
-  const valid = regex.test(updateInput.artistName);
-  setArtistNameEValid(valid);
-  if(updateInput.artistName.length === 0) setArtistNameEClass("");
-  else setArtistNameEClass(valid ? "is-valid" : "is-invalid");
-}, [updateInput]);
+  const checkArtistNameE = useCallback(() => {
+    const regex = /^([가-힣]{2,7}|[a-zA-Z ]{1,30})$/;
+    const valid = regex.test(updateInput.artistName);
+    setArtistNameEValid(valid);
+    if (updateInput.artistName.length === 0) setArtistNameEClass("");
+    else setArtistNameEClass(valid ? "is-valid" : "is-invalid");
+  }, [updateInput]);
 
-const checkArtistDescriptionE = useCallback(()=>{
-  const regex = /^.{1,300}$/;
-  const valid = regex.test(updateInput.artistDescription);
-  setArtistDescriptionEValid(valid);
-  if(updateInput.artistDescription.length === 0) setArtistDescriptionEClass("");
-  else setArtistDescriptionEClass(valid ? "is-valid" : "is-invalid");
-}, [updateInput]);
+  const checkArtistDescriptionE = useCallback(() => {
+    const regex = /^.{1,300}$/;
+    const valid = regex.test(updateInput.artistDescription);
+    setArtistDescriptionEValid(valid);
+    if (updateInput.artistDescription.length === 0) setArtistDescriptionEClass("");
+    else setArtistDescriptionEClass(valid ? "is-valid" : "is-invalid");
+  }, [updateInput]);
 
-const checkArtistHistoryE = useCallback(()=> {
-  const regex = /^.{1,300}$/;
-  const valid = regex.test(updateInput.artistHistory);
-  setArtistHistoryEValid(valid);
-  if(updateInput.artistHistory.length ===0) setArtistHistoryEClass("");
-  else setArtistHistoryEClass(valid ? "is-valid" : "is-invalid");
-}, [updateInput]);
+  const checkArtistHistoryE = useCallback(() => {
+    const regex = /^.{1,300}$/;
+    const valid = regex.test(updateInput.artistHistory);
+    setArtistHistoryEValid(valid);
+    if (updateInput.artistHistory.length === 0) setArtistHistoryEClass("");
+    else setArtistHistoryEClass(valid ? "is-valid" : "is-invalid");
+  }, [updateInput]);
 
-const checkArtistBirthE = useCallback(()=> {
-  const regex = /^([0-9]{4})-(02-(0[1-9]|1[0-9]|2[0-8])|(0[469]|11)-(0[1-9]|1[0-9]|2[0-9]|30)|(0[13578]|1[02])-(0[1-9]|1[0-9]|2[0-9]|3[01]))$/;
-  const valid = regex.test(updateInput.artistBirth);
-  setArtistBirthEValid(valid);
-  if(updateInput.artistBirth.length ===0) setArtistBirthEClass("");
-  else setArtistBirthEClass(valid ? "is-valid" : "is-invalid");
-}, [updateInput]);
+  const checkArtistBirthE = useCallback(() => {
+    const regex = /^([0-9]{4})-(02-(0[1-9]|1[0-9]|2[0-8])|(0[469]|11)-(0[1-9]|1[0-9]|2[0-9]|30)|(0[13578]|1[02])-(0[1-9]|1[0-9]|2[0-9]|3[01]))$/;
+    const valid = regex.test(updateInput.artistBirth);
+    setArtistBirthEValid(valid);
+    if (updateInput.artistBirth.length === 0) setArtistBirthEClass("");
+    else setArtistBirthEClass(valid ? "is-valid" : "is-invalid");
+  }, [updateInput]);
 
-const checkArtistDeathE = useCallback(()=> {
-  const regex = /^([0-9]{4})-(02-(0[1-9]|1[0-9]|2[0-8])|(0[469]|11)-(0[1-9]|1[0-9]|2[0-9]|30)|(0[13578]|1[02])-(0[1-9]|1[0-9]|2[0-9]|3[01]))$/;
-  const valid = regex.test(updateInput.artistDeath);
-  setArtistDeathEValid(valid);
-  if(updateInput.artistDeath.length ===0) setArtistDeathEClass("");
-  else setArtistDeathEClass(valid ? "is-valid" : "is-invalid");
-}, [updateInput]);
+  const checkArtistDeathE = useCallback(() => {
+    const regex = /^([0-9]{4})-(02-(0[1-9]|1[0-9]|2[0-8])|(0[469]|11)-(0[1-9]|1[0-9]|2[0-9]|30)|(0[13578]|1[02])-(0[1-9]|1[0-9]|2[0-9]|3[01]))$/;
+    const valid = regex.test(updateInput.artistDeath);
+    setArtistDeathEValid(valid);
+    if (updateInput.artistDeath.length === 0) setArtistDeathEClass("");
+    else setArtistDeathEClass(valid ? "is-valid" : "is-invalid");
+  }, [updateInput]);
 
-const isAllEValid = useMemo(()=>{
-  return artistFileEValid && artistNameEValid && artistDescriptionEValid && artistHistoryEValid
-              && artistBirthEValid && artistDeathEValid
-}, [artistFileEValid, artistNameEValid, artistDescriptionEValid, artistHistoryEValid, artistBirthEValid, artistDeathEValid]);
+  const isAllEValid = useMemo(() => {
+    return artistFileEValid && artistNameEValid && artistDescriptionEValid && artistHistoryEValid
+      && artistBirthEValid && artistDeathEValid
+  }, [artistFileEValid, artistNameEValid, artistDescriptionEValid, artistHistoryEValid, artistBirthEValid, artistDeathEValid]);
 
-const clearEState = useCallback(()=>{
-  setArtistFileEValid(true);
-  setArtistNameEValid(true);
-  setArtistDescriptionEValid(true);
-  setArtistHistoryEValid(true);
-  setArtistBirthEValid(true);
-  setArtistDeathEValid(true);
+  const clearEState = useCallback(() => {
+    setArtistFileEValid(true);
+    setArtistNameEValid(true);
+    setArtistDescriptionEValid(true);
+    setArtistHistoryEValid(true);
+    setArtistBirthEValid(true);
+    setArtistDeathEValid(true);
 
-  setArtistFileEClass("");
-  setArtistNameEClass("");
-  setArtistDescriptionEClass("");
-  setArtistHistoryEClass("");
-  setArtistBirthEClass("");
-  setArtistDeathEClass("");
-}, []);
+    setArtistFileEClass("");
+    setArtistNameEClass("");
+    setArtistDescriptionEClass("");
+    setArtistHistoryEClass("");
+    setArtistBirthEClass("");
+    setArtistDeathEClass("");
+  }, []);
 
-//-------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------------
 
 
   return (
     <>
-      <Jumbotron title="작가 페이지"></Jumbotron>
       <div className="row mt-3">
         <div className="col-11 text-end">
-          <button className="btn btn-primary" onClick={openModal}>
-            작가 등록하기
-          </button>
+          {memberRank === '관리자' && <button className="btn btn-primary"
+            onClick={openModal}>작가 등록하기</button>
+          }
         </div>
       </div>
 
@@ -521,8 +518,8 @@ const clearEState = useCallback(()=>{
               <div className="row">
                 <div className="col">
                   <label>작가 이미지</label>
-                  <input type="file" className={"form-control "+artistFileClass} name="attachList" multiple accept="image/*" onChange={changeInput} ref={inputFileRef} 
-                                    onBlur={checkArtistFile} onFocus={checkArtistFile}/>
+                  <input type="file" className={"form-control " + artistFileClass} name="attachList" multiple accept="image/*" onChange={changeInput} ref={inputFileRef}
+                    onBlur={checkArtistFile} onFocus={checkArtistFile} />
                   {images.map((image, index) => (
                     <img key={index} src={image} alt={`미리보기 ${index + 1}`} style={{ maxWidth: '100px', margin: '5px' }} />
                   ))}
@@ -538,14 +535,14 @@ const clearEState = useCallback(()=>{
                   <input type="text"
                     value={input.artistName}
                     name="artistName"
-                    className={"form-control "+artistNameClass}
+                    className={"form-control " + artistNameClass}
                     onChange={changeInput}
                     placeholder="작가명"
-                    autoComplete="off" 
+                    autoComplete="off"
                     onBlur={checkArtistName}
-                    onFocus={checkArtistName}/>
-                    <div className="valid-feedback"></div>
-                    <div className="invalid-feedback"></div>
+                    onFocus={checkArtistName} />
+                  <div className="valid-feedback"></div>
+                  <div className="invalid-feedback"></div>
                 </div>
               </div>
               <div className="row">
@@ -554,14 +551,14 @@ const clearEState = useCallback(()=>{
                   <textarea type="text"
                     value={input.artistDescription}
                     name="artistDescription"
-                    className={"form-control "+artistDescriptionClass}
+                    className={"form-control " + artistDescriptionClass}
                     onChange={e => changeInput(e)}
                     placeholder="작가에 대한 소개"
-                    autoComplete="off" 
+                    autoComplete="off"
                     onBlur={checkArtistDescription}
-                    onFocus={checkArtistDescription}/>
-                    <div className="valid-feedback"></div>
-                    <div className="invalid-feedback"></div>
+                    onFocus={checkArtistDescription} />
+                  <div className="valid-feedback"></div>
+                  <div className="invalid-feedback"></div>
                 </div>
               </div>
               <div className="row">
@@ -569,15 +566,15 @@ const clearEState = useCallback(()=>{
                   <label>작가 기록</label>
                   <input type="text"
                     name="artistHistory"
-                    className={"form-control "+artistHistoryClass}
+                    className={"form-control " + artistHistoryClass}
                     value={input.artistHistory}
                     onChange={e => changeInput(e)}
                     placeholder="작품, 활동 등"
-                    autoComplete="off" 
+                    autoComplete="off"
                     onBlur={checkArtistHistory}
-                    onFocus={checkArtistHistory}/>
-                    <div className="valid-feedback"></div>
-                    <div className="invalid-feedback"></div>
+                    onFocus={checkArtistHistory} />
+                  <div className="valid-feedback"></div>
+                  <div className="invalid-feedback"></div>
                 </div>
               </div>
               <div className="row">
@@ -585,15 +582,15 @@ const clearEState = useCallback(()=>{
                   <label>출생</label>
                   <input type="date"
                     name="artistBirth"
-                    className={"form-control "+artistBirthClass}
+                    className={"form-control " + artistBirthClass}
                     value={input.artistBirth}
                     onChange={e => changeInput(e)}
                     placeholder="yyyy-mm-dd 형식으로만"
-                    autoComplete="off" 
+                    autoComplete="off"
                     onBlur={checkArtistBirth}
-                    onFocus={checkArtistBirth}/>
-                    <div className="valid-feedback"></div>
-                    <div className="invalid-feedback"></div>
+                    onFocus={checkArtistBirth} />
+                  <div className="valid-feedback"></div>
+                  <div className="invalid-feedback"></div>
                 </div>
               </div>
               <div className="row">
@@ -601,15 +598,15 @@ const clearEState = useCallback(()=>{
                   <label>사망</label>
                   <input type="date"
                     name="artistDeath"
-                    className={"form-control "+artistDeathClass}
+                    className={"form-control " + artistDeathClass}
                     value={input.artistDeath}
                     onChange={e => changeInput(e)}
                     placeholder="yyyy-mm-dd 형식으로만"
-                    autoComplete="off" 
+                    autoComplete="off"
                     onBlur={checkArtistDeath}
-                    onFocus={checkArtistDeath}/>
-                    <div className="valid-feedback"></div>
-                    <div className="invalid-feedback"></div>
+                    onFocus={checkArtistDeath} />
+                  <div className="valid-feedback"></div>
+                  <div className="invalid-feedback"></div>
                 </div>
               </div>
             </div>
@@ -736,11 +733,11 @@ const clearEState = useCallback(()=>{
                 <div className="row mt-2">
                   <div className="col">
                     <label>이미지 수정</label>
-                    <input type="file" className={"form-control "+artistFileEClass} name="attachList" multiple
-                      accept="image/*" onChange={e => changeUpdateInput(e)} ref={inputFileRef} 
-                      onBlur={checkArtistFileE} onFocus={checkArtistFileE}/>
-                      <div className="valid-feedback"></div>
-                      <div className="invalid-feedback"></div>
+                    <input type="file" className={"form-control " + artistFileEClass} name="attachList" multiple
+                      accept="image/*" onChange={e => changeUpdateInput(e)} ref={inputFileRef}
+                      onBlur={checkArtistFileE} onFocus={checkArtistFileE} />
+                    <div className="valid-feedback"></div>
+                    <div className="invalid-feedback"></div>
                   </div>
                 </div>
               )}
@@ -754,13 +751,13 @@ const clearEState = useCallback(()=>{
                       {/* {updateStatus.artistName == true ? (<> */}
                       <input type="text" name="artistName"
                         value={updateInput.artistName || ""}
-                        className={"form-control "+artistNameEClass}
+                        className={"form-control " + artistNameEClass}
                         onChange={e => changeUpdateInput(e)}
                         onBlur={checkArtistNameE}
                         onFocus={checkArtistNameE}
-                        disabled={!isEditing}/>
-                        <div className="valid-feedback"></div>
-                        <div className="invalid-feedback"></div>
+                        disabled={!isEditing} />
+                      <div className="valid-feedback"></div>
+                      <div className="invalid-feedback"></div>
                       {/* </>) : (<p>{detailArtist.artistName}</p>)} */}
                     </div>
                     {/* <div className="col-2">
@@ -779,13 +776,13 @@ const clearEState = useCallback(()=>{
                       {/* {updateStatus.artistDescription == true ? (<> */}
                       <input type="text" name="artistDescription"
                         value={updateInput.artistDescription || ""}
-                        className={"form-control "+artistDescriptionEClass}
+                        className={"form-control " + artistDescriptionEClass}
                         onChange={e => changeUpdateInput(e)}
                         onBlur={checkArtistDescriptionE}
                         onFocus={checkArtistDescriptionE}
-                        disabled={!isEditing}/>
-                        <div className="valid-feedback"></div>
-                        <div className="invalid-feedback"></div>
+                        disabled={!isEditing} />
+                      <div className="valid-feedback"></div>
+                      <div className="invalid-feedback"></div>
                       {/* </>) : (<p>{detailArtist.artistDescription}</p>)} */}
                     </div>
                     {/* <div className="col-2">
@@ -803,13 +800,13 @@ const clearEState = useCallback(()=>{
                       {/* {updateStatus.artistHistory == true ? (<> */}
                       <input type="text" name="artistHistory"
                         value={updateInput.artistHistory || ""}
-                        className={"form-control "+ artistHistoryEClass}
+                        className={"form-control " + artistHistoryEClass}
                         onChange={e => changeUpdateInput(e)}
                         onBlur={checkArtistHistoryE}
                         onFocus={checkArtistHistoryE}
-                        disabled={!isEditing}/>
-                        <div className="valid-feedback"></div>
-                        <div className="invalid-feedback"></div>
+                        disabled={!isEditing} />
+                      <div className="valid-feedback"></div>
+                      <div className="invalid-feedback"></div>
                       {/* </>) : (<p>{detailArtist.artistHistory}</p>)} */}
                     </div>
                     {/* <div className="col-2">
@@ -827,13 +824,13 @@ const clearEState = useCallback(()=>{
                       {/* {updateStatus.artistBirth == true ? (<> */}
                       <input type="date" name="artistBirth"
                         value={updateInput.artistBirth || ""}
-                        className={"form-control "+artistBirthEClass}
+                        className={"form-control " + artistBirthEClass}
                         onChange={e => changeUpdateInput(e)}
                         onBlur={checkArtistBirthE}
                         onFocus={checkArtistBirthE}
-                        disabled={!isEditing}/>
-                        <div className="valid-feedback"></div>
-                        <div className="invalid-feedback"></div>
+                        disabled={!isEditing} />
+                      <div className="valid-feedback"></div>
+                      <div className="invalid-feedback"></div>
                       {/* </>) : (<p>{detailArtist.artistBirth}</p>)} */}
                     </div>
                     {/* <div className="col-2">
@@ -844,53 +841,72 @@ const clearEState = useCallback(()=>{
                 </div>
               </div>
               <div className="row">
-                <div className="col">
-                  <label>사망</label>
-                  <div className="row">
-                    <div className="col">
-                      {/* {updateStatus.artistDeath == true ? (<> */}
-                      <input type="date" name="artistDeath"
-                        value={updateInput.artistDeath || ""}
-                        className={"form-control "+artistDeathEClass}
-                        onChange={e => changeUpdateInput(e)}
-                        onBlur={checkArtistDeathE}
-                        onFocus={checkArtistDeathE}
-                        disabled={!isEditing}/>
-                        <div className="valid-feedback"></div>
-                        <div className="invalid-feedback"></div>
-                      {/* </>) : (<p>{detailArtist.artistDeath}</p>)}{ } */}
-                    </div>
-                    {/* <div className="col-2">
-                      <input type="checkbox" name='artistDeath'
-                        onChange={e => changeStatus(e)}></input>
-                    </div> */}
-                  </div>
-                </div>
-              </div>
+  <div className="col">
+    <label>사망</label>
+    <div className="row">
+      <div className="col">
+        {isEditing ? (
+          <input
+            type="date"
+            name="artistDeath"
+            value={updateInput.artistDeath || ""}
+            className={"form-control " + artistDeathEClass}
+            onChange={changeUpdateInput}
+            onBlur={checkArtistDeathE}
+            onFocus={checkArtistDeathE}
+          />
+        ) : (
+          new Date(updateInput.artistDeath) <= new Date() ? (
+            <p>{updateInput.artistDeath}</p>
+          ) : (
+            <input placeholder=" - " disabled className="form-control"/>
+          )
+        )}
+        <div className="valid-feedback"></div>
+        <div className="invalid-feedback"></div>
+      </div>
+    </div>
+  </div>
+</div>
             </div>
             <div className="modal-footer">
               <div className="row">
                 <div className="col-4">
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    onClick={e => deleteArtist(detailArtist.artistNo)}>
-                    삭제
-                  </button>
+                  {memberRank === '관리자' &&
+                    <button type="button" className="btn btn-danger"
+                      onClick={e => deleteArtist(detailArtist.artistNo)}>
+                      삭제
+                    </button>
+                  }
                 </div>
                 <div className="col-4">
-                  <button type="button" className="btn btn-success" onClick={toggleEditMode} disabled={isAllEValid=== false}>
-                    {isEditing ? "완료" : "수정"}
-                  </button>
+                  {memberRank === '관리자' &&
+                    <button type="button" className="btn btn-success"
+                      onClick={toggleEditMode} disabled={isAllEValid === false}>
+                      {isEditing ? "완료" : "수정"}
+                    </button>
+                  }
                 </div>
                 <div className="col-4">
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={closeDetailModal}>
-                    확인
-                  </button>
+                  {memberRank === '관리자' &&
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={closeDetailModal}>
+                      확인
+                    </button>
+                  }
                 </div>
+                  {memberRank !== '관리자' &&
+                <div className="text-end">
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={closeDetailModal}>
+                      확인
+                    </button>
+                </div>
+                  }
               </div>
             </div>
           </div>
