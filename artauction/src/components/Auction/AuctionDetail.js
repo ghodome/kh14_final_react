@@ -432,12 +432,6 @@ const Auction = () => {
                                             {point ? point.toLocaleString('ko-KR') : memberPoint?.toLocaleString('ko-KR')}
                                         </div>
                                     </div>
-                                    <div className="row mb-1">
-                                        <div className="col-6">응찰 방법</div>
-                                        <div className="col-6 text-end font-weight-bold">
-                                            
-                                        </div>
-                                    </div>
                                 </div>
 
                                 <div className="col">
@@ -498,34 +492,36 @@ const Auction = () => {
                                                 </div>)}
                                     </div>
                                 </div>
-                                <ul className="list-group">
-                                    {messageList && messageList.slice().reverse().map((message, index) => (
-                                        <div className="row" key={index}>
-                                            <div className="col">
-                                                <p>{message.content.contentForLot}</p>
-                                                <p className="text-muted">
-                                                    {moment(message.bidTime).format('HH:mm:ss')}
-                                                </p>
+                                <div className="message-container" style={{ height: '400px', overflowY: 'auto' }}>
+                                    <ul className="list-group">
+                                        {messageList && messageList.slice().reverse().map((message, index) => (
+                                            <div className="row" key={index}>
+                                                <div className="col">
+                                                    <p>{message.content.contentForLot}</p>
+                                                    <p className="text-muted">
+                                                        {moment(message.bidTime).format('HH:mm:ss')}
+                                                    </p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
-                                </ul>
-                                <ul className="list-group">
-                                {wholeMessageList && wholeMessageList.slice().reverse().map((message, index) => (
-                                    <div className="row" key={index}>
-                                    <div className="col">
-                                    <p>{message.content.contentForLot}</p>
-                                    <p className="text-muted">
-                                    {moment(message.time).format('HH:mm:ss')}
-                                    </p>
-                                    </div>
-                                    </div>
-                                ))}
-                                </ul>
+                                        ))}
+                                    </ul>
+                                    <ul className="list-group">
+                                        {wholeMessageList && wholeMessageList.slice().reverse().map((message, index) => (
+                                            <div className="row" key={index}>
+                                                <div className="col">
+                                                    <p>{message.content.contentForLot}</p>
+                                                    <p className="text-muted">
+                                                        {moment(message.time).format('HH:mm:ss')}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </ul>
                                 </div>
-                                <hr />
-                                </div>
-                                <div className="modal fade" ref={bidModal}>
+                            </div>
+                            <hr />
+                        </div>
+                        <div className="modal fade" ref={bidModal}>
                             <div className="modal-dialog">
                                 <div className="modal-content">
                                     <div className="modal-header">

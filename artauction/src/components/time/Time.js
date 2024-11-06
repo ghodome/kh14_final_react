@@ -11,16 +11,23 @@ const Time = ({endDate})=>{
     const getTime = useCallback(async () => {
         try {
             const resp = await axios.get("http://localhost:8080/time/");
-            const currentTime = resp.data;
-            const date = new Date(endDate).getTime() - new Date(currentTime).getTime();
-            const days = Math.floor(date / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');; // 일수
-            if(days<0) setEnd(true);
-            else setEnd(false);
-            const hours = Math.floor((date / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');; // 남은 시간
-            const minutes = Math.floor((date / (1000 * 60)) % 60).toString().padStart(2, '0');; // 남은 분
-            const seconds = Math.floor((date / 1000) % 60).toString().padStart(2, '0');; // 남은 초
-            setTime(date);
-            setTimeToShow(`${days}일 ${hours}:${minutes}:${seconds}`);
+            const currentDateTime = new Date(resp.data);
+
+            const delay = 1000 - currentDateTime.getMilliseconds();
+
+            setTimeout(() => {
+                currentDateTime.setMilliseconds(currentDateTime.getMilliseconds()+delay);
+                const date = new Date(endDate).getTime() - new Date(currentDateTime).getTime();
+                const days = Math.floor(date / (1000 * 60 * 60 * 24)).toString().padStart(2, '0'); 
+                if (days < 0) setEnd(true);
+                else setEnd(false);
+                const hours = Math.floor((date / (1000 * 60 * 60)) % 24).toString().padStart(2, '0'); 
+                const minutes = Math.floor((date / (1000 * 60)) % 60).toString().padStart(2, '0'); 
+                const seconds = Math.floor((date / 1000) % 60).toString().padStart(2, '0'); 
+
+                setTime(date);
+                setTimeToShow(`${days}일 ${hours}:${minutes}:${seconds}`);
+}, delay);
         } catch (error) {
             console.log(error)
         }
@@ -32,11 +39,11 @@ const Time = ({endDate})=>{
 
             const date = new Date(prevTime);
             date.setMilliseconds(date.getMilliseconds() - 10);
-            const days = Math.floor(date / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');; // 일수
+            const days = Math.floor(date / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');;
             if(days<0) setEnd(true);
-            const hours = Math.floor((date / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');; // 남은 시간
-            const minutes = Math.floor((date / (1000 * 60)) % 60).toString().padStart(2, '0');; // 남은 분
-            const seconds = Math.floor((date / 1000) % 60).toString().padStart(2, '0');; // 남은 초
+            const hours = Math.floor((date / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');; 
+            const minutes = Math.floor((date / (1000 * 60)) % 60).toString().padStart(2, '0');; 
+            const seconds = Math.floor((date / 1000) % 60).toString().padStart(2, '0');; 
 
             setTimeToShow(`${days}일 ${hours}:${minutes}:${seconds}`);
             return date;
@@ -49,7 +56,7 @@ const Time = ({endDate})=>{
             getTime();
         }, 30000);
         return () => clearInterval(intervalId);
-    }, [getTime]);
+    }, []);
 
     useEffect(() => {
         const intervalId = setInterval(() => {
