@@ -50,7 +50,7 @@ const Container = () => {
     return (<>
         <div className="container-fluid">
             <div className="row my-5 pt-3">
-                <div className="col-sm-10 offset-sm-1" style={{marginTop:'2cm'}}>
+                <div className="col-sm-10 offset-sm-1" style={{marginTop:'3cm'}}>
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/join" element={<OfflineRoute element={<MemberJoin />} />} />
@@ -73,10 +73,10 @@ const Container = () => {
                         <Route path="/auction/detail/:auctionNo" element={<AuctionDetail />} />
                         <Route path="/notice/detail/:noticeNo" element={<NoticeDetail />} />
                         <Route path="/faq" element={<Faq />} />
-                        <Route path="/payment" element={<Payment />} />
+                        <Route path="/payment" element={<PrivateRoute element={<Payment />} />} />
                         <Route path="/payment/success/:partnerOrderId" element={<PaymentSuccess />} />
                         <Route path="/charge" element={<PrivateRoute element={ <Charge />}/>} />
-                        <Route path="/charge/success/:partnerOrderId" element={<ChargeSuccess />} />
+                        <Route path="/charge/success/:partnerOrderId" element={<PrivateRoute element={ <ChargeSuccess />}/>} />
                         <Route path="/room" element={<PrivateRoute element={<Room />} />} />
                         <Route path="/randomBox" element={<PrivateRoute element={<Items />}/>} />
                         <Route path="/roomchat/:roomNo" element={<PrivateRoute element={<RoomChat />} />} />
