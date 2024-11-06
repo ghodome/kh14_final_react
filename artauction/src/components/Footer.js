@@ -47,6 +47,7 @@ const Footer = () => {
                             fontWeight: '500',
                             borderBottom: 'none',
                         }}
+                        
                     >
                         <li style={{ display: 'inline', marginRight: '20px' }}>
                             <NavLink to="/notice" style={{ textDecoration: 'none', color: 'black' }}>
