@@ -32,5 +32,7 @@
     background-color: #f8f9fa; /* 메뉴 항목이 마우스를 올렸을 때 색상 */
     color: #000;
 }
-
+body {
+    background-color: white;
+}
 

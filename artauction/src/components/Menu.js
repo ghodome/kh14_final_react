@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { blockedState, loginState, memberIdState, memberRankState } from "../utils/recoil";
 import './Menu.css'; // Menu.css 파일 불러오기
+import Mypage from './Member/Mypage';
 
 const Menu = () => {
     const navigate = useNavigate();
@@ -106,65 +107,40 @@ const Menu = () => {
 
     return (
         <>
-            <nav className="navbar navbar-expand bg-white fixed-top" data-bs-theme="light">
-                <div className="container-fluid" style={{ position: 'relative' }}>
+            <nav className="navbar navbar-expand fixed-top" data-bs-theme="light" style={{ backgroundColor: 'white' }}>
+                <div className="container-fluid" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    {/* 왼쪽 상단: Art Auction 로고 */}
                     <b
                         style={{
-                            position: 'absolute',
-                            top: '4vh',
-                            left: '5%',
-                            transform: 'translate(0%, -50%)',
                             fontSize: '1.8rem',
                             zIndex: 1051,
                             color: 'black',
                             fontFamily: "'Dancing Script', cursive",
-                            textShadow: '2px 2px 4px rgba(0,0,0,0.1)',
                             letterSpacing: '0.1em',
                             fontWeight: '300',
                             whiteSpace: 'nowrap',
-                            maxWidth: 'calc(100% - 50px)',
+                            backgroundColor: 'white',
+                            padding: '5px',
+                            borderRadius: '5px',
+                            marginLeft: '1cm'
                         }}
                     >
                         <NavLink className="nav-link" to="/">Art Auction</NavLink>
                     </b>
 
-                    <ul className="navbar-nav ms-auto" style={{ position: 'absolute', right: '30px', top: '5px', fontSize:'12px'}}>
-                        {login ? (
-                            <>
-                                <li className="nav-item">
-                                    <NavLink className="nav-link" to="/member/mypage">
-                                        {memberId} ({blocked && memberRank !== '관리자' ? '차단된' : ''} {memberRank})
-                                    </NavLink>
-                                </li>
-                                <span style={{marginTop:'6px'}}>|</span>
-                                <li className="nav-item">
-                                    <NavLink className="nav-link" to="/" onClick={logout}>
-                                        로그아웃
-                                    </NavLink>
-                                </li>
-                            </>
-                        ) : (
-                            <>
-                                <li className="nav-item">
-                                    <NavLink className="nav-link" to="/check">회원가입</NavLink>
-                                </li>
-                            <span style={{marginTop:'6px'}}>|</span>
-                                <li className="nav-item">
-                                    <NavLink className="nav-link" to="/login">로그인</NavLink>
-                                </li>
-                            </>
-                        )}
-                    </ul>
-                </div>
-            </nav>
-
-            {/* 중앙 네비게이션 바 메뉴 */}
-            <nav className="navbar navbar-expand fixed-top" data-bs-theme="light" style={{ top: '2cm', marginLeft: '12.4cm' }}>
-                <div className="container-fluid" style={{ position: 'relative' }}>
-                    <div className="collapse navbar-collapse" id="top-menu" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                        <ul className="navbar-nav me-auto" style={{ textAlign: 'center' }}>
-
-                            {/*-----------------------------*/}
+                    {/* 중앙 네비게이션 메뉴 */}
+                    <div
+                        className="collapse navbar-collapse"
+                        id="top-menu"
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            width: '100%',
+                            marginTop: '2cm'  // 중앙 네비게이션 메뉴를 2cm 아래로 내림
+                        }}
+                    >
+                        <ul className="navbar-nav" style={{ display: 'flex', gap: '20px', fontSize: '18px', listStyle: 'none' }}>
+                            {/* Auctions 메뉴 */}
                             <li className="nav-item dropdown">
                                 <a
                                     className="nav-link dropdown-toggle"
@@ -174,7 +150,7 @@ const Menu = () => {
                                     aria-haspopup="true"
                                     aria-expanded={dropdownStates.auctions ? 'true' : 'false'}
                                     onClick={() => toggleDropdown('auctions')}
-                                    style={{ fontWeight: 'bold', fontSize: '18px', }}
+                                    style={{ fontWeight: 'bold' }}
                                 >
                                     Auctions
                                 </a>
@@ -183,8 +159,8 @@ const Menu = () => {
                                 </div>
                             </li>
 
-                            {/*-----------------------------*/}
-                            <li className="nav-item dropdown" style={{ marginLeft: '1.5cm' }}>
+                            {/* Services 메뉴 */}
+                            <li className="nav-item dropdown">
                                 <a
                                     className="nav-link dropdown-toggle"
                                     data-bs-toggle="dropdown"
@@ -193,7 +169,7 @@ const Menu = () => {
                                     aria-haspopup="true"
                                     aria-expanded={dropdownStates.services ? 'true' : 'false'}
                                     onClick={() => toggleDropdown('services')}
-                                    style={{ fontWeight: 'bold', fontSize: '18px' }}
+                                    style={{ fontWeight: 'bold' }}
                                 >
                                     Services
                                 </a>
@@ -214,8 +190,8 @@ const Menu = () => {
                                 </div>
                             </li>
 
-                            {/*-----------------------------*/}
-                            <li className="nav-item dropdown" style={{ marginLeft: '1.5cm' }}>
+                            {/* Author 메뉴 */}
+                            <li className="nav-item dropdown">
                                 <a
                                     className="nav-link dropdown-toggle"
                                     data-bs-toggle="dropdown"
@@ -224,7 +200,7 @@ const Menu = () => {
                                     aria-haspopup="true"
                                     aria-expanded={dropdownStates.author ? 'true' : 'false'}
                                     onClick={() => toggleDropdown('author')}
-                                    style={{ fontWeight: 'bold', fontSize: '18px' }}
+                                    style={{ fontWeight: 'bold' }}
                                 >
                                     Author
                                 </a>
@@ -233,61 +209,101 @@ const Menu = () => {
                                 </div>
                             </li>
 
-                            {/*-----------------------------*/}
+                            {/* Sell 메뉴 (회원만 표시) */}
                             {memberRank === '회원' && (
-                                <>
-                                    <li className="nav-item dropdown" style={{ marginLeft: '1.5cm' }}>
-                                        <a
-                                            className="nav-link dropdown-toggle"
-                                            data-bs-toggle="dropdown"
-                                            href="#"
-                                            role="button"
-                                            aria-haspopup="true"
-                                            aria-expanded={dropdownStates.sell ? 'true' : 'false'}
-                                            onClick={() => toggleDropdown('sell')}
-                                            style={{ fontWeight: 'bold', fontSize: '18px' }}
-                                        >
-                                            Sell
-                                        </a>
-                                        <div className={`dropdown-menu ${dropdownStates.sell ? 'show' : ''}`}>
-                                            <NavLink className="dropdown-item" to="/payment">결제</NavLink>
-                                            <NavLink className="dropdown-item" to="/charge">충전/환불</NavLink>
-                                        </div>
-                                    </li>
-                                </>
+                                <li className="nav-item dropdown">
+                                    <a
+                                        className="nav-link dropdown-toggle"
+                                        data-bs-toggle="dropdown"
+                                        href="#"
+                                        role="button"
+                                        aria-haspopup="true"
+                                        aria-expanded={dropdownStates.sell ? 'true' : 'false'}
+                                        onClick={() => toggleDropdown('sell')}
+                                        style={{ fontWeight: 'bold' }}
+                                    >
+                                        Sell
+                                    </a>
+                                    <div className={`dropdown-menu ${dropdownStates.sell ? 'show' : ''}`}>
+                                        <NavLink className="dropdown-item" to="/payment">결제</NavLink>
+                                        <NavLink className="dropdown-item" to="/charge">충전/환불</NavLink>
+                                    </div>
+                                </li>
                             )}
 
-                            {/*-----------------------------*/}
+                            {/* Manager 메뉴 (관리자만 표시) */}
                             {memberRank === '관리자' && (
-
-                                <>
-                                    <li className="nav-item dropdown" style={{ marginLeft: '1.5cm' }}>
-                                        <a
-                                            className="nav-link dropdown-toggle"
-                                            data-bs-toggle="dropdown"
-                                            href="#"
-                                            role="button"
-                                            aria-haspopup="true"
-                                            aria-expanded={dropdownStates.manager ? 'true' : 'false'}
-                                            onClick={() => toggleDropdown('manager')}
-                                            style={{ fontWeight: 'bold', fontSize: '18px' }}
-                                        >
-                                            Manager
-                                        </a>
-                                        <div className={`dropdown-menu ${dropdownStates.manager ? 'show' : ''}`}>
-                                            <NavLink className="dropdown-item" to="/admin/member/list">회원조회</NavLink>
-                                            <NavLink className="dropdown-item" to="/giveup">취소 물품 확인</NavLink>
-                                             <NavLink className="nav-link" to="/paymentcancel">취소시키기</NavLink>
-                                            <button className="nav-link btn" onClick={handleShowModal}>
-                                                1:1 채팅방
-                                            </button>
-                                        </div>
-                                    </li>
-                                </>
-
+                                <li className="nav-item dropdown">
+                                    <a
+                                        className="nav-link dropdown-toggle"
+                                        data-bs-toggle="dropdown"
+                                        href="#"
+                                        role="button"
+                                        aria-haspopup="true"
+                                        aria-expanded={dropdownStates.manager ? 'true' : 'false'}
+                                        onClick={() => toggleDropdown('manager')}
+                                        style={{ fontWeight: 'bold' }}
+                                    >
+                                        Manager
+                                    </a>
+                                    <div className={`dropdown-menu ${dropdownStates.manager ? 'show' : ''}`}>
+                                        <NavLink className="dropdown-item" to="/admin/member/list">회원조회</NavLink>
+                                        <NavLink className="dropdown-item" to="/giveup">취소 물품 확인</NavLink>
+                                        <NavLink className="nav-link" to="/paymentcancel">취소시키기</NavLink>
+                                        <button className="nav-link btn" onClick={handleShowModal}>
+                                            1:1 채팅방
+                                        </button>
+                                    </div>
+                                </li>
                             )}
                         </ul>
                     </div>
+
+
+                    {/* 오른쪽 상단: 로그인/회원가입 및 마이페이지/로그아웃 */}
+                    <ul
+                        className="navbar-nav"
+                        style={{
+                            display: 'flex',
+                            gap: '10px',
+                            fontSize: '12px',
+                            marginRight: '100px',
+                            flexDirection: 'row',  // 가로로 나열되도록 설정
+                            alignItems: 'center',  // 세로 중앙 정렬
+                        }}
+                    >
+                        {login ? (
+                            <>
+                                <li className="nav-item">
+                                    <NavLink className="nav-link" to="/member/mypage">
+                                    Mypage{/* Mypage ({blocked && memberRank !== '관리자' ? '차단된' : ''} {memberRank}) */}
+                                    </NavLink>
+                                </li>
+                                <li className="nav-item">
+                                    <span style={{ margin: '0 5px' }}>|</span>
+                                </li>
+                                <li className="nav-item">
+                                    <NavLink className="nav-link" to="/" onClick={logout}>
+                                        LogOut
+                                    </NavLink>
+                                </li>
+                            </>
+                        ) : (
+                            <>
+                                <li className="nav-item">
+                                    <NavLink className="nav-link" to="/check" style={{ whiteSpace: 'nowrap' }}>회원가입</NavLink>
+                                </li>
+                                <li className="nav-item">
+                                    <span style={{ margin: '0 5px' }}>|</span>
+                                </li>
+                                <li className="nav-item">
+                                    <NavLink className="nav-link" to="/login" style={{ whiteSpace: 'nowrap' }}>LogIn</NavLink>
+                                </li>
+                            </>
+                        )}
+                    </ul>
+
+
                 </div>
             </nav>
 
