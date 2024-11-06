@@ -185,7 +185,7 @@ const Auction = () => {
 
     const sendMessage = useCallback(async () => {
         loadMemberPoint();
-        if(memberPoint<input.bid.bidPrice+input.bid.bidIncrement) {
+        if(memberPoint<(input.bid.bidPrice+input.bid.bidIncrement)*0.3) {
             window.alert("보유 포인트가 부족합니다.")
             return;
         }
@@ -200,6 +200,7 @@ const Auction = () => {
         }
         else {
             const bidResp = await axios.patch(`http://localhost:8080/auctionchat/${auctionNo}`, json.content);
+            console.log(bidResp.data.success)
             if (bidResp.data.success) {
                 window.alert(`LOT ${json.content.bid.auctionLot} ${json.content.bid.bidPrice + json.content.bid.bidIncrement}원 응찰에 성공하셨습니다.`);
             } else {
