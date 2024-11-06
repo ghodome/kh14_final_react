@@ -115,6 +115,12 @@ const MemberSearch = () => {
     const totalPages = Math.ceil(result.count / size);
     const startPage = Math.max(1, page - 4);
     const endPage = Math.min(totalPages, page + 4);
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ko-KR');  // 'ko-KR'은 한국 날짜 형식 (yyyy. MM. dd)
+    };
+    
     return (
         <div className="row">
             {/* 왼쪽 - 검색 결과 */}
@@ -124,19 +130,19 @@ const MemberSearch = () => {
                     <table className="table mt-4 table-hover">
                         <thead>
                             <tr>
-                                <th>아이디</th>
-                                <th>이름</th>
-                                <th>이메일</th>
-                                <th>가입일</th>
+                                <th style={{ width: '25%' }}>아이디</th>
+                                <th style={{ width: '25%', whiteSpace: 'nowrap' }}>이름</th>
+                                <th style={{ width: '25%' }}>이메일</th>
+                                <th style={{ width: '25%' }}>가입일</th>
                             </tr>
                         </thead>
                         <tbody>
                             {result.memberList.map(member => (
                                 <tr key={member.memberId} onClick={() => handleMemberClick(member.memberId)}>
-                                    <td>{member.memberId}</td>
-                                    <td>{member.memberName}</td>
-                                    <td>{member.memberEmail}</td>
-                                    <td>{member.memberJoinDate}</td>
+                                    <td style={{ width: '25%' }}>{member.memberId}</td>
+                                    <td style={{ width: '25%', whiteSpace: 'nowrap' }}>{member.memberName}</td>
+                                    <td style={{ width: '25%' }}>{member.memberEmail}</td>
+                                    <td style={{ width: '25%' }}>{formatDate(member.memberJoinDate)}</td>
                                 </tr>
                             ))}
                         </tbody>
