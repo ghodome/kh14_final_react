@@ -20,6 +20,7 @@ const App = () => {
  useEffect(()=>{
    refreshLogin();
  }, []);
+ 
 
  //callback
  const refreshLogin = useCallback(async ()=>{
@@ -59,8 +60,8 @@ const App = () => {
   return (<>
 
     <Menu />
-    <Container />
-    <div id='wrapper'>
+    <div id='wrapper' style={{minHeight:'600px'}}>
+    <Container />0
      
     </div>
     <Footer/>
@@ -69,3 +70,4 @@ const App = () => {
 }
 
 export default App;
+  

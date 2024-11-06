@@ -35,3 +35,12 @@
 .footer-icons a:hover {
     color: #ccc;
 }
+/* 전체 페이지 레이아웃을 flexbox로 구성 */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  
