@@ -21,7 +21,6 @@ const PaymentCancel = ()=>{
                 paymentDetailNo: detail.paymentDetailNo,
             };
             setCancelList(cancelData); // 상태는 여전히 업데이트하되, post 요청에 직접 전달
-            console.log(cancelData);
             // cancelData를 바로 사용하여 post 요청 전송
             const resp = await axios.post("http://localhost:8080/payment/cancel", cancelData);
             alert("환불이 완료되었습니다.");
@@ -37,7 +36,7 @@ const PaymentCancel = ()=>{
             <table className="table">
                 <thead>
                     <tr>
-                        <th>작품 번호(paymentDetailNo)</th>
+                        <th>개별 구매상품 번호(paymentDetailNo)</th>
                         <th>사용자명</th>
                         <th>작품명</th>
                         <th>가격</th>
