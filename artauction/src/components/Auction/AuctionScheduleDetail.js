@@ -1,6 +1,6 @@
 import { Navigate, useNavigate, useParams } from "react-router";
 import Jumbotron from "../Jumbotron";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import moment from "moment";
 import "moment/locale/ko";  //moment 한국어 정보 불러오기
@@ -185,6 +185,7 @@ const AuctionScheduleDetail = ()=>{
         setImages(fileList.length > 0 ? loadImages : (target.attachment ? [target.attachment] : []));
     
         clearTarget();
+        clearEditState();
         setImages([]); // 미리보기 이미지 초기화
         setAttachImages([]); // 추가 첨부 이미지 초기화
         loadAuctionSchedule();
@@ -326,7 +327,90 @@ const AuctionScheduleDetail = ()=>{
         }
     },[auctionList]);
 
+    // 일정 수정 입력검사
+    const [scheduleEditFileValid, setScheduleEditFileValid] = useState(true);
+    const [scheduleEditTitleValid, setScheduleEditTitleValid] = useState(true);
+    const [scheduleEditStartDateValid, setScheduleEditStartDateValid] = useState(true);
+    const [scheduleEditEndDateValid, setScheduleEditEndDateValid] = useState(true);
+    const [scheduleEditStateValid, setScheduleEditStateValid] = useState(true);
+    const [scheduleEditNoticeValid, setScheduleEditNoticeValid] = useState(true);
+
+    const [scheduleEditFileClass, setScheduleEditFileClass] = useState("");
+    const [scheduleEditTitleClass, setScheduleEditTitleClass] = useState("");
+    const [scheduleEditStartDateClass, setScheduleEditStartDateClass] = useState("");
+    const [scheduleEditEndDateClass, setScheduleEditEndDateClass] = useState("");
+    const [scheduleEditStateClass, setScheduleEditStateClass] = useState("");
+    const [scheduleEditNoticeClass, setScheduleEditNoticeClass] = useState("");
+
+    const checkScheduleEditFile = useCallback(()=> {
+        const valid = (target.attachList && target.attachList.length > 0);
+        setScheduleEditFileValid(valid);
+        if (!target.attachList || target.attachList.length === 0) {
+            setScheduleEditFileClass("");
+        } else {
+            setScheduleEditFileClass(valid ? "is-valid" : "is-invalid");
+        }
+    }, [target]);
+
+    const checkScheduleEditTitle = useCallback(()=>{
+        const regex = /^([ㄱ-힣a-zA-Z!@#$%^&*~()_+-=\s]{1,100})$/;
+        const valid = regex.test(target.auctionScheduleTitle);
+        setScheduleEditTitleValid(valid);
+        if(target.auctionScheduleTitle.length === 0) setScheduleEditTitleClass("");
+        else setScheduleEditTitleClass(valid ? "is-valid" : "is-invalid");
+    }, [target]);
+
+    const checkScheduleEditStartDate = useCallback(()=>{
+        const valid = target.auctionScheduleStartDate !== null;
+        setScheduleEditStartDateValid(valid);
+        if(target.auctionScheduleStartDate.length === 0) setScheduleEditStartDateClass("");
+        else setScheduleEditStartDateClass(valid ? "is-valid" : "is-invalid");
+    }, [target]);
+
+    const checkScheduleEditEndDate = useCallback(()=>{
+        const valid = target.auctionScheduleEndDate !== null;
+        setScheduleEditEndDateValid(valid);
+        if(target.auctionScheduleEndDate.length === 0) setScheduleEditEndDateClass("");
+        else setScheduleEditEndDateClass(valid ? "is-valid" : "is-invalid");
+    }, [target]);
     
+    const checkScheduleEditState = useCallback(()=>{
+        const valid = ["예정경매", "진행경매", "종료경매"].includes(target.auctionScheduleState);
+        setScheduleEditStateValid(valid);
+        if(target.auctionScheduleState.length === 0) setScheduleEditStateClass("");
+        else setScheduleEditStateClass(valid ? "is-valid" : "is-invalid");
+    }, [target]);
+
+    const checkScheduleEditNotice = useCallback(()=>{
+        const regex = /^([ㄱ-힣a-zA-Z!@#$%^&*~()_+-=\s]{1,300})$/;
+        const valid = regex.test(target.auctionScheduleNotice);
+        setScheduleEditNoticeValid(valid);
+        if(target.auctionScheduleNotice.length === 0) setScheduleEditNoticeClass("");
+        else setScheduleEditNoticeClass(valid ? "is-valid" : "is-invalid");
+    }, [target]);
+    
+    const isAllValid = useMemo(()=>{
+        return scheduleEditFileValid && scheduleEditTitleValid && scheduleEditStartDateValid 
+                && scheduleEditEndDateValid && scheduleEditStateValid && scheduleEditNoticeValid
+    }, [scheduleEditFileValid, scheduleEditTitleValid, scheduleEditStartDateValid, 
+        scheduleEditEndDateValid, scheduleEditStateValid, scheduleEditNoticeValid]);
+    
+    const clearEditState = useCallback(()=>{
+        setScheduleEditFileValid(true);
+        setScheduleEditTitleValid(true);
+        setScheduleEditStartDateValid(true);
+        setScheduleEditEndDateValid(true);
+        setScheduleEditStateValid(true);
+        setScheduleEditNoticeValid(true);
+
+        setScheduleEditFileClass("");
+        setScheduleEditTitleClass("");
+        setScheduleEditStartDateClass("");
+        setScheduleEditEndDateClass("");
+        setScheduleEditStateClass("");
+        setScheduleEditNoticeClass("");
+    }, []);
+
     //view
     return (<>
 
@@ -415,67 +499,79 @@ const AuctionScheduleDetail = ()=>{
             <div className="modal-dialog">
                 <div className="modal-content">
 
-                    <div className="modal-header">
-                        <h5 className="modal-title">
-                            경매 일정 수정
-                        </h5>
-                        <button type="button" className="btn-close" 
-                            data-bs-dismiss="modal" aria-label="Close"
-                            onClick={closeEditModal}>
-                        <span aria-hidden="true"></span>
-                        </button>
+                <div className="modal-header">
+                        <h5 className="modal-title">경매 일정 수정</h5>
+                        <button type="button" className="btn-close" onClick={closeEditModal}></button>
                     </div>
 
                     <div className="modal-body">
-                        <div className="row mt-4">
-                            <div className="col">
-                                <label>경매 일정명</label>
-                                <input type="text" className="form-control mb-4" 
-                                        name="auctionScheduleTitle" value={target.auctionScheduleTitle} 
-                                        onChange={changeTarget}/>
-                                                
-                                <label>일정 시작일</label>
-                                <input type="datetime-local" className="form-control mb-4" 
-                                    name="auctionScheduleStartDate" value={target.auctionScheduleStartDate} 
-                                    onChange={changeTarget}/>
+                        <label className="mt-4">일정명</label>
+                        <input type="text" className={`form-control mb-3 ${scheduleEditTitleClass}`} 
+                            name="auctionScheduleTitle" value={target.auctionScheduleTitle} 
+                            onChange={e=>changeTarget(e)} autoComplete="off" 
+                            onBlur={checkScheduleEditTitle} onFocus={checkScheduleEditTitle}/>
+                        <div className="valid-feedback"></div>
+                        <div className="invalid-feedback"></div>
+                                        
+                        <label className="mt-2">시작일</label>
+                        <input type="datetime-local" className={`form-control mb-3 ${scheduleEditStartDateClass}`}
+                            name="auctionScheduleStartDate" value={target.auctionScheduleStartDate}
+                            onChange={e=>changeTarget(e)} autoComplete="off" 
+                            onBlur={checkScheduleEditStartDate} onFocus={checkScheduleEditStartDate}/>
+                        <div className="valid-feedback"></div>
+                        <div className="invalid-feedback"></div>
 
-                                <label>일정 종료일</label>
-                                <input type="datetime-local" className="form-control mb-4" 
-                                        name="auctionScheduleEndDate" value={target.auctionScheduleEndDate} 
-                                        onChange={changeTarget}/>
-                                                
-                                <label>일정 상태</label>
-                                <select className="form-select mb-4" name="auctionScheduleState" 
-                                        value={target.auctionScheduleState} onChange={changeTarget}>
-                                    <option value="">선택하세요</option>
-                                    <option>예정경매</option>
-                                    <option>진행경매</option>
-                                    <option>종료경매</option>
-                                </select>
+                        <label className="mt-2">종료일</label>
+                        <input type="datetime-local" className={`form-control mb-3 ${scheduleEditEndDateClass}`}
+                            name="auctionScheduleStartDate" value={target.auctionScheduleEndDate}
+                            onChange={e=>changeTarget(e)} autoComplete="off" 
+                            onBlur={checkScheduleEditEndDate} onFocus={checkScheduleEditEndDate}/>
+                        <div className="valid-feedback"></div>
+                        <div className="invalid-feedback"></div>
+                                            
+                        <label className="mt-2">일정상태</label>
+                        <select className={`form-select mb-3 ${scheduleEditStateClass}`} 
+                            name="auctionScheduleState" value={target.auctionScheduleState}
+                            onChange={e=>changeTarget(e)}
+                            onBlur={checkScheduleEditState} onFocus={checkScheduleEditState}>
+                            <option selected disabled value="">선택하세요</option>
+                                <option>예정경매</option>
+                                <option>진행경매</option>
+                                <option>종료경매</option>
+                        </select>
+                        <div className="valid-feedback"></div>
+                        <div className="invalid-feedback"></div>
 
-                                <label>안내사항</label>
-                                <textarea type="text" className="form-control mb-4" 
-                                    name="auctionScheduleNotice" value={target.auctionScheduleNotice} 
-                                    onChange={changeTarget}/>
+                        <label className="mt-2">안내사항</label>
+                        <textarea className={`form-control mb-3 ${scheduleEditNoticeClass}`} 
+                            name="auctionScheduleNotice" value={target.auctionScheduleNotice}
+                            onChange={e=>changeTarget(e)} autoComplete="off" 
+                            onBlur={checkScheduleEditNotice} onFocus={checkScheduleEditNotice} />
+                        <div className="valid-feedback"></div>
+                        <div className="invalid-feedback"></div>
 
-                                <label>사진 첨부</label><br/>
-                                    <input type="file" className="form-control" name="attachList" multiple accept="image/*"
-                                           onChange={changeTarget} ref={inputFileRef} />
-                                    {/* {images.map((image, index) => (
-                                        <img key={index} src={image} alt={`미리보기 ${index + 1}`} style={{ maxWidth: '100px', margin: '5px' }} />
-                                    ))} */}
-
+                        <label className="mt-2">사진첨부</label>
+                        <input type="file" className={`form-control ${scheduleEditFileClass}`}  
+                            name="attachList" multiple accept="image/*"
+                            onChange={e=>changeTarget(e)} ref={inputFileRef}
+                            onBlur={checkScheduleEditFile} onFocus={checkScheduleEditFile}/>
+                        {attachImages.map((image, index) => (
+                            <div key={index} style={{ position: "relative", display: "inline-block" }}>
+                              <img src={image} alt={`미리보기 ${index + 1}`} style={{ maxWidth: '100px', margin: '5px', display: "block" }} />
                             </div>
-                        </div>
+                        ))}
+                        <div className="valid-feedback"></div>
+                        <div className="invalid-feedback"></div>
+
                     </div>
 
                     <div className="modal-footer">
                         <button type="button" className="btn btn-success rounded-1"
-                                    onClick={saveTarget}>수정</button>
+                                    onClick={saveTarget} disabled={isAllValid === false}>수정</button>
                         <button type="button" className="btn btn-secondary btn-manual-close rounded-1" 
-                                    onClick={closeEditModal}>취소</button>
-                                    
+                                    onClick={closeEditModal}>취소</button>                   
                     </div>
+                    
                 </div>
             </div>
         </div>
