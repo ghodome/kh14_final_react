@@ -179,13 +179,13 @@ const Menu = () => {
                                     <NavLink className="dropdown-item" to="/work/list">작품</NavLink>
                                     {memberRank === '회원' && (
                                         <>
-                                            <li className="nav-item">
-                                                <button className="nav-link btn" onClick={createInquiryRoom}>
+                                            <div className="dropdown-item btn" onClick={createInquiryRoom}>
                                                     문의하기
-                                                </button>
-                                            </li>
-                                            <NavLink className="dropdown-item" to="/randomBox">랜덤박스</NavLink>
+                                            </div>
                                         </>
+                                    )}
+                                    {memberRank && (
+                                        <NavLink className="dropdown-item" to="/randomBox">랜덤박스</NavLink>
                                     )}
                                 </div>
                             </li>

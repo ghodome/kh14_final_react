@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Modal from "react-modal";
+import {Modal} from 'bootstrap';
 import { blockedState, memberIdState, memberRankState } from "../../utils/recoil";
 import { useRecoilState } from "recoil";
 

@@ -101,31 +101,30 @@ const Charge = ()=>{
         <div className="row mt-4">
             
             <div className="col-6">
-            <h2>포인트 충전</h2>
+            <h2 className="text-center">포인트 충전</h2>
                 <input className="form-control w-100" value={money.toLocaleString()} readOnly/>
                 <button className="btn btn-secondary m-3"onClick={e=>setMoney(money + 10000)}>+10,000</button>
                 <button className="btn btn-secondary m-3"onClick={e=>setMoney(money + 100000)}>+100,000</button>
-                <button className="btn btn-secondary m-3"onClick={e=>setMoney(money + 1000000)}>+1,000,000</button>
+                <button className="btn btn-secondary m-3"onClick={e=>setMoney(money + 1000000)}>+1,000,000</button><br/>
                 <button className="btn btn-secondary m-3"onClick={e=>setMoney(money + 10000000)}>+10,000,000</button>
                 <button className="btn btn-secondary m-3"onClick={e=>setMoney(money + 100000000)}>+100,000,000</button>
+                <button className="btn  btn-light text-dark "onClick={e=>setMoney(0)}>초기화하기</button>
                 <button className="btn btn-dark text-light float-end m-3" onClick={sendPurchaseRequest}>충전하기</button>
-                <button className="btn  btn-light text-dark float-end m-3"onClick={e=>setMoney(0)}>초기화하기</button>
             </div>
             <div className="col-6">
-            <h2>포인트 환불</h2>
+            <h2 className="text-center">포인트 환불</h2>
                 <input className="form-control w-100" value={refund.toLocaleString()} readOnly></input>
                 <button className="btn btn-secondary m-3"onClick={e=>setRefund(refund + 10000)}>+10,000</button>
                 <button className="btn btn-secondary m-3"onClick={e=>setRefund(refund + 100000)}>+100,000</button>
-                <button className="btn btn-secondary m-3"onClick={e=>setRefund(refund + 1000000)}>+1,000,000</button>
+                <button className="btn btn-secondary m-3"onClick={e=>setRefund(refund + 1000000)}>+1,000,000</button><br/>
                 <button className="btn btn-secondary m-3"onClick={e=>setRefund(refund + 10000000)}>+10,000,000</button>
                 <button className="btn btn-secondary m-3"onClick={e=>setRefund(refund + 100000000)}>+100,000,000</button>
 
+                <button className="btn  btn-light text-dark "onClick={e=>setRefund(0)}>초기화하기</button>
                 <button className="btn btn-dark text-light float-end m-3" onClick={handleShow}>환불하기</button>
-                <button className="btn  btn-light text-dark float-end m-3"onClick={e=>setRefund(0)}>초기화하기</button>
 
             </div>
         </div>
-        <h4 className="text-danger">최대 충전/환불 금액은 21억입니다.</h4>
 
          {/* 비밀번호 인증 모달 추가 */}
         <Modal
@@ -171,13 +170,19 @@ const Charge = ()=>{
                         </tr>
                     </thead>
                     <tbody>
-                        {list.map(list=>(
+                    {list.length === 0 ? (
+        <tr>
+            <td colSpan="3" className="text-center">충전내역이 없습니다</td>
+        </tr>
+    ) : (
+                        list.map(list=>(
                         <tr key={list.chargeNo}>
                             <td>{list?.chargeTotal.toLocaleString()||''}원</td>
                             <td>{list?.chargeTime||''}</td>
                             <td></td>
                         </tr>
-                        ))}
+                        ))
+                    )}
                     </tbody>
                 </table>
             </div>
