@@ -3,8 +3,8 @@ import Jumbotron from "../Jumbotron";
 import axios from "axios";
 import { Modal } from "bootstrap";
 import { NavLink } from "react-router-dom";
-import { useRecoilState } from "recoil";
-import { memberRankState } from "../../utils/recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { memberPointState, memberRankState } from "../../utils/recoil";
 import "../../index.css";
 
 const Items = () => {
@@ -13,6 +13,7 @@ const Items = () => {
     const [isButtonDisabled, setIsButtonDisabled] = useState(false); // 버튼 비활성화 상태
     const [memberRank, setMemberRank] = useRecoilState(memberRankState);
     const [boxClass, setBoxClass] = useState("random-box");
+    let memberPoint=useRecoilValue(memberPointState);
 
     // 페이지 로드 시 아이템 목록 로드
     useEffect(() => {
@@ -136,11 +137,11 @@ const Items = () => {
             </table>
 
             <div
-    className={boxClass}
-    onClick={openRandomBox} // 클릭 이벤트 추가
-    style={{ cursor: isButtonDisabled ? 'not-allowed' : 'pointer' }} // 비활성화 시 커서 스타일 변경
->    
-    </div>
+                className={boxClass}
+                onClick={openRandomBox} // 클릭 이벤트 추가
+                style={{ cursor: isButtonDisabled ? 'not-allowed' : 'pointer' }} // 비활성화 시 커서 스타일 변경
+            >
+            </div>
 
             {result && (
                 <div className="result-box">
@@ -153,6 +154,11 @@ const Items = () => {
                     )}
                 </div>
             )}
+            <div className="row">
+                <div className="col text-end mx-5">
+                    <span>보유 포인트 : {memberPoint.toLocaleString("ko-KR")}</span>
+                </div>
+            </div>    
 
             {/* 모달 */}
             <div className="modal fade" tabIndex="-1" ref={insertModal} data-bs-backdrop="static">

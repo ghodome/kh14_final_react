@@ -7,6 +7,7 @@ import 'moment/locale/ko';
 import Jumbotron from '../Jumbotron';
 import { useRecoilValue } from 'recoil';
 import { memberRankState } from '../../utils/recoil';
+import EmptyPagePlaceHolder from '../TempComp/EmptyPagePlaceHolder';
 moment.locale('ko');
 
 
@@ -257,7 +258,7 @@ const AuctionSchedule = () => {
                         </div>
                         ))
                     ) : (
-                        <div>경매 일정이 없습니다.</div>
+                        <EmptyPagePlaceHolder message='경매 일정이 없습니다.'/>
                     )}
                     
                     <div className="row">
