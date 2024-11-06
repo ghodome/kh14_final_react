@@ -227,7 +227,6 @@ const AuctionScheduleDetail = ()=>{
         tag.hide();
         clearTarget(); 
     }, [editModal]);
-
     
     //출품작 목록
     const loadAuctionList=useCallback(async ()=>{   //출품작 불러오기
@@ -282,11 +281,14 @@ const AuctionScheduleDetail = ()=>{
     //출품 등록
     const registPresentInput=useCallback(async ()=>{
         try {
+            if(presentInput.auctionStartPrice.substring(presentInput.auctionStartPrice.length-2)!=='00') {
+                window.alert("시작가격은 100원 단위여야 합니다.");
+                return;
+            }
             const resp=await axios.post(`http://localhost:8080/auction/`, presentInput);
             console.log(presentInput.auctionLot===null)
             if(resp.status===200) 
                 window.alert("출품작 등록 완료");
-            console.log("!!");
             clearPresentInput();
         closePresentModal();
         loadAuctionList();
@@ -477,18 +479,18 @@ const AuctionScheduleDetail = ()=>{
             </div>
 
             {/* 관리자 기능 */}
-            <div className="row mt-2">    
+            {memberRank==='관리자'&&<div className="row mt-2">    
                 <div className="col text-end">
-                {memberRank==='관리자'&&<button className="btn btn-primary ms-2 rounded-1" 
-                                    onClick={openPresentModal}>출품등록</button>}
-                    <button className="btn btn-outline-dark ms-2 rounded-1"
+                <button className="btn btn-primary ms-2 rounded-1" 
+                                    onClick={openPresentModal}>출품등록</button>
+                    <button className="btn btn-success ms-2 rounded-1"
                                     onClick={e=>navigate("/auctionList/"+auctionScheduleNo)}>경매보기</button>
-                    {memberRank==='관리자'&&<button className="btn btn-warning ms-2 rounded-1" 
-                                onClick={e=>openEditModal(auctionSchedule)}>일정수정</button>}
-                    {memberRank==='관리자'&&<button className="btn btn-danger ms-2 rounded-1" 
-                                onClick={e=>deleteAuctionSchedule(auctionSchedule)}>일정삭제</button>}
+                    <button className="btn btn-warning ms-2 rounded-1" 
+                                onClick={e=>openEditModal(auctionSchedule)}>일정수정</button>
+                    <button className="btn btn-danger ms-2 rounded-1" 
+                                onClick={e=>deleteAuctionSchedule(auctionSchedule)}>일정삭제</button>
                 </div>
-            </div>
+            </div>}
 
         </div>
 
@@ -608,15 +610,23 @@ const AuctionScheduleDetail = ()=>{
                                         <div className="card-text">{auction.workMaterials}</div>
                                         <div className="card-text">{auction.workCategory}</div>
                                         <div className="text-end mt-4">
-                                        <button type="button" className="btn btn-outline-dark card-text ms-2 rounded-1" 
+                                        <div className="row mt-1">
+                                            <div className="col">
+                                                <button type="button" className="btn btn-outline-dark card-text ms-2 rounded-1" 
                                                     onClick={e=>navigate(`/auction/detail/${auction.auctionNo}`)}
                                                     disabled={auction.auctionState=='종료경매'}>입찰상세</button>
-                                        {memberRank==='관리자'&&<button type="button" className="btn btn-warning card-text ms-2 rounded-1" onClick={e => cancelLot(auction)}>취소</button>}
-                                        {memberRank==='관리자'&&<button type="button" className="btn btn-danger card-text ms-2 rounded-1" onClick={e => deleteLot(auction)}>삭제</button>}
+                                            </div>
+                                        </div>
+                                        <div className="row mt-1">
+                                            <div className="col">
+                                                {memberRank==='관리자'&&<button type="button" className="btn btn-warning card-text ms-2 rounded-1" onClick={e => cancelLot(auction)}>취소</button>}
+                                                {memberRank==='관리자'&&<button type="button" className="btn btn-danger card-text ms-2 rounded-1" onClick={e => deleteLot(auction)}>삭제</button>}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
                         )
                     ))}
                 </ul>

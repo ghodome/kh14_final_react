@@ -9,7 +9,7 @@ const EmptyPagePlaceHolder =({ message = "데이터가 없습니다." })=>{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            height: '100vh',   // 화면 전체 높이로 중앙 배치
+            height: '70vh',   // 화면 전체 높이로 중앙 배치
             textAlign: 'center',
         },
         content: {
@@ -43,9 +43,9 @@ const EmptyPagePlaceHolder =({ message = "데이터가 없습니다." })=>{
             <div style={styles.content}>
                 <div style={styles.icon}>📄</div>
                 <h2 style={styles.message}>{message}</h2>
-                    <button className="btn btn-dark m-2" onClick={e=>navigate(-1)}>
+                    {/* <button className="btn btn-dark m-2" onClick={e=>navigate(-1)}>
                         뒤로 가기
-                    </button>
+                    </button> */}
             </div>
         </div>
     </>);

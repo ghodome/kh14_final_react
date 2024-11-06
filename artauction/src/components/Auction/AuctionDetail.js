@@ -9,7 +9,6 @@ import moment from "moment";
 import styles from './auction.module.css';
 import { FaArrowUp } from "react-icons/fa";
 import { FaArrowDown } from "react-icons/fa";
-import { TbRadar2, TbRadioactiveOff, TbZoomMoney } from "react-icons/tb";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { Modal } from "bootstrap";
 import Time from "../time/Time";
@@ -186,6 +185,10 @@ const Auction = () => {
 
     const sendMessage = useCallback(async () => {
         loadMemberPoint();
+        if(memberPoint<input.bid.bidPrice+input.bid.bidIncrement) {
+            window.alert("보유 포인트가 부족합니다.")
+            return;
+        }
         const json = { content: input };
 
         if (client === null || !connect) {
@@ -205,7 +208,7 @@ const Auction = () => {
         }
         // 응찰 성공 후 새 bidPrice 업데이트를 위해 loadAuctionAndWork 호출
         loadAuctionAndWork();
-    }, [input, client, connect, auctionAndWork, blocked]);
+    }, [input, client, connect, auctionAndWork, blocked, memberPoint]);
 
     const increaseBidIncrement = useCallback(() => {
         setInput({
@@ -294,13 +297,15 @@ const Auction = () => {
             <div className={styles.auctionContainer}>
                 <div className="mt-5 text-center">
                     {auctionAndWork && (<h4>{auctionAndWork.auctionScheduleNo}주차 경매 현황</h4>)}
-                    <ul className="list-group" style={{height:'10em'}}>
+                    <ul className="list-group bg-light border border-top-1" style={{height:'13.5em'}}>
                         {messageList.slice(-5).map((message, index) => (
-                            <div className="row" key={index}>
-                                <div className="col">
+                            <div className="row mt-1" key={index}>
+                                <div className="col-9 text-center ps-3">
                                     <p>{message.content.contentForSchedule}</p>
-                                    <p className="text-muted">
-                                        {(message.content.bidtime)}
+                                </div>
+                                <div className="col-3">
+                                    <p className="text-muted text-end pe-3">
+                                        {moment(message.content.bidTime).format('H:mm:ss')}
                                     </p>
                                 </div>
                             </div>
@@ -312,215 +317,182 @@ const Auction = () => {
                     <>
                         <div className="row mt-4">
                             <div className="col-7">
-                                {/* 작품 상세내용  */}
+                                
+                                <div className="border p-3 rounded bg-light">
+                                {/* 작품 상세내용 */}
                                 <div className="row my-2 text-center">
                                     <div className="col">
-                                    {workImage.attachment === null || workImage.attachment === undefined ? (
-                                        <img src="https://placehold.co/300x200"
-                                        className="img-thumbnail rounded-1" alt="" 
-                                        height='250px' width='450px' />
-                                    ) : (
-                                        <img src={`http://localhost:8080/attach/download/${workImage.attachment}`} 
-                                                className="img-thumbnail rounded-1" alt="이미지 정보 없음" 
-                                                height='250px' width='450px' />
-                                     )}
+                                        {workImage.attachment ? (
+                                            <img 
+                                                src={`http://localhost:8080/attach/download/${workImage.attachment}`} 
+                                                className="img-thumbnail rounded-1 shadow-sm" 
+                                                alt="이미지 정보 없음" 
+                                                height="250px" 
+                                                width="450px" 
+                                            />
+                                        ) : (
+                                            <img 
+                                                src="https://placehold.co/300x200"
+                                                className="img-thumbnail rounded-1 shadow-sm" 
+                                                alt="이미지 정보 없음" 
+                                                height="250px" 
+                                                width="450px" 
+                                            />
+                                        )}
                                     </div>
                                 </div>
-                                <div className="row my-2">
-                                    <div className="col">
-                                        {auctionAndWork.workTitle}
+                                    <div className="row my-2">
+                                        <div className="col font-weight-bold">{auctionAndWork.workTitle}</div>
                                     </div>
-                                </div>
-                                <div className="row my-2">
-                                    <div className="col">
-                                        {auctionAndWork.workDescription}
+                                    <div className="row my-2">
+                                        <div className="col text-muted">{auctionAndWork.workDescription}</div>
                                     </div>
-                                </div>
-                                <div className="row my-2">
-                                    <div className="col">
-                                        {auctionAndWork.workMaterials}
+                                    <div className="row my-2">
+                                        <div className="col">{auctionAndWork.workMaterials}</div>
                                     </div>
-                                </div>
-                                <div className="row my-2">
-                                    <div className="col">
-                                        {auctionAndWork.workSize}
+                                    <div className="row my-2">
+                                        <div className="col">{auctionAndWork.workSize}</div>
                                     </div>
-                                </div>
-                                <div className="row my-2">
-                                    <div className="col">
-                                        {auctionAndWork.workCategory}
+                                    <div className="row my-2">
+                                        <div className="col">{auctionAndWork.workCategory}</div>
                                     </div>
-                                </div>
-                                <div className="row my-2">
-                                    <div className="col">
-                                        {auctionAndWork.workTitle}
+                                    {/* 작가 사진 */}
+                                    <div className="row my-2">
+                                        <div className="col text-muted">{auctionAndWork.artistName}</div>
                                     </div>
-                                </div>
-                                <div className="row my-2">
-                                    <div className="col">
-                                        {auctionAndWork.artistName}
+                                    <div className="row my-2">
+                                        <div className="col">{auctionAndWork.artistDescription}</div>
                                     </div>
-                                </div>
-                                <div className="row my-2">
-                                    <div className="col">
-                                        {auctionAndWork.artistDescription}
+                                    <div className="row my-2">
+                                        <div className="col">{auctionAndWork.artistMaterials}</div>
                                     </div>
-                                </div>
-                                <div className="row my-2">
-                                    <div className="col">
-                                        {auctionAndWork.artistMaterials}
-                                    </div>
-                                </div>
-                                <div className="row my-2">
-                                    <div className="col">
-                                        {auctionAndWork.artistBirth} ~  {auctionAndWork.artistDeath}
-                                    </div>
-                                </div>
-                                <div className="row my-2">
-                                    <div className="col">
-
+                                    <div className="row my-2">
+                                        <div className="col">
+                                            {auctionAndWork.artistBirth} ~ {auctionAndWork.artistDeath}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-5 m-0 p-0">
-                                <h2>LOT {auctionAndWork.auctionLot}</h2>
-                                <div className="row mt-2">
-                                    <div className="col-6">
-                                        일정번호 : {auctionAndWork.auctionScheduleNo}
-                                    </div>
-                                    <div className="col-6">
-                                        작품번호 : {auctionAndWork.workNo}
+
+                            <div className="col-5 m-0 p-0 border-left">
+                                <div className="px-3 py-2 bg-dark text-white rounded-top">
+                                    <h3>LOT {auctionAndWork.auctionLot}</h3>
+                                </div>
+
+                                <div className="p-3 border bg-light">
+                                    <div className="row">
+                                        <div className="col-6">일정번호: <span className="font-weight-bold">{auctionAndWork.auctionScheduleNo}</span></div>
+                                        <div className="col-6 text-end">작품번호: <span className="font-weight-bold">{auctionAndWork.workNo}</span></div>
                                     </div>
                                 </div>
-                                        <div className="col">
-                                            <div className="col">경매 진행 상황</div>
-                                            <div className="col"></div>
+
+                                <div className="p-3 bg-white shadow-sm rounded">
+                                    <h5 className="mb-3">경매 진행 상황</h5>
+                                    <div className="row mb-1">
+                                        <div className="col-6">추정가</div>
+                                        <div className="col-6 text-end font-weight-bold">{auctionAndWork.auctionLowPrice.toLocaleString('ko-KR')} 원</div>
                                     </div>
-                                    <div className="col">
-                                        <div className="row">
-                                            <div className="row">
-                                                <div className="col-4">추정가</div>
-                                                <div className="col-8 text-end">{auctionAndWork.auctionLowPrice.toLocaleString('ko-KR')} 원</div>
-                                            </div>
+                                    <div className="row mb-1">
+                                        <div className="col-6">~</div>
+                                        <div className="col-6 text-end font-weight-bold">{auctionAndWork.auctionHighPrice.toLocaleString('ko-KR')} 원</div>
+                                    </div>
+                                    <div className="row mb-1">
+                                        <div className="col-6">시작가</div>
+                                        <div className="col-6 text-end font-weight-bold">{auctionAndWork.auctionStartPrice.toLocaleString('ko-KR')} 원</div>
+                                    </div>
+                                    <div className="row mb-1">
+                                        <div className="col-6">현재가</div>
+                                        <div className="col-6 text-end">
+                                            <span className="font-weight-bold">{input?.bid.bidPrice.toLocaleString('ko-KR')} 원</span>
+                                            <span className="ml-2 text-muted">({auctionAndWork.auctionBidCnt} 회)</span>
                                         </div>
                                     </div>
-                                    <div className="col">
-                                        <div className="row">
-                                            <div className="row">
-                                                <div className="col-4">~</div>
-                                                <div className="col-8 text-end">{auctionAndWork.auctionHighPrice.toLocaleString('ko-KR')} 원</div>
-                                            </div>
+                                    <div className="row mb-1">
+                                        <div className="col-6">호가 단위</div>
+                                        <div className="col-6 text-end">
+                                            <span onClick={openBidIncrementModal} className="text-info cursor-pointer">
+                                                <IoMdInformationCircleOutline />
+                                            </span>
+                                            <span className="font-weight-bold ml-1">{bidIncrement?.toLocaleString('ko-KR')} 원</span>
                                         </div>
                                     </div>
-                                        <div className="col">
-                                            <div className="row">
-                                                <div className="row">
-                                                    <div className="col-4">시작가</div>
-                                                    <div className="col-8 text-end">{auctionAndWork.auctionStartPrice.toLocaleString('ko-KR')} 원</div>
-                                                </div>
-                                            </div>
+                                    <div className="row mb-1">
+                                        <div className="col-6">마감 시간</div>
+                                        <div className="col-6 text-end">{moment(auctionAndWork.auctionEndDate).format('YYYY년 MM월 DD일 H:mm:ss')}</div>
+                                    </div>
+                                    <div className="row mb-1">
+                                        <div className="col-6">남은 시간</div>
+                                        <div className="col-6 text-end"><Time endDate={auctionAndWork.auctionEndDate}/></div>
+                                    </div>
+                                    <div className="row mb-1">
+                                        <div className="col-6">보유 포인트</div>
+                                        <div className="col-6 text-end font-weight-bold">
+                                            {point ? point.toLocaleString('ko-KR') : memberPoint?.toLocaleString('ko-KR')}
                                         </div>
-                                        <div className="col">
-                                            <div className="row">
-                                                <div className="row">
-                                                    <div className="col-5">현재가</div>
-                                                    <div className="col-2">{auctionAndWork.auctionBidCnt} 회</div>
-                                                    <div className="col-5 text-end">
-                                                        {input&&input.bid.bidPrice.toLocaleString('ko-KR')} 원</div>
-                                                </div>
-                                            </div>
+                                    </div>
+                                    <div className="row mb-1">
+                                        <div className="col-6">응찰 방법</div>
+                                        <div className="col-6 text-end font-weight-bold">
+                                            
                                         </div>
-                                        <div className="col">
-                                            <div className="row">
-                                                <div className="row">
-                                                    <div className="col-5">호가 단위</div>
-                                                    <div className="col-6 text-end">{bidIncrement&&bidIncrement.toLocaleString('ko-KR')} 원</div>
-                                                    <div className="col-1">
-                                                        <div onClick={e => openBidIncrementModal()}>
-                                                            <IoMdInformationCircleOutline /></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col">
-                                            <div className="row">
-                                                <div className="row">
-                                                    <div className="col-4">마감 시간</div>
-                                                    <div className="col-8 text-end">{moment(auctionAndWork.auctionEndDate).format('yyyy년 MM월 DD일 H:mm:ss')}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col">
-                                            <div className="row">
-                                                <div className="row">
-                                                    <div className="col-4">남은 시간</div>
-                                                    <div className="col-8 text-end"><Time endDate={auctionAndWork.auctionEndDate}/></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col">
-                                            <div className="row">
-                                                <div className="row">
-                                                    <div className="col-4">보유 포인트</div>
-                                                    <div className="col-8 text-end">{point?point.toLocaleString('ko-KR'):memberPoint&&memberPoint.toLocaleString('ko-KR')}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col">
-                                            <div className="p-0">
-                                                    {login && (
-                                                        <>
-                                                                {blocked ? (
-                                                                    <div className="text-danger mb-2" style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '10px' }}>
-                                                                        응찰 금지된 회원입니다.
-                                                                    </div>
-                                                                ) : (
-                                                                        <div className="input-group flex-nowrap">
-                                                                            {/* 버튼 */}
-                                                                            <button 
-                                                                                type="button" 
-                                                                                className="btn btn-dark rounded-0" 
-                                                                                onClick={increaseBidIncrement}>
-                                                                                <FaArrowUp />
-                                                                            </button>
-                                                                                <button 
-                                                                                    type="button" 
-                                                                                    className="btn btn-light rounded-0" 
-                                                                                    onClick={decreaseBidIncrement}>
-                                                                                    <FaArrowDown />
-                                                                                </button>
-                                                                                <input
-                                                                                    type="text"
-                                                                                    className="flex-grow-1 text-center"
-                                                                                    value={
-                                                                                        input.bid.bidPrice !== 0 
-                                                                                            ? input.bid.bidPrice + input.bid.bidIncrement
-                                                                                            : auctionAndWork.auctionStartPrice + auctionAndWork.auctionBidIncrement
-                                                                                    }
-                                                                                    onChange={e =>
-                                                                                        setInput(prev => ({
-                                                                                            ...prev,
-                                                                                            bid: {
-                                                                                                ...prev.bid,
-                                                                                                bidPrice: e.target.value > 0 ? e.target.value : 0,
-                                                                                            },
-                                                                                        }))
-                                                                                    }
-                                                                                    placeholder="응찰 가격을 입력하세요"
-                                                                                />
-                                                                                <button 
-                                                                                    type="button" 
-                                                                                    className="btn btn-dark rounded-0" 
-                                                                                    onClick={sendMessage}>
-                                                                                    응찰
-                                                                                </button>
-                                                                            {/* 버튼 끝 */}
-                                                                        </div>
-                                                                )}
-                                                        </>
+                                    </div>
+                                </div>
+
+                                <div className="col">
+                                    <div className="p-0">
+                                            {login && (
+                                                <>
+                                                        {blocked ? (
+                                                            <div className="text-danger mb-2" style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '10px' }}>
+                                                                응찰 금지된 회원입니다.
+                                                            </div>
+                                                        ) : (
+                                                                <div className="input-group flex-nowrap">
+                                                                    {/* 버튼 */}
+                                                                    <button 
+                                                                        type="button" 
+                                                                        className="btn btn-dark rounded-0" 
+                                                                        onClick={increaseBidIncrement}>
+                                                                        <FaArrowUp />
+                                                                    </button>
+                                                                        <button 
+                                                                            type="button" 
+                                                                            className="btn btn-light rounded-0" 
+                                                                            onClick={decreaseBidIncrement}>
+                                                                            <FaArrowDown />
+                                                                        </button>
+                                                                        <input
+                                                                            type="text"
+                                                                            className="flex-grow-1 text-center"
+                                                                            value={
+                                                                                input.bid.bidPrice !== 0 
+                                                                                    ? input.bid.bidPrice + input.bid.bidIncrement
+                                                                                    : auctionAndWork.auctionStartPrice + auctionAndWork.auctionBidIncrement
+                                                                            }
+                                                                            onChange={e =>
+                                                                                setInput(prev => ({
+                                                                                    ...prev,
+                                                                                    bid: {
+                                                                                        ...prev.bid,
+                                                                                        bidPrice: e.target.value > 0 ? e.target.value : 0,
+                                                                                    },
+                                                                                }))
+                                                                            }
+                                                                            placeholder="응찰 가격을 입력하세요"
+                                                                        />
+                                                                        <button 
+                                                                            type="button" 
+                                                                            className="btn btn-dark rounded-0" 
+                                                                            onClick={sendMessage}>
+                                                                            응찰
+                                                                        </button>
+                                                                    {/* 버튼 끝 */}
+                                                                </div>
                                                         )}
-                                            </div>
-                                        </div>
+                                                </>
+                                                )}
+                                    </div>
+                                </div>
                                 <ul className="list-group">
                                     {messageList && messageList.slice().reverse().map((message, index) => (
                                         <div className="row" key={index}>
