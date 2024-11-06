@@ -61,14 +61,14 @@ const ChargeSuccess = ()=>{
    return (<>
        <div className="row mt-4">
            <div className="col">
-             <h1>포인트 구매 완료</h1>
+             <h1 className="text-center">포인트 구매 완료</h1>
            </div>
        </div>
        
    </>);
    }
    else{
-       return <h1>결제 승인 실패</h1>
+       return <h1>결제 승인 실패 문의 부탁드립니다</h1>
    }
 
 };
