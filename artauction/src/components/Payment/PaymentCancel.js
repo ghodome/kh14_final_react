@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
+import EmptyPagePlaceHolder from "../TempComp/EmptyPagePlaceHolder";
 
 const PaymentCancel = ()=>{
 
@@ -31,6 +32,9 @@ const PaymentCancel = ()=>{
     },[]);
     
     return(<>
+     {detailList.length === 0 ? (
+            <EmptyPagePlaceHolder message="취소할 결제 상품이 없습니다" />
+        ) : (
         <div className="mt-4">
             <div className="col">
             <table className="table">
@@ -59,6 +63,7 @@ const PaymentCancel = ()=>{
 
             </div>
         </div>
+          )}
     </>);
 };
 export default PaymentCancel;
