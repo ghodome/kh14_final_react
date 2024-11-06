@@ -291,7 +291,7 @@ const Menu = () => {
                         ) : (
                             <>
                                 <li className="nav-item">
-                                    <NavLink className="nav-link" to="/check" style={{ whiteSpace: 'nowrap' }}>회원가입</NavLink>
+                                    <NavLink className="nav-link" to="/check" style={{ whiteSpace: 'nowrap' }}>Join</NavLink>
                                 </li>
                                 <li className="nav-item">
                                     <span style={{ margin: '0 5px' }}>|</span>
