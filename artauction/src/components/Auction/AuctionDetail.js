@@ -492,11 +492,9 @@ const Auction = () => {
                                                                 </div>
                                                         )}
                                                 </>
-                                                ):(<div className="row mt-3">
-                                                    <div className="col-md-10 affset-md-1">
-                                                            <button type="button" className="btn btn-primary"
-                                                            onClick={e=>navigate("/login")}>로그인 후 응찰이 가능합니다</button>
-                                                    </div>
+                                                ):(<div className="input-group flex-nowrap">
+                                                        <button type="button" className="btn btn-primary rounded-0 w-100 m-0"
+                                                        onClick={e=>navigate("/login")}>로그인 후 응찰이 가능합니다</button>
                                                 </div>)}
                                     </div>
                                 </div>
