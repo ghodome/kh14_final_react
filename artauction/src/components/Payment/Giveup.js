@@ -22,12 +22,6 @@ const Giveup = () =>{
     //view
     return (
         <>
-            {list === null || list.length === 0 ? (<>
-                <h1>올바르지 못한 접근입니다</h1><hr/>
-                <NavLink className="nav-link" to="/"><h1>홈으로</h1></NavLink>
-                </>
-            ) : (
-                <>
                     <Jumbotron title="관리자용 폐기 물품 확인" />
                     <div className="row mt-4">
                         <div className="col">
@@ -43,7 +37,19 @@ const Giveup = () =>{
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {list.map(item => (
+                                {list.length === 0 ? (
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                <td>
+                                    <h2>낙찰 포기 상품이 없습니다</h2>
+                                </td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                    ) : (
+                                    list.map(item => (
                                         <tr key={item.dealNo}>
                                             <td>{item.dealBuyer}</td>
                                             <td>{item.dealNo}</td>
@@ -52,13 +58,12 @@ const Giveup = () =>{
                                             <td>{item.dealCancelTime}</td>
                                             <td>{item.dealStatus}</td>
                                         </tr>
-                                    ))}
+                                    )))}
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </>
-            )}
+               
         </>
     );
 };

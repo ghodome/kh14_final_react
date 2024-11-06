@@ -59,12 +59,9 @@ const ChargeSuccess = ()=>{
    }
    else if(result ===true){
    return (<>
-       <Jumbotron title="포인트 구매 완료"/>
        <div className="row mt-4">
            <div className="col">
-              <h3>홈으로</h3>
-              <h3>마이페이지로</h3>
-              <h3>경매 페이지로</h3>
+             <h1>포인트 구매 완료</h1>
            </div>
        </div>
        
