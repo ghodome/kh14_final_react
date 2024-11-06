@@ -22,7 +22,7 @@ const Giveup = () =>{
     //view
     return (
         <>
-                    <Jumbotron title="관리자용 폐기 물품 확인" />
+                <h2 className="text-center">포기 물품</h2>
                     <div className="row mt-4">
                         <div className="col">
                             <table className="table">
