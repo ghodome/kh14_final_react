@@ -119,7 +119,14 @@ const Payment = () => {
                 </thead>
 
                 <tbody>
-                    {dealList.map(deal => (
+                {dealList.length === 0 ? (
+            <tr>
+                <td colSpan="10" className="text-center">
+                    <h2>결제할 미술품이 없습니다</h2>
+                </td>
+            </tr>
+        ) : (
+                    dealList.map(deal => (
                         <tr key={deal.dealNo}>
                             <td>
                                 <input type="checkbox" className="form-check-input"
@@ -130,8 +137,8 @@ const Payment = () => {
                             <td>{deal.workTitle}</td>
                             <td>{deal.artistName}</td>
                             <td>{deal?.dealPrice.toLocaleString() || ''}원</td>
-                            <td>{(deal?.dealPrice*0.3).toLocaleString() || ''}원</td>
-                            <td>{(deal?.dealPrice*0.7).toLocaleString() || ''}원</td>
+                            <td>{(deal?.dealPrice*3/10).toLocaleString() || ''}원</td>
+                            <td>{(deal?.dealPrice*7/10).toLocaleString() || ''}원</td>
                             <td>{deal.dealTime}</td>
                             <td>{calculateDay(deal.dealTime)}</td>
                             <td>
@@ -143,14 +150,21 @@ const Payment = () => {
                                 <button className="btn btn-light text-dark" onClick={e=>sendGiveUp(deal.dealNo)}>결제 포기</button>
                             </td>
                         </tr>
-                    ))}
+                    ))
+                )}
                 </tbody>
             </table>
 
             <div className="row mt-4">
                 <div className="col">
-                    <h3>총 가격은 : {(checkedDealTotal*0.7)?.toLocaleString() || ''}원</h3>
-                    <button className="btn btn-dark text-light w-100" onClick={() => sendPurchaseRequest(checkedDealList)}>결제하기</button>
+                {checkedDealList.length === 0 ? (
+            <></>
+        ) : (
+            <>
+                <h3>총 가격은 : {(checkedDealTotal * 7 / 10)?.toLocaleString() || ''}원</h3>
+                <button className="btn btn-dark text-light w-100" onClick={() => sendPurchaseRequest(checkedDealList)}>결제하기</button>
+            </>
+        )}
                 </div>
             </div>
             

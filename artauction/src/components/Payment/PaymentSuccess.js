@@ -61,7 +61,7 @@ const PaymentSuccess = () =>{
    }
    else if(result ===true){
    return (<>
-       <Jumbotron title="경매 상품 구매 완료"/>
+       <h1>결제 상품 구매 완료</h1>
        <div className="row mt-4">
            <div className="col">
             <table className="table">
@@ -76,7 +76,7 @@ const PaymentSuccess = () =>{
                     {dealList.map(deal=>(
                     <tr key={deal.dealNo}>
                         <td>{deal.workTitle}</td>
-                        <td>{deal.dealPrice}</td>
+                        <td>{deal.dealPrice}.toLocaleString()||''</td>
                         <td>결제 완료</td>
                     </tr>
                     ))}
