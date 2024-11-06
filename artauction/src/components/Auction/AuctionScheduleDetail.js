@@ -5,11 +5,14 @@ import axios from "axios";
 import moment from "moment";
 import "moment/locale/ko";  //moment 한국어 정보 불러오기
 import { Modal } from "bootstrap";
+import { memberRankState } from "../../utils/recoil";
+import { useRecoilValue } from "recoil";
 moment.locale("ko");  //moment에 한국어를 기본 언어로 설정
 
 
 const AuctionScheduleDetail = ()=>{
-    
+    //recoil
+    const memberRank=useRecoilValue(memberRankState);
      //parameter
      const {auctionScheduleNo} = useParams();
 
@@ -326,7 +329,6 @@ const AuctionScheduleDetail = ()=>{
     
     //view
     return (<>
-        <Jumbotron title={auctionSchedule.auctionScheduleTitle} content={auctionScheduleNo + " 번 경매 일정 상세정보"}/>
 
         <div className="container w-50">  
             {/* 경매일정 이미지 */}
@@ -386,21 +388,21 @@ const AuctionScheduleDetail = ()=>{
                                     onClick={e=>navigate("/auctionList/"+auctionScheduleNo)}>경매참여</button>
                 )}
                     <button className="btn btn-outline-secondary ms-2 rounded-1" 
-                                    onClick={e=>navigate("/auctionschedule")}>뒤로가기</button>
+                                    onClick={e=>navigate("/auctionschedule")}>목록가기</button>
                 </div>
             </div>
 
             {/* 관리자 기능 */}
             <div className="row mt-2">    
                 <div className="col text-end">
-                    <button className="btn btn-primary ms-2 rounded-1" 
-                                    onClick={openPresentModal}>출품등록</button>
+                {memberRank==='관리자'&&<button className="btn btn-primary ms-2 rounded-1" 
+                                    onClick={openPresentModal}>출품등록</button>}
                     <button className="btn btn-outline-dark ms-2 rounded-1"
                                     onClick={e=>navigate("/auctionList/"+auctionScheduleNo)}>경매보기</button>
-                    <button className="btn btn-warning ms-2 rounded-1" 
-                                onClick={e=>openEditModal(auctionSchedule)}>일정수정</button>
-                    <button className="btn btn-danger ms-2 rounded-1" 
-                                onClick={e=>deleteAuctionSchedule(auctionSchedule)}>일정삭제</button>
+                    {memberRank==='관리자'&&<button className="btn btn-warning ms-2 rounded-1" 
+                                onClick={e=>openEditModal(auctionSchedule)}>일정수정</button>}
+                    {memberRank==='관리자'&&<button className="btn btn-danger ms-2 rounded-1" 
+                                onClick={e=>deleteAuctionSchedule(auctionSchedule)}>일정삭제</button>}
                 </div>
             </div>
 
@@ -513,8 +515,8 @@ const AuctionScheduleDetail = ()=>{
                                         <button type="button" className="btn btn-outline-dark card-text ms-2 rounded-1" 
                                                     onClick={e=>navigate(`/auction/detail/${auction.auctionNo}`)}
                                                     disabled={auction.auctionState=='종료경매'}>입찰상세</button>
-                                        <button type="button" className="btn btn-warning card-text ms-2 rounded-1" onClick={e => cancelLot(auction)}>취소</button>
-                                        <button type="button" className="btn btn-danger card-text ms-2 rounded-1" onClick={e => deleteLot(auction)}>삭제</button>
+                                        {memberRank==='관리자'&&<button type="button" className="btn btn-warning card-text ms-2 rounded-1" onClick={e => cancelLot(auction)}>취소</button>}
+                                        {memberRank==='관리자'&&<button type="button" className="btn btn-danger card-text ms-2 rounded-1" onClick={e => deleteLot(auction)}>삭제</button>}
                                         </div>
                                     </div>
                                 </div>
