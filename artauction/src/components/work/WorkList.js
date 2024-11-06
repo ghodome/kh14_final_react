@@ -6,8 +6,12 @@ import * as hangul from 'hangul-js';
 import Artist from './../Artist/Artist';
 import { MdCancel } from "react-icons/md";
 import Jumbotron from "../Jumbotron";
+import { useRecoilValue } from 'recoil';
+import { memberRankState } from "../../utils/recoil";
 
 const WorkList = () => {
+    //recoil
+    const memberRank = useRecoilValue(memberRankState);
 
     //state
     const [workList, setWorkList] = useState([]);
@@ -59,7 +63,7 @@ const WorkList = () => {
     const loadArtistList = useCallback(async () => {
         const resp = await axios.post("http://localhost:8080/artist/", inputKeyword);
         setArtistList(resp.data.artistList);
-    }, [artistList,inputKeyword]);
+    }, [artistList, inputKeyword]);
 
     const changeKeyword = useCallback(e => {
         setKeyword(e.target.value);
@@ -84,7 +88,7 @@ const WorkList = () => {
         });
     }, [keyword, artistList]);
 
-    useEffect(()=>{
+    useEffect(() => {
         loadArtistList();
     }, []);
 
@@ -179,7 +183,7 @@ const WorkList = () => {
         tag.show();
     }, [insertModal]);
 
-   
+
     const closeInsertModal = useCallback(() => {
         var tag = Modal.getInstance(insertModal.current);
         tag.hide();
@@ -288,17 +292,17 @@ const WorkList = () => {
 
     const changeTarget = useCallback(e => {
         const { name, value } = e.target;
-        if(e.target.type === "file") {
+        if (e.target.type === "file") {
             const files = Array.from(e.target.files);
-            setInput(prevInput =>({
+            setInput(prevInput => ({
                 ...prevInput,
                 attachList: files
             }));
-            const imageUrls = files.map(file=>{
-                const reader =new FileReader();
+            const imageUrls = files.map(file => {
+                const reader = new FileReader();
                 reader.readAsDataURL(file);
-                return new Promise ((resolve) => {
-                    reader.onloadend = () =>{
+                return new Promise((resolve) => {
+                    reader.onloadend = () => {
                         resolve(reader.result);
                     };
                 });
@@ -307,12 +311,12 @@ const WorkList = () => {
                 setAttachImages(urls);
             });
         }
-        else{
+        else {
             setInput(prevInput => ({
                 ...prevInput,
                 product: {
                     ...prevInput.work,
-                    [e.target.name] : e.target.value
+                    [e.target.name]: e.target.value
                 }
             }));
         }
@@ -379,11 +383,11 @@ const WorkList = () => {
     const saveTarget = useCallback(async () => {
         const formData = new FormData();
         const fileList = inputFileRef.current.files;
-    
+
         for (let i = 0; i < fileList.length; i++) {
             formData.append("attachList", fileList[i]);
         }
-    
+
         formData.append("workTitle", target.workTitle);
         formData.append("artistNo", target.artistNo);
         formData.append("workDescription", target.workDescription);
@@ -391,22 +395,22 @@ const WorkList = () => {
         formData.append("workSize", target.workSize);
         formData.append("workCategory", target.workCategory);
         formData.append("workNo", target.workNo);
-    
+
         // 이미지가 새로 첨부된 경우 loadImages를, 그렇지 않다면 target.attachment를 사용
         if (fileList.length > 0) {
             formData.append("originList", loadImages); // 새로 첨부된 파일이 있는 경우
         } else {
             formData.append("originList", target.attachment); // 첨부된 파일이 없는 경우 기존 목록 유지
         }
-    
+
         await axios.post("http://localhost:8080/work/edit", formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
         });
-    
+
         setImage(fileList.length > 0 ? loadImages : target.attachment); // 이미지 목록 업데이트
-    
+
         closeEditModal();
         loadWorkList();
     }, [target, loadImages]);
@@ -521,64 +525,64 @@ const WorkList = () => {
     const [workSizeClass, setWorkSizeClass] = useState("");
     const [workCategoryClass, setWorkCategoryClass] = useState("");
 
-    const checkWorkfile = useCallback(()=> {
-        const valid = input.attachList.length > 0 ;
+    const checkWorkfile = useCallback(() => {
+        const valid = input.attachList.length > 0;
         setWorkfileValid(valid);
-        if(input.attachList.length === 0) setWorkFileClass("");
+        if (input.attachList.length === 0) setWorkFileClass("");
         else setWorkfileClass(valid ? "is-valid" : "is-invalid");
     }, [input]);
 
-    const checkWorkTitle = useCallback(()=>{
+    const checkWorkTitle = useCallback(() => {
         const regex = /^.+$/;
         const valid = regex.test(input.workTitle);
         setWorkTitleValid(valid);
-        if(input.workTitle.length === 0) setWorkTitleClass("");
+        if (input.workTitle.length === 0) setWorkTitleClass("");
         else setWorkTitleClass(valid ? "is-valid" : "is-invalid");
     }, [input]);
 
-    const checkArtistNo = useCallback(()=> {
+    const checkArtistNo = useCallback(() => {
         const regex = /^.+$/;
         const valid = regex.test(input.artistNo);
         setArtistNoValid(valid);
-        if(input.artistNo.length === 0) setArtistNoClass();
+        if (input.artistNo.length === 0) setArtistNoClass();
         else setArtistNoClass(valid ? "is-valid" : "is-inValid");
     }, [input]);
 
-    const checkWorkDescription = useCallback(()=> {
+    const checkWorkDescription = useCallback(() => {
         const regex = /^.+$/;
-        const valid =  regex.test(input.workDescription);
+        const valid = regex.test(input.workDescription);
         setWorkDescriptionValid(valid);
-        if(input.workDescription.length === 0) setWorkDescriptionClass("");
+        if (input.workDescription.length === 0) setWorkDescriptionClass("");
         else setWorkDescriptionClass(valid ? "is-valid" : "is-inValid");
     }, [input]);
 
-    const checkWorkMaterials = useCallback(()=>{
+    const checkWorkMaterials = useCallback(() => {
         const regex = /^.+$/;
         const valid = regex.test(input.workMaterials);
         setWorkMaterialsValid(valid);
-        if(input.workMaterials.length === 0) setWorkMaterialsClass("");
+        if (input.workMaterials.length === 0) setWorkMaterialsClass("");
         else setWorkMaterialsClass(valid ? "is-valid" : "is-inValid");
     }, [input]);
 
-    const checkWorkSize = useCallback(()=>{
+    const checkWorkSize = useCallback(() => {
         const regex = /^.+$/;
         const valid = regex.test(input.workSize);
         setWorkSizeValid(valid);
-        if(input.workSize.length === 0) setWorkSizeClass("");
+        if (input.workSize.length === 0) setWorkSizeClass("");
         else setWorkSizeClass(valid ? "is-valid" : "is-inValid");
     }, [input]);
 
-    const checkWorkCategory = useCallback(()=> {
+    const checkWorkCategory = useCallback(() => {
         const regex = /^(근현대|아트|고미술)$/;
         const valid = regex.test(input.workCategory);
         setWorkCategoryValid(valid);
-        if(input.workCategory.length === 0) setWorkCategoryClass("");
+        if (input.workCategory.length === 0) setWorkCategoryClass("");
         else setWorkCategoryClass(valid ? "is-valid" : "is-inValid");
     }, [input]);
 
-    const isAllValid = useMemo(()=> {
+    const isAllValid = useMemo(() => {
         return workTitleValid && workfileValid && artistNoValid && workDescriptionValid
-                             && workMaterialsValid && workSizeValid && workCategoryValid;
+            && workMaterialsValid && workSizeValid && workCategoryValid;
     }, [workTitleValid, workfileValid, artistNoValid, workDescriptionValid, workMaterialsValid, workSizeValid, workCategoryValid]);
 
     const clearState = useCallback(() => {
@@ -589,7 +593,7 @@ const WorkList = () => {
         setWorkMaterialsValid(false);
         setWorkSizeValid(false);
         setWorkCategoryValid(false);
-    
+
         setWorkTitleClass("");
         setWorkfileClass("");
         setArtistNoClass("");
@@ -598,7 +602,7 @@ const WorkList = () => {
         setWorkSizeClass("");
         setWorkCategoryClass("");
     }, []);
-    
+
 
     //view
     return (<>
@@ -628,8 +632,6 @@ const WorkList = () => {
             </div>
         </div> */}
 
-        <Jumbotron title="작품 리스트" />
-
         <div className="row mt-4 text-center">
             <div className="col-2 offset-2">
                 <button className={collapse.workButton} name="work" onClick={changeCollapse}>전체</button>
@@ -655,16 +657,18 @@ const WorkList = () => {
             <div className="col text-start">
 
             </div>
-            <div className="col text-end">
-                <button className="btn btn-primary" onClick={openInsertModal}>등록</button>
-            </div>
+            {memberRank === '관리자' &&
+                <div className="col text-end">
+                    <button className="btn btn-primary" onClick={openInsertModal}>등록</button>
+                </div>
+            }
         </div>
 
 
         {collapse.work === true && (<>
             <div className="row text-end fw-bold">
                 <div className="col-10 offset-1">
-                    <div>검색결과 ({workList.length})</div>
+                <span>검색결과 (<b style={{color:'#00b894'}}>{workList.length}</b>)</span>
                 </div>
             </div>
             <div className="row">
@@ -725,7 +729,7 @@ const WorkList = () => {
         {collapse.modern === true && (<>
             <div className="row text-end fw-bold">
                 <div className="col-10 offset-1">
-                    <div>검색결과 ({modernList.length})</div>
+                <span>검색결과 (<b style={{color:'#00b894'}}>{modernList.length}</b>)</span>
                 </div>
             </div>
             <div className="row mt-4">
@@ -786,7 +790,7 @@ const WorkList = () => {
         {collapse.art === true && (<>
             <div className="row text-end fw-bold">
                 <div className="col-10 offset-1">
-                    <div>검색결과 ({artList.length})</div>
+                <span>검색결과 (<b style={{color:'#00b894'}}>{artList.length}</b>)</span>
                 </div>
             </div>
             <div className="row mt-4">
@@ -847,7 +851,7 @@ const WorkList = () => {
         {collapse.ancient === true && (<>
             <div className="row text-end fw-bold">
                 <div className="col-10 offset-1">
-                    <div>검색결과 ({ancientList.length})</div>
+                <span>검색결과 (<b style={{color:'#00b894'}}>{ancientList.length}</b>)</span>
                 </div>
             </div>
             <div className="row mt-4">
@@ -957,14 +961,14 @@ const WorkList = () => {
                             </div>
                         ))}
 
-                        
+
 
                         {isEditing && (
                             <div className="row mt-2">
                                 <div className="col">
                                     <label>이미지 수정</label>
                                     <input type="file" className="form-control" name="attachList" multiple
-                                        accept="image/*"  onChange={changeTarget} ref={inputFileRef}/>
+                                        accept="image/*" onChange={changeTarget} ref={inputFileRef} />
                                 </div>
                             </div>
                         )}
@@ -979,23 +983,23 @@ const WorkList = () => {
 
                         {/* 작가 선택 - select option */}
                         <div className="row mt-2">
-                                <div className="col">
-                                    <label>작가 선택</label>
-                                    <select
-                                        className="form-select"
-                                        name="artistNo"
-                                        value={target.artistNo}
-                                        disabled={!isEditing}
-                                        onChange={changeTarget}>
-                                        <option value="">선택</option>
-                                        {artistList.map(artist => (
-                                            <option key={artist.artistNo} value={artist.artistNo}>
-                                                {artist.artistNo} - {artist.artistName}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
+                            <div className="col">
+                                <label>작가 선택</label>
+                                <select
+                                    className="form-select"
+                                    name="artistNo"
+                                    value={target.artistNo}
+                                    disabled={!isEditing}
+                                    onChange={changeTarget}>
+                                    <option value="">선택</option>
+                                    {artistList.map(artist => (
+                                        <option key={artist.artistNo} value={artist.artistNo}>
+                                            {artist.artistNo} - {artist.artistName}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
+                        </div>
 
 
                         <div className="row mt-2">
@@ -1038,23 +1042,34 @@ const WorkList = () => {
 
                     {/* 모달 푸터 */}
                     <div className="modal-footer">
-                        <div className="row">
-                            <div className="col">
-                                <button type="button" className="btn btn-danger" onClick={e => deleteWork(target.workNo)}>
-                                    삭제
-                                </button>
+                        {memberRank === '관리자' &&
+                            <div className="row">
+                                <div className="col">
+                                    <button type="button" className="btn btn-danger" onClick={e => deleteWork(target.workNo)}>
+                                        삭제
+                                    </button>
+                                </div>
+                                <div className="col">
+                                    <button type="button" className="btn btn-success" onClick={toggleEditMode}>
+                                        {isEditing ? "완료" : "수정"}
+                                    </button>
+                                </div>
+                                <div className="col">
+                                    <button type="button" className="btn btn-primary" onClick={closeEditModal}>
+                                        확인
+                                    </button>
+                                </div>
                             </div>
-                            <div className="col">
-                                <button type="button" className="btn btn-success" onClick={toggleEditMode}>
-                                    {isEditing ? "완료" : "수정"}
-                                </button>
+                        }
+                        {memberRank !== '관리자' &&
+                            <div className="row text-end">
+                                <div className="col">
+                                    <button type="button" className="btn btn-primary" onClick={closeEditModal}>
+                                        확인
+                                    </button>
+                                </div>
                             </div>
-                            <div className="col">
-                                <button type="button" className="btn btn-primary" onClick={closeEditModal}>
-                                    확인
-                                </button>
-                            </div>
-                        </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -1082,8 +1097,8 @@ const WorkList = () => {
                             <div className="col">
                                 <label className="form-label">파일</label>
                                 {/*  multiple accept -> 어떤 형식 받을건가*/}
-                                <input type="file" className={"form-control "+workfileClass} name="attachList" multiple accept="image/*" onChange={changeInput} ref={inputFileRef} 
-                                                onBlur={checkWorkfile} onFocus={checkWorkfile}/>
+                                <input type="file" className={"form-control " + workfileClass} name="attachList" multiple accept="image/*" onChange={changeInput} ref={inputFileRef}
+                                    onBlur={checkWorkfile} onFocus={checkWorkfile} />
                                 <div className="valid-feedback"></div>
                                 <div className="invalid-feedback"></div>
                             </div>
@@ -1092,10 +1107,10 @@ const WorkList = () => {
                         <div className="row mt-2">
                             <div className="col">
                                 <label>작품명</label>
-                                <input type="text" className={"form-control "+workTitleClass} name="workTitle"
-                                    value={input.workTitle} onChange={changeInput} onBlur={checkWorkTitle} onFocus={checkWorkTitle}/>
+                                <input type="text" className={"form-control " + workTitleClass} name="workTitle"
+                                    value={input.workTitle} onChange={changeInput} onBlur={checkWorkTitle} onFocus={checkWorkTitle} />
                                 <div className="valid-feedback"></div>
-                                <div className="invalid-feedback"></div>    
+                                <div className="invalid-feedback"></div>
                             </div>
                         </div>
 
@@ -1103,7 +1118,7 @@ const WorkList = () => {
                             <div className="col">
                                 <label>작가 선택</label>
                                 <select
-                                    className={"form-select "+artistNoClass}
+                                    className={"form-select " + artistNoClass}
                                     name="artistNo"
                                     value={input.artistNo}
                                     onChange={changeInput}
@@ -1123,9 +1138,9 @@ const WorkList = () => {
                         <div className="row mt-2">
                             <div className="col">
                                 <label>작품설명</label>
-                                <textarea className={"form-control "+workDescriptionClass} id="exampleTextarea" rows="3"
+                                <textarea className={"form-control " + workDescriptionClass} id="exampleTextarea" rows="3"
                                     style={{ minHeight: '100px' }} name="workDescription"
-                                    value={input.workDescription} onChange={changeInput} onBlur={checkWorkDescription} onFocus={checkWorkDescription}/>
+                                    value={input.workDescription} onChange={changeInput} onBlur={checkWorkDescription} onFocus={checkWorkDescription} />
                                 <div className="valid-feedback"></div>
                                 <div className="invalid-feedback"></div>
                             </div>
@@ -1134,8 +1149,8 @@ const WorkList = () => {
                         <div className="rorw mt-2">
                             <div className="col">
                                 <label>작품재료</label>
-                                <input type="text" className={"form-control "+workMaterialsClass} name="workMaterials"
-                                    value={input.workMaterials} onChange={changeInput} onBlur={checkWorkMaterials} onFocus={checkWorkMaterials}/>
+                                <input type="text" className={"form-control " + workMaterialsClass} name="workMaterials"
+                                    value={input.workMaterials} onChange={changeInput} onBlur={checkWorkMaterials} onFocus={checkWorkMaterials} />
                                 <div className="valid-feedback"></div>
                                 <div className="invalid-feedback"></div>
                             </div>
@@ -1145,8 +1160,8 @@ const WorkList = () => {
                         <div className="row mt-2">
                             <div className="col">
                                 <label>작품크기</label>
-                                <input type="text" className={"form-control "+workSizeClass} placeholder="가로 X 세로" name="workSize"
-                                    value={input.workSize} onChange={changeInput} onBlur={checkWorkSize} onFocus={checkWorkSize}/>
+                                <input type="text" className={"form-control " + workSizeClass} placeholder="가로 X 세로" name="workSize"
+                                    value={input.workSize} onChange={changeInput} onBlur={checkWorkSize} onFocus={checkWorkSize} />
                                 <div className="valid-feedback"></div>
                                 <div className="invalid-feedback"></div>
                             </div>
@@ -1155,7 +1170,7 @@ const WorkList = () => {
                         <div className="rorw mt-2">
                             <div className="col">
                                 <label>작품분류</label>
-                                <select type="text" name="workCategory" className={"form-select "+workCategoryClass}
+                                <select type="text" name="workCategory" className={"form-select " + workCategoryClass}
                                     value={input.workCategory} onChange={changeInput} onBlur={checkWorkCategory} onFocus={checkWorkCategory}>
                                     <option value="" className="text-muted">선택하세요</option>
                                     <option>근현대</option>
