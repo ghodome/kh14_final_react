@@ -88,7 +88,6 @@ const Menu = () => {
         }
     }, [memberId, navigate]);
 
-    // 드롭다운 메뉴 상태 관리
     const [dropdownStates, setDropdownStates] = useState({
         auctions: false,
         services: false,
@@ -97,7 +96,6 @@ const Menu = () => {
         manager: false,
     });
 
-    // 드롭다운 토글 함수
     const toggleDropdown = (menu) => {
         setDropdownStates(prevState => ({
             ...prevState,
@@ -127,7 +125,6 @@ const Menu = () => {
                     >
                         <NavLink className="nav-link" to="/">Art Auction</NavLink>
                     </b>
-
                     {/* 중앙 네비게이션 메뉴 */}
                     <div
                         className="collapse navbar-collapse"
@@ -136,7 +133,7 @@ const Menu = () => {
                             display: 'flex',
                             justifyContent: 'center',
                             width: '100%',
-                            marginTop: '2cm'  // 중앙 네비게이션 메뉴를 2cm 아래로 내림
+                            marginTop: '2cm'  
                         }}
                     >
                         <ul className="navbar-nav" style={{ display: 'flex', gap: '20px', fontSize: '18px', listStyle: 'none' }}>
@@ -150,12 +147,27 @@ const Menu = () => {
                                     aria-haspopup="true"
                                     aria-expanded={dropdownStates.auctions ? 'true' : 'false'}
                                     onClick={() => toggleDropdown('auctions')}
-                                    style={{ fontWeight: 'bold' }}
+                                    style={{
+                                        fontWeight: 'bold',
+                                        padding: '10px 20px',
+                                        fontSize: '18px',  
+                                        borderRadius: '5px',  
+                                    }}
                                 >
                                     Auctions
                                 </a>
                                 <div className={`dropdown-menu ${dropdownStates.auctions ? 'show' : ''}`}>
-                                    <NavLink className="dropdown-item" to="/auctionschedule">경매</NavLink>
+                                    <NavLink
+                                        className="dropdown-item"
+                                        to="/auctionschedule"
+                                        style={{
+                                            padding: '10px 20px',  
+                                            fontSize: '18px',
+                                            borderRadius: '5px',  
+                                        }}
+                                    >
+                                        경매
+                                    </NavLink>
                                 </div>
                             </li>
 
@@ -169,23 +181,74 @@ const Menu = () => {
                                     aria-haspopup="true"
                                     aria-expanded={dropdownStates.services ? 'true' : 'false'}
                                     onClick={() => toggleDropdown('services')}
-                                    style={{ fontWeight: 'bold' }}
+                                    style={{
+                                        fontWeight: 'bold',
+                                        padding: '10px 20px',
+                                        fontSize: '18px',  
+                                        borderRadius: '5px',  
+                                    }}
                                 >
                                     Services
                                 </a>
                                 <div className={`dropdown-menu ${dropdownStates.services ? 'show' : ''}`}>
-                                    <NavLink className="dropdown-item" to="/notice">공지사항</NavLink>
-                                    <NavLink className="dropdown-item" to="/faq">FAQ</NavLink>
-                                    <NavLink className="dropdown-item" to="/work/list">작품</NavLink>
+                                    <NavLink
+                                        className="dropdown-item"
+                                        to="/notice"
+                                        style={{
+                                            padding: '10px 20px',  
+                                            fontSize: '18px',  
+                                            borderRadius: '5px',  
+                                        }}
+                                    >
+                                        공지사항
+                                    </NavLink>
+                                    <NavLink
+                                        className="dropdown-item"
+                                        to="/faq"
+                                        style={{
+                                            padding: '10px 20px',  
+                                            fontSize: '18px',  
+                                            borderRadius: '5px',  
+                                        }}
+                                    >
+                                        FAQ
+                                    </NavLink>
+                                    <NavLink
+                                        className="dropdown-item"
+                                        to="/work/list"
+                                        style={{
+                                            padding: '10px 20px',  
+                                            fontSize: '18px',  
+                                            borderRadius: '5px',  
+                                        }}
+                                    >
+                                        작품
+                                    </NavLink>
                                     {memberRank === '회원' && (
-                                        <>
-                                            <div className="dropdown-item btn" onClick={createInquiryRoom}>
-                                                    문의하기
-                                            </div>
-                                        </>
+                                        <div
+                                            className="dropdown-item btn"
+                                            onClick={createInquiryRoom}
+                                            style={{
+                                                padding: '10px 20px',  
+                                                fontSize: '18px',  
+                                                borderRadius: '5px',  
+                                            }}
+                                        >
+                                            문의하기
+                                        </div>
                                     )}
                                     {memberRank && (
-                                        <NavLink className="dropdown-item" to="/randomBox">랜덤박스</NavLink>
+                                        <NavLink
+                                            className="dropdown-item"
+                                            to="/randomBox"
+                                            style={{
+                                                padding: '10px 20px',  
+                                                fontSize: '18px',  
+                                                borderRadius: '5px',  
+                                            }}
+                                        >
+                                            랜덤박스
+                                        </NavLink>
                                     )}
                                 </div>
                             </li>
@@ -200,12 +263,27 @@ const Menu = () => {
                                     aria-haspopup="true"
                                     aria-expanded={dropdownStates.author ? 'true' : 'false'}
                                     onClick={() => toggleDropdown('author')}
-                                    style={{ fontWeight: 'bold' }}
+                                    style={{
+                                        fontWeight: 'bold',
+                                        padding: '10px 20px',  
+                                        fontSize: '18px',  
+                                        borderRadius: '5px',  
+                                    }}
                                 >
                                     Author
                                 </a>
                                 <div className={`dropdown-menu ${dropdownStates.author ? 'show' : ''}`}>
-                                    <NavLink className="dropdown-item" to="/artist">작가</NavLink>
+                                    <NavLink
+                                        className="dropdown-item"
+                                        to="/artist"
+                                        style={{
+                                            padding: '10px 20px',  
+                                            fontSize: '18px',  
+                                            borderRadius: '5px',  
+                                        }}
+                                    >
+                                        작가
+                                    </NavLink>
                                 </div>
                             </li>
 
@@ -220,13 +298,38 @@ const Menu = () => {
                                         aria-haspopup="true"
                                         aria-expanded={dropdownStates.sell ? 'true' : 'false'}
                                         onClick={() => toggleDropdown('sell')}
-                                        style={{ fontWeight: 'bold' }}
+                                        style={{
+                                            fontWeight: 'bold',
+                                            padding: '10px 20px',  
+                                            fontSize: '18px',  
+                                            borderRadius: '5px',  
+                                        }}
                                     >
                                         Sell
                                     </a>
                                     <div className={`dropdown-menu ${dropdownStates.sell ? 'show' : ''}`}>
-                                        <NavLink className="dropdown-item" to="/payment">결제</NavLink>
-                                        <NavLink className="dropdown-item" to="/charge">충전/환불</NavLink>
+                                        <NavLink
+                                            className="dropdown-item"
+                                            to="/payment"
+                                            style={{
+                                                padding: '10px 20px',  
+                                                fontSize: '18px',  
+                                                borderRadius: '5px',  
+                                            }}
+                                        >
+                                            결제
+                                        </NavLink>
+                                        <NavLink
+                                            className="dropdown-item"
+                                            to="/charge"
+                                            style={{
+                                                padding: '10px 20px',
+                                                fontSize: '18px',  
+                                                borderRadius: '5px',  
+                                            }}
+                                        >
+                                            충전/환불
+                                        </NavLink>
                                     </div>
                                 </li>
                             )}
@@ -242,15 +345,58 @@ const Menu = () => {
                                         aria-haspopup="true"
                                         aria-expanded={dropdownStates.manager ? 'true' : 'false'}
                                         onClick={() => toggleDropdown('manager')}
-                                        style={{ fontWeight: 'bold' }}
+                                        style={{
+                                            fontWeight: 'bold',
+                                            padding: '10px 20px',
+                                            fontSize: '18px',  
+                                            borderRadius: '5px',  
+                                        }}
                                     >
                                         Manager
                                     </a>
                                     <div className={`dropdown-menu ${dropdownStates.manager ? 'show' : ''}`}>
-                                        <NavLink className="dropdown-item" to="/admin/member/list">회원조회</NavLink>
-                                        <NavLink className="dropdown-item" to="/giveup">취소 물품 확인</NavLink>
-                                        <NavLink className="nav-link" to="/paymentcancel">취소시키기</NavLink>
-                                        <button className="nav-link btn" onClick={handleShowModal}>
+                                        <NavLink
+                                            className="dropdown-item"
+                                            to="/admin/member/list"
+                                            style={{
+                                                padding: '10px 20px',
+                                                fontSize: '18px',  
+                                                borderRadius: '5px',  
+                                            }}
+                                        >
+                                            회원조회
+                                        </NavLink>
+                                        <NavLink
+                                            className="dropdown-item"
+                                            to="/giveup"
+                                            style={{
+                                                padding: '10px 20px',  
+                                                fontSize: '18px',  
+                                                borderRadius: '5px',  
+                                            }}
+                                        >
+                                            취소 물품 확인
+                                        </NavLink>
+                                        <NavLink
+                                            className="nav-link"
+                                            to="/paymentcancel"
+                                            style={{
+                                                padding: '10px 20px',  
+                                                fontSize: '18px',  
+                                                borderRadius: '5px',  
+                                            }}
+                                        >
+                                            취소시키기
+                                        </NavLink>
+                                        <button
+                                            className="nav-link btn"
+                                            onClick={handleShowModal}
+                                            style={{
+                                                padding: '10px 20px',
+                                                fontSize: '18px',  
+                                                borderRadius: '5px',  
+                                            }}
+                                        >
                                             1:1 채팅방
                                         </button>
                                     </div>
@@ -258,6 +404,7 @@ const Menu = () => {
                             )}
                         </ul>
                     </div>
+
 
 
                     {/* 오른쪽 상단: 로그인/회원가입 및 마이페이지/로그아웃 */}
@@ -268,15 +415,15 @@ const Menu = () => {
                             gap: '10px',
                             fontSize: '12px',
                             marginRight: '100px',
-                            flexDirection: 'row',  // 가로로 나열되도록 설정
-                            alignItems: 'center',  // 세로 중앙 정렬
+                            flexDirection: 'row',  
+                            alignItems: 'center',  
                         }}
                     >
                         {login ? (
                             <>
                                 <li className="nav-item">
                                     <NavLink className="nav-link" to="/member/mypage">
-                                    Mypage{/* Mypage ({blocked && memberRank !== '관리자' ? '차단된' : ''} {memberRank}) */}
+                                        Mypage
                                     </NavLink>
                                 </li>
                                 <li className="nav-item">
@@ -291,7 +438,7 @@ const Menu = () => {
                         ) : (
                             <>
                                 <li className="nav-item">
-                                    <NavLink className="nav-link" to="/check" style={{ whiteSpace: 'nowrap' }}>회원가입</NavLink>
+                                    <NavLink className="nav-link" to="/check" style={{ whiteSpace: 'nowrap' }}>Join</NavLink>
                                 </li>
                                 <li className="nav-item">
                                     <span style={{ margin: '0 5px' }}>|</span>
@@ -337,7 +484,7 @@ const Menu = () => {
                             )}
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
         </>
