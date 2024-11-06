@@ -71,7 +71,7 @@ const Artist = () => {
   //페이지
   const sortedArtistList = [...artistList].sort();
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(15);
+  const [pageSize, setPageSize] = useState(10);
   const totalPage = Math.ceil(sortedArtistList.length / pageSize);
 
   const pageClick = useCallback((pageNumber) => {
@@ -234,7 +234,6 @@ const Artist = () => {
       }));
     }
   }, [setUpdateInput]);
-
 
   // const updateArtist = useCallback(async () => {
   //   const formData = new FormData();
