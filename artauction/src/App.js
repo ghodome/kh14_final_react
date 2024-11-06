@@ -60,8 +60,8 @@ const App = () => {
   return (<>
 
     <Menu />
-    <div id='wrapper' style={{minHeight:'600px'}}>
-    <Container />0
+    <div id='wrapper' style={{minHeight:'640px'}}>
+    <Container />
      
     </div>
     <Footer/>
