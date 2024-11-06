@@ -95,7 +95,7 @@ const MemberLogin = () => {
                                 value={input.memberId} onChange={changeInput}
                                 onKeyUp={e => e.key === 'Enter' && sendLoginRequest()} />
                             {memberIdError && (
-                                <div style={{ color: 'red', marginTop: '0.5rem' }}>
+                                <div className="d-flex justify-content-start" style={{ color: 'red', marginTop: '0.5rem' }}>
                                     {memberIdError}
                                 </div>
                             )}
@@ -124,7 +124,7 @@ const MemberLogin = () => {
                                 {display ? <RiEyeLine /> : <RiEyeOffLine />}
                             </span>
                             {memberPwError && (
-                                <div style={{ color: 'red', marginTop: '0.5rem' }}>
+                                <div className="d-flex justify-content-start" style={{ color: 'red', marginTop: '0.5rem' }}>
                                     {memberPwError}
                                 </div>
                             )}
