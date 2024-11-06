@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import { blockedState, loginState, memberIdState, memberPointState, memberRankState } from "../../utils/recoil";
+import { blockedState, loginState, memberIdState, memberPointState, memberRankState, endState } from "../../utils/recoil";
 import { useRecoilState, useRecoilValue } from "recoil";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
@@ -16,6 +16,7 @@ import Time from "../time/Time";
 const Auction = () => {
     //recoil
     const memberPoint=useRecoilValue(memberPointState);
+    const end=useRecoilValue(endState);
 
     //ref
     const bidModal = useRef();
@@ -441,7 +442,7 @@ const Auction = () => {
 
                                 <div className="col">
                                     <div className="p-0">
-                                            {login && (
+                                            {login ?(
                                                 <>
                                                         {blocked ? (
                                                             <div className="text-danger mb-2" style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '10px' }}>
@@ -453,16 +454,16 @@ const Auction = () => {
                                                                     <button 
                                                                         type="button" 
                                                                         className="btn btn-dark rounded-0" 
-                                                                        onClick={increaseBidIncrement}>
+                                                                        onClick={increaseBidIncrement} disabled={end}>
                                                                         <FaArrowUp />
                                                                     </button>
                                                                         <button 
                                                                             type="button" 
                                                                             className="btn btn-light rounded-0" 
-                                                                            onClick={decreaseBidIncrement}>
+                                                                            onClick={decreaseBidIncrement} disabled={end}>
                                                                             <FaArrowDown />
                                                                         </button>
-                                                                        <input
+                                                                        <input disabled={true}
                                                                             type="text"
                                                                             className="flex-grow-1 text-center"
                                                                             value={
@@ -484,14 +485,17 @@ const Auction = () => {
                                                                         <button 
                                                                             type="button" 
                                                                             className="btn btn-dark rounded-0" 
-                                                                            onClick={sendMessage}>
+                                                                            onClick={sendMessage} disabled={end}>
                                                                             응찰
                                                                         </button>
                                                                     {/* 버튼 끝 */}
                                                                 </div>
                                                         )}
                                                 </>
-                                                )}
+                                                ):(<div className="input-group flex-nowrap">
+                                                        <button type="button" className="btn btn-primary rounded-0 w-100 m-0"
+                                                        onClick={e=>navigate("/login")}>로그인 후 응찰이 가능합니다</button>
+                                                </div>)}
                                     </div>
                                 </div>
                                 <ul className="list-group">
