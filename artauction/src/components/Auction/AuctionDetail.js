@@ -77,7 +77,7 @@ const Auction = () => {
         });
     },[])
     const loadAuctionAndWork=useCallback(async ()=>{
-        const resp = await axios.get(`http://localhost:8080/auction/work/${auctionNo}`);
+        const resp = await axios.get(`/auction/work/${auctionNo}`);
         setAuctionAndWork(resp.data);
         setTranferTime(resp.data.auctionEndDate);
         setBidIncrementByPrice(resp.data.auctionBidPrice>0?resp.data.auctionBidPrice:resp.data.auctionStartPrice);
@@ -97,7 +97,7 @@ const Auction = () => {
 
     const loadWorkImage = useCallback(async () => {
         try {
-            const resp = await axios.get(`http://localhost:8080/auction/workImage/${auctionNo}`);
+            const resp = await axios.get(`/auction/workImage/${auctionNo}`);
             const data = resp.data[0] || {}; // data[0]가 없는 경우 빈 객체로 설정
             setWorkImage({
                 ...data,
@@ -140,12 +140,12 @@ const Auction = () => {
     }, [bidIncrement]);
 
     const loadMemberPoint=useCallback(async ()=>{
-        const resp=await axios.get(`http://localhost:8080/member/point`);
+        const resp=await axios.get(`/member/point`);
         setPoint(resp.data);
     },[point])
 
     const connectToServer = useCallback(() => {
-        const socket = new SockJS("http://localhost:8080/ws");
+        const socket = new SockJS(`${process.env.REACT_APP_BASE_URL}/ws`);
         const client = new Client({
             webSocketFactory: () => socket,
             onConnect: () => {
@@ -200,7 +200,7 @@ const Auction = () => {
             return;
         }
         else {
-            const bidResp = await axios.patch(`http://localhost:8080/auctionchat/${auctionNo}`, json.content);
+            const bidResp = await axios.patch(`/auctionchat/${auctionNo}`, json.content);
             console.log(bidResp.data.success)
             if (bidResp.data.success) {
                 window.alert(`LOT ${json.content.bid.auctionLot} ${json.content.bid.bidPrice + json.content.bid.bidIncrement}원 응찰에 성공하셨습니다.`);
@@ -234,7 +234,7 @@ const Auction = () => {
     },[input,bidIncrement]);
 
     const loadMessageList = useCallback(async () => {
-        const resp = await axios.get(`http://localhost:8080/bid/bidMessageList/${auctionNo}`);
+        const resp = await axios.get(`/bid/bidMessageList/${auctionNo}`);
         setWholeMessageList(resp.data);
     }, [wholeMessageList]);
 
@@ -281,7 +281,7 @@ const Auction = () => {
         const loadMember = async () => {
             if (login) { // 로그인 상태일 때만 요청
                 try {
-                    const resp = await axios.get(`http://localhost:8080/member/${memberId}`);
+                    const resp = await axios.get(`/member/${memberId}`);
                     setMember(resp.data);
                     setBlocked(resp.data.blocked);
                 } catch (error) {
@@ -299,6 +299,7 @@ const Auction = () => {
             <div className={styles.auctionContainer}>
                 <div className="mt-5 text-center">
                     {auctionAndWork && (<h4>{auctionAndWork.auctionScheduleNo}주차 경매 현황</h4>)}
+                    
                     <ul className="list-group bg-light border border-top-1" style={{height:'13.5em'}}>
                         {messageList.slice(-5).map((message, index) => (
                             <div className="row mt-1" key={index}>
@@ -326,7 +327,7 @@ const Auction = () => {
                                     <div className="col">
                                         {workImage.attachment ? (
                                             <img 
-                                                src={`http://localhost:8080/attach/download/${workImage.attachment}`} 
+                                                src={`${process.env.REACT_APP_BASE_URL}/attach/download/${workImage.attachment}`} 
                                                 className="img-thumbnail rounded-1 shadow-sm" 
                                                 alt="이미지 정보 없음" 
                                                 height="250px" 
@@ -371,6 +372,11 @@ const Auction = () => {
                                     <div className="row my-2">
                                         <div className="col">
                                             {auctionAndWork.artistBirth} ~ {auctionAndWork.artistDeath}
+                                        </div>
+                                    </div>
+                                    <div className="row text-end">
+                                        <div className="col">
+                                        <button className="btn btn-secondary rounded-1" onClick={e=>navigate(-1)}>목록 가기</button>
                                         </div>
                                     </div>
                                 </div>
@@ -457,25 +463,27 @@ const Auction = () => {
                                                                             onClick={decreaseBidIncrement} disabled={end}>
                                                                             <FaArrowDown />
                                                                         </button>
-                                                                        <input disabled={true}
-                                                                            type="text"
-                                                                            className="flex-grow-1 text-center"
-                                                                            value={
-                                                                                input.bid.bidPrice !== 0 
-                                                                                    ? input.bid.bidPrice + input.bid.bidIncrement
-                                                                                    : auctionAndWork.auctionStartPrice + auctionAndWork.auctionBidIncrement
-                                                                            }
-                                                                            onChange={e =>
-                                                                                setInput(prev => ({
-                                                                                    ...prev,
-                                                                                    bid: {
-                                                                                        ...prev.bid,
-                                                                                        bidPrice: e.target.value > 0 ? e.target.value : 0,
-                                                                                    },
-                                                                                }))
-                                                                            }
-                                                                            placeholder="응찰 가격을 입력하세요"
-                                                                        />
+                                                                        <div className="flex-grow-1 text-center"
+                                                                            // type="text" 백엔드 코드가 /10 *5 인데.. 10개단위로 5분씩 올라간단 말이죠
+                                                                            // className="flex-grow-1 text-center"
+                                                                            // value={
+                                                                                // input.bid.bidPrice !== 0 
+                                                                                //     ? input.bid.bidPrice + input.bid.bidIncrement
+                                                                                //     : auctionAndWork.auctionStartPrice + auctionAndWork.auctionBidIncrement
+                                                                            // }
+                                                                            // onChange={e =>
+                                                                            //     setInput(prev => ({
+                                                                            //         ...prev,
+                                                                            //         bid: {
+                                                                            //             ...prev.bid,
+                                                                            //             bidPrice: e.target.value > 0 ? e.target.value : 0,
+                                                                            //         },
+                                                                            //     }))
+                                                                            // }
+                                                                            // placeholder="응찰 가격을 입력하세요"
+                                                                        >{(input.bid.bidPrice !== 0 
+                                                                            ? input.bid.bidPrice + input.bid.bidIncrement
+                                                                            : auctionAndWork.auctionStartPrice + auctionAndWork.auctionBidIncrement).toLocaleString('ko-KR')}</div>
                                                                         <button 
                                                                             type="button" 
                                                                             className="btn btn-dark rounded-0" 
@@ -647,7 +655,7 @@ const Auction = () => {
                             </div>
                         </div>
                         <div className="col-5 m-0 p-0">
-                            <h2>LOT</h2>
+                        <h2>LOT</h2>
                             <div className="row mt-2">
                                 <div className="col-6">
                                     일정번호 : 
@@ -657,7 +665,9 @@ const Auction = () => {
                                 </div>
                             </div>
                             <div className="col">
-                                <div className="col">경매 진행 상황</div>
+                                <div className="col">경매 진행 상황
+                                    
+                                    </div>
                                 <div className="col"></div>
                             </div>
                             <div className="col">

@@ -41,7 +41,7 @@ const MemberSearch = () => {
 
     const handleFindClick = async () => {
         setPage(1); // 페이지를 첫 페이지로 리셋
-        const resp = await axios.post("http://localhost:8080/member/search", {
+        const resp = await axios.post("/member/search", {
             basicKeyword: basicSearch.keyword,
             searchColumn: searchColumn,
             isBlocked: input.isBlocked,
@@ -67,7 +67,7 @@ const MemberSearch = () => {
     };
     useEffect(() => {
         const fetchInitialData = async () => {
-            const resp = await axios.post("http://localhost:8080/member/search", {
+            const resp = await axios.post("/member/search", {
                 basicKeyword: basicSearch.keyword,
                 searchColumn: searchColumn,
                 isBlocked: input.isBlocked,

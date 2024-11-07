@@ -24,7 +24,7 @@ const AuctionList = ()=>{
 
     const loadAuctionDataCollectionList = useCallback(async()=>{
         try{
-        const resp = await axios.get(`http://localhost:8080/auction/auctionLotList/${auctionScheduleNo}`);
+        const resp = await axios.get(`/auction/auctionLotList/${auctionScheduleNo}`);
         // console.log("resp=", resp.data);
         setAuctionDataCollectionList(resp.data);
         } 
@@ -35,7 +35,7 @@ const AuctionList = ()=>{
 
     const loadAuctionScheduleInfo = useCallback(async()=>{
         try{
-            const resp = await axios.get(`http://localhost:8080/auction/auctionScheduleInfo/${auctionScheduleNo}`);
+            const resp = await axios.get(`/auction/auctionScheduleInfo/${auctionScheduleNo}`);
             // console.log("resp=", resp.data);
             setAuctionScheduleInfo(resp.data[0]);
             } 
@@ -83,7 +83,7 @@ const AuctionList = ()=>{
                                     className="card-img-top" alt="" 
                                     style={{ height: '100%', width: '100%', objectFit: 'cover' }}/>
                                 ) : (
-                                    <img src={`http://localhost:8080/attach/download/${auctionData.attachment}`} 
+                                    <img src={`${process.env.REACT_APP_BASE_URL}/attach/download/${auctionData.attachment}`} 
                                     className="card-img-top" alt="이미지 정보 없음" 
                                     style={{ height: '100%', width: '100%', objectFit: 'cover' }}/>
                                 )}

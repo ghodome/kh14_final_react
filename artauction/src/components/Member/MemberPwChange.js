@@ -51,7 +51,7 @@ const MemberPwChange = () => {
 
     const loadMember = useCallback(async () => {
         try {
-            const resp = await axios.get("http://localhost:8080/member/find");
+            const resp = await axios.get("/member/find");
             setMember(resp.data[0]);
         } catch (error) {
             console.error("Failed to load member data:", error);
@@ -85,7 +85,7 @@ const MemberPwChange = () => {
         }
 
         try {
-            const resp = await axios.post("http://localhost:8080/member/verfiyPw", null, {
+            const resp = await axios.post("/member/verfiyPw", null, {
                 params: {
                     memberId: member.memberId,
                     memberPw: currentPw
@@ -130,7 +130,7 @@ const MemberPwChange = () => {
         }
 
         try {
-            await axios.patch("http://localhost:8080/member/update", {
+            await axios.patch("/member/update", {
                 memberId: member.memberId,
                 memberPw: newPw
             });

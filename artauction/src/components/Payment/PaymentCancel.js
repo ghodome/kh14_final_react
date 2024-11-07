@@ -11,7 +11,7 @@ const PaymentCancel = ()=>{
     },[]);
     const [cancelList,setCancelList] = useState([]);
     const loadList = useCallback(async()=>{
-        const resp = await axios.get("http://localhost:8080/payment/detailList");
+        const resp = await axios.get("/payment/detailList");
         setDetailList(resp.data);
     },[]);
     const cancel = useCallback(async(detail)=>{
@@ -23,7 +23,7 @@ const PaymentCancel = ()=>{
             };
             setCancelList(cancelData); // 상태는 여전히 업데이트하되, post 요청에 직접 전달
             // cancelData를 바로 사용하여 post 요청 전송
-            const resp = await axios.post("http://localhost:8080/payment/cancel", cancelData);
+            const resp = await axios.post("/payment/cancel", cancelData);
             alert("환불이 완료되었습니다.");
         } catch (error) {
             alert("환불에 실패했습니다.");

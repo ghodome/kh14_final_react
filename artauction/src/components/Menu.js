@@ -30,7 +30,7 @@ const Menu = () => {
         const loadMember = async () => {
             if (login) {
                 try {
-                    const resp = await axios.get(`http://localhost:8080/member/${memberId}`);
+                    const resp = await axios.get(`/member/${memberId}`);
                     setMember(resp.data);
                     setBlocked(resp.data.blocked);
                 } catch (error) {
@@ -43,7 +43,7 @@ const Menu = () => {
 
     const handleShowModal = async () => {
         try {
-            const response = await axios.get("http://localhost:8080/room/");
+            const response = await axios.get("/room/");
             setRoomList(response.data);
             const modal = modalRef.current;
             modal.style.display = "block";
@@ -60,8 +60,8 @@ const Menu = () => {
     const deleteRoom = async (roomNo) => {
         if (window.confirm("정말로 삭제하시겠습니까?")) {
             try {
-                await axios.delete(`http://localhost:8080/room/${roomNo}`);
-                const response = await axios.get("http://localhost:8080/room/");
+                await axios.delete(`/room/${roomNo}`);
+                const response = await axios.get("/room/");
                 setRoomList(response.data);
             } catch (error) {
                 console.error("방 삭제 중 오류 발생:", error);
@@ -73,13 +73,13 @@ const Menu = () => {
         if (!memberId) return;
 
         try {
-            const response = await axios.get("http://localhost:8080/room/");
+            const response = await axios.get("/room/");
             const existingRoom = response.data.find(room => room.roomName === memberId);
 
             if (existingRoom) {
                 navigate(`/roomchat/${existingRoom.roomNo}`);
             } else {
-                const newRoomResponse = await axios.post("http://localhost:8080/room/", { roomName: memberId });
+                const newRoomResponse = await axios.post("/room/", { roomName: memberId });
                 const newRoomNo = newRoomResponse.data.roomNo;
                 navigate(`/roomchat/${newRoomNo}`);
             }

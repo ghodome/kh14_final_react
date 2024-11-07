@@ -25,7 +25,7 @@ const NoticeDetail = () => {
 
     //callback
     const loadNotice = useCallback(async () => {
-        const resp = await axios.get(`http://localhost:8080/notice/${noticeNo}`);
+        const resp = await axios.get(`/notice/${noticeNo}`);
         setNotice(resp.data);
         setNewNotice({
             title: resp.data.noticeTitle,
@@ -38,7 +38,7 @@ const NoticeDetail = () => {
         const confirmUpdate = window.confirm("정말로 수정하시겠습니까?");
         if (confirmUpdate) {
             try {
-                await axios.put(`http://localhost:8080/notice/`, {
+                await axios.put(`/notice/`, {
                     noticeNo: noticeNo,
                     noticeTitle: newNotice.title,
                     noticeType: newNotice.type,
@@ -56,7 +56,7 @@ const NoticeDetail = () => {
         const confirmDelete = window.confirm("정말로 삭제하시겠습니까?");
         if (confirmDelete) {
             try {
-                await axios.delete(`http://localhost:8080/notice/${noticeNo}`);
+                await axios.delete(`/notice/${noticeNo}`);
                 navigate("/notice");
             } catch (error) {
                 console.error("삭제 실패:", error);

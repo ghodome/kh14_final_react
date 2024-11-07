@@ -9,7 +9,7 @@ const Menu = ()=>{
 
       //callback
       const getTime = useCallback(async () => {
-          const resp = await axios.get("http://localhost:8080/time/");
+          const resp = await axios.get("/time/");
           const currentTime = resp.data;
           const date = new Date(currentTime);
           const timeDiff = currentTime.substring(20, 23);

@@ -59,12 +59,12 @@ const Home = () => {
     };
 
     const sendRankList = useCallback(async () => {
-        const resp = await axios.get("http://localhost:8080/deal/list");
+        const resp = await axios.get("/deal/list");
         setRankList(resp.data);
     }, []);
 
     const sendWorkList = useCallback(async () => {
-        const resp = await axios.post("http://localhost:8080/work/", inputKeyword);
+        const resp = await axios.post("/work/", inputKeyword);
         setWorkList(resp.data.workList);
     }, [inputKeyword]);
 
@@ -108,7 +108,7 @@ const Home = () => {
                             <div className="card h-100">
                                 <img
                                     className="card-img-top"
-                                    src={work.attachment ? `http://localhost:8080/attach/download/${work.attachment}` : "https://placehold.co/300x200"}
+                                    src={work.attachment ? `${process.env.REACT_APP_BASE_URL}/attach/download/${work.attachment}` : "https://placehold.co/300x200"}
                                     alt={`Image ${index + 1}`}
                                     style={{ height: 300, objectFit: 'cover', objectPosition: 'center' }}
                                 />

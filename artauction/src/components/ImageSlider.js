@@ -32,7 +32,7 @@ const ImageSlider = () => {
     const loadAuctionScheduleList = useCallback(async () => {
 
         try {
-            const resp = await axios.post("http://localhost:8080/auctionSchedule/home", {
+            const resp = await axios.post("/auctionSchedule/home", {
 
             });
             const list = resp.data.auctionScheduleList;
@@ -54,7 +54,7 @@ const ImageSlider = () => {
             <Slider {...settings}>
                 {auctionScheduleList.map((schedule, index) => (
                     <div key={index} className="slide">
-                        <img className="slide-image" src={schedule.attachment ? `http://localhost:8080/attach/download/${schedule.attachment}` : "https://placehold.co/300x200"} alt={`Image ${index + 1}`}
+                        <img className="slide-image" src={schedule.attachment ? `${process.env.REACT_APP_BASE_URL}/attach/download/${schedule.attachment}` : "https://placehold.co/300x200"} alt={`Image ${index + 1}`}
                             style={{ height: 250, width: '100%', objectFit: 'cover', objectPosition: 'center' }} />
                         <div className="text-overlay">
                             <h2>{schedule.auctionScheduleTitle}</h2>

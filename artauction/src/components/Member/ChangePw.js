@@ -49,7 +49,7 @@ const ChangePw = () => {
         }
 
         try {
-            const resp = await axios.post(`http://localhost:8080/member/changePw?token=${token}`, {
+            const resp = await axios.post(`/member/changePw?token=${token}`, {
                 newPw: newPw
             });
             // 성공적으로 비밀번호가 변경된 후 리다이렉트

@@ -20,11 +20,11 @@ const AuctionWholeWS = ()=>{
 
     //callback
     const connectToServer = useCallback(()=>{
-        const socket = new SockJS("http://localhost:8080/ws");
+        const socket = new SockJS("/ws");
     },[connect])
 
     const loadMessageList= useCallback(async ()=>{
-        const resp=await axios.get("http://localhost:8080/message/");
+        const resp=await axios.get("/message/");
         setMessageList(resp.data);
     },[messageList])
 

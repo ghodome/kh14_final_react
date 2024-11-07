@@ -156,7 +156,7 @@ const Artist = () => {
   }, [input]);
 
   const loadArtistList = useCallback(async () => {
-    const resp = await axios.post("http://localhost:8080/artist/", inputKeyword);
+    const resp = await axios.post("/artist/", inputKeyword);
     setArtistList(resp.data.artistList);
   }, [artistList, inputKeyword]);
 
@@ -175,7 +175,7 @@ const Artist = () => {
     formData.append("artistBirth", input.artistBirth);
     formData.append("artistDeath", input.artistDeath);
 
-    await axios.post("http://localhost:8080/artist/", formData, {
+    await axios.post("/artist/", formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -189,7 +189,7 @@ const Artist = () => {
   }, [input]);
 
   const deleteArtist = useCallback(async (artistNo) => {
-    await axios.delete(`http://localhost:8080/artist/${artistNo}`);
+    await axios.delete(`/artist/${artistNo}`);
     window.alert("삭제가 완료되었습니다.");
     loadArtistList();
     closeDetailModal();
@@ -251,7 +251,7 @@ const Artist = () => {
 
   //   formData.append("originList", updateInput.attachment); //updateInput.attachment /  loadImages
 
-  //   await axios.post("http://localhost:8080/artist/edit", formData, {
+  //   await axios.post("/artist/edit", formData, {
   //     headers: {
   //       'Content-Type': 'multipart/form-data',
   //     },
@@ -280,7 +280,7 @@ const Artist = () => {
     const originList = fileList.length > 0 ? loadImages : updateInput.attachment;
     formData.append("originList", originList);
 
-    await axios.post("http://localhost:8080/artist/edit", formData, {
+    await axios.post("/artist/edit", formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -709,7 +709,7 @@ const Artist = () => {
               <div className="row text-center">
                 <div className="col">
                   {detailArtist.attachment ? (
-                    <img src={`http://localhost:8080/attach/download/${detailArtist.attachment}`} style={{ width: 200 }} />
+                    <img src={`${process.env.REACT_APP_BASE_URL}/attach/download/${detailArtist.attachment}`} style={{ width: 200 }} />
                   ) : (
                     <img src="https://placeholder.com/200" style={{ width: 200 }} />
                   )}

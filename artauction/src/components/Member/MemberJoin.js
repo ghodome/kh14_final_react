@@ -102,7 +102,7 @@ const MemberJoin = () => {
             const value = input.memberId;
             if (!value) return;
 
-            const resp = await axios.get(`http://localhost:8080/member/checkId`, {
+            const resp = await axios.get(`/member/checkId`, {
                 params: { memberId: value }
             });
             if (!resp.data) {
@@ -121,7 +121,7 @@ const MemberJoin = () => {
             const value = input.memberName;
             if (!value) return;
 
-            const resp = await axios.get(`http://localhost:8080/member/checkName`, {
+            const resp = await axios.get(`/member/checkName`, {
                 params: { memberName: value }
             });
             if (!resp.data) {
@@ -169,7 +169,7 @@ const MemberJoin = () => {
         }
 
         try {
-            const resp = await axios.post("http://localhost:8080/member/join", input);
+            const resp = await axios.post("/member/join", input);
             console.log(resp.data);
             navigate("/login");
         } catch (error) {

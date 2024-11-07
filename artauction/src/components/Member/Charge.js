@@ -34,12 +34,12 @@ const Charge = ()=>{
     }, []);
 
     const loadMember = useCallback(async () => {
-        const resp = await axios.get("http://localhost:8080/member/find");
+        const resp = await axios.get("/member/find");
         setMember(resp.data[0]);
     }, []);
 
     const loadList = useCallback(async()=>{
-        const resp = await axios.get("http://localhost:8080/charge/");
+        const resp = await axios.get("/charge/");
         setList(resp.data);
     },[]);
 
@@ -47,7 +47,7 @@ const Charge = ()=>{
         if(money === 0) return;
 
         const resp = await axios.post(
-                    "http://localhost:8080/member/charge/purchase", 
+                    "/member/charge/purchase", 
                     {
                         totalAmount : money,
                         approvalUrl : getCurrentUrl() + "/success",
@@ -67,14 +67,14 @@ const Charge = ()=>{
     const sendRefundRequest = useCallback(async()=>{
         if(refund ===0)return;
         try{
-            await axios.post("http://localhost:8080/member/verfiyPw",null, {
+            await axios.post("/member/verfiyPw",null, {
                 params: {
                     memberId: member.memberId, 
                     memberPw: memberPw
                 }
             });
 
-            const resp = await axios.post("http://localhost:8080/member/refund/"+refund);
+            const resp = await axios.post("/member/refund/"+refund);
             console.log(resp.data);
             alert("환불 성공!");
         }

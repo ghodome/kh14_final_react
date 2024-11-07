@@ -21,7 +21,7 @@ const Mypage = () => {
         if (memberId) {  // memberId가 있을 때만 호출
             const loadMember = async () => {
                 try {
-                    const resp = await axios.get(`http://localhost:8080/member/${memberId}`);
+                    const resp = await axios.get(`/member/${memberId}`);
                     setMember(resp.data);
                     setBlocked(resp.data.blocked); // 차단 상태 업데이트
                 } catch (error) {
@@ -36,7 +36,7 @@ const Mypage = () => {
     // 미술품 목록 불러오기
     const loadInven = useCallback(async () => {
         try {
-            const resp = await axios.get("http://localhost:8080/inventory/find");
+            const resp = await axios.get("/inventory/find");
             setItemList(resp.data);
         } catch (error) {
             console.error("Failed to load inventory:", error);
@@ -49,7 +49,7 @@ const Mypage = () => {
         if (!confirmDelete) return;
 
         try {
-            await axios.delete(`http://localhost:8080/member/delete/${member.memberId}`);
+            await axios.delete(`/member/delete/${member.memberId}`);
             navigate("/login");
         } catch (error) {
             console.error("Failed to delete member:", error);
@@ -58,7 +58,7 @@ const Mypage = () => {
 
     // 수령 완료 처리
     const saveInsertInput = useCallback(async () => {
-        await axios.delete(`http://localhost:8080/inventory/${inventoryId}`);
+        await axios.delete(`/inventory/${inventoryId}`);
         clearInsertInput();
         closeInsertModal();
         alert("수령 완료 배달이 시작됩니다");

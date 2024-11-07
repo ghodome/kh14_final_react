@@ -17,7 +17,7 @@ const FindPw = () => {
         }
 
         try {
-            const resp = await axios.post('http://localhost:8080/member/findPw', { memberId, memberEmail });
+            const resp = await axios.post(`/member/findPw`, { memberId, memberEmail });
             setMessage('비밀번호 재설정 이메일이 전송되었습니다.'); // 이메일 전송 성공
         } catch (error) {
             setMessage('아이디와 이메일이 일치하지 않습니다.'); // 오류 처리
