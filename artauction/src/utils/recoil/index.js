@@ -10,6 +10,7 @@
 */
 
 import {atom, selector} from "recoil";
+import axios from "axios";
 
 const countState = atom({
     key: "countState", //식별자(ID)
@@ -53,6 +54,15 @@ const loginState = selector({
     }
 });
 export {memberIdState, memberRankState, loginState, blockedState, memberPointState, endState};
+
+// axios.defaults.baseURL=process.env.REACT_APP_BASE_URL;
+axios.defaults.baseURL=process.env.REACT_APP_BASE_URL;
+axios.defaults.timeout=10000;
+//axios customize
+//- 환경설정(.env)에 정의된 값을 읽어온다
+//- process.env.항목이름
+
+
 
 //로그인 처리 완료 여부
 const memberLoadingState = atom({

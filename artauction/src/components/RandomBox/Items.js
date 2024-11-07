@@ -29,7 +29,7 @@ const Items = () => {
             setBoxClass("random-box shake"); // 흔들리는 애니메이션 시작
 
             setTimeout(async () => {
-                const resp = await axios.get("http://localhost:8080/item/randomBox");
+                const resp = await axios.get("/item/randomBox");
                 if(resp.data.length===0){
                     alert("포인트 부족");
                 }
@@ -56,12 +56,12 @@ const Items = () => {
 
     // 아이템 삭제 함수
     const deleteItem = useCallback(async (itemId) => {
-        await axios.delete(`http://localhost:8080/item/${itemId}`);
+        await axios.delete(`/item/${itemId}`);
     }, []);
 
     // 아이템 목록 로드 함수
     const loadItems = useCallback(async () => {
-        const resp = await axios.get("http://localhost:8080/item/list");
+        const resp = await axios.get("/item/list");
         setItem(resp.data);
     }, []);
 
@@ -80,7 +80,7 @@ const Items = () => {
 
     // 등록 저장 함수
     const saveInsertInput = useCallback(async () => {
-        await axios.post("http://localhost:8080/item/", insert);
+        await axios.post("/item/", insert);
         clearInsertInput();
         closeInsertModal();
     }, [insert]);

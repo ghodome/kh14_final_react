@@ -32,7 +32,7 @@ const MemberEdit = () => {
     };
 
     const loadMember = useCallback(async () => {
-        const resp = await axios.get(`http://localhost:8080/member/${memberId}`);
+        const resp = await axios.get(`/member/${memberId}`);
         setMember(resp.data);
     }, [memberId, navigate]);
 
@@ -59,7 +59,7 @@ const MemberEdit = () => {
         };
 
         try {
-            await axios.patch("http://localhost:8080/member/update", updateMember);
+            await axios.patch("/member/update", updateMember);
             alert("회원 정보가 수정되었습니다.");
             navigate(`/admin/member/detail/${memberId}`); // 수정 후 해당 회원 상세 페이지로 리다이렉트
         } catch (error) {

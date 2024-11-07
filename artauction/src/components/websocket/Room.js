@@ -18,7 +18,7 @@ const Room = ()=>{
 
     //callback
     const loadRoomList = useCallback(async ()=>{
-        const resp = await axios.get("http://localhost:8080/room/");
+        const resp = await axios.get("/room/");
         setRoomList(resp.data);
     }, [roomList]);
 
@@ -28,25 +28,25 @@ const Room = ()=>{
     }, [input]);
 
     const saveInput = useCallback(async ()=>{
-        const resp = await axios.post("http://localhost:8080/room/", input);
+        const resp = await axios.post("/room/", input);
         loadRoomList();
         setInput({roomName:""});
     }, [input]);
 
     const deleteRoom = useCallback(async (target)=>{
-        const resp = await axios.delete("http://localhost:8080/room/"+target.roomNo);
+        const resp = await axios.delete("/room/"+target.roomNo);
         loadRoomList();
     }, [roomList]);
 
     const enterRoom = useCallback(async (target)=>{
-        await axios.post("http://localhost:8080/room/enter", {roomNo : target.roomNo});
+        await axios.post("/room/enter", {roomNo : target.roomNo});
         loadRoomList();
         //방으로 이동     
         navigate("/roomchat/"+target.roomNo);   
     }, [roomList]);
 
     const leaveRoom = useCallback(async (target)=>{
-        await axios.post("http://localhost:8080/room/leave", {roomNo : target.roomNo});
+        await axios.post("/room/leave", {roomNo : target.roomNo});
         loadRoomList();
     }, [roomList]);
 

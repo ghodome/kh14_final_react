@@ -33,7 +33,7 @@ const ChargeSuccess = ()=>{
     console.log("pgToken = ",pgToken);
       try{
        const resp = await axios.post(
-           "http://localhost:8080/member/charge/approve",
+           "/member/charge/approve",
            {
                partnerOrderId : partnerOrderId,
                pgToken : pgToken,

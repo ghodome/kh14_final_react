@@ -14,7 +14,7 @@ const Giveup = () =>{
     },[]);
 
     const loadList = useCallback(async()=>{
-        const resp = await axios.get("http://localhost:8080/payment/giveup")
+        const resp = await axios.get("/payment/giveup")
         setList(resp.data);
     },[]);
 

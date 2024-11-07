@@ -44,7 +44,7 @@ const MemberLogin = () => {
         }
 
         try {
-            const resp = await axios.post("http://localhost:8080/member/login", input);
+            const resp = await axios.post("/member/login", input);
             setMemberId(resp.data.memberId);
             setMemberRank(resp.data.memberRank);
 

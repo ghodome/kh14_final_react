@@ -38,7 +38,7 @@ const MemberUpdate = () => {
 
     const loadMember = useCallback(async () => {
         try {
-            const resp = await axios.get("http://localhost:8080/member/find");
+            const resp = await axios.get("/member/find");
             setMember(resp.data[0]);
         } catch (error) {
             console.error("Failed to load member data:", error);
@@ -62,7 +62,7 @@ const MemberUpdate = () => {
 
     const handlePasswordSubmit = async () => {
         try {
-            const resp = await axios.post("http://localhost:8080/member/verfiyPw", null, {
+            const resp = await axios.post("/member/verfiyPw", null, {
                 params: {
                     memberId: member.memberId,
                     memberPw: currentPw
@@ -101,7 +101,7 @@ const MemberUpdate = () => {
                 memberAddress2: member.memberAddress2 || undefined,
             };
 
-            await axios.patch("http://localhost:8080/member/update", updateMember);
+            await axios.patch("/member/update", updateMember);
             alert("회원 정보가 수정되었습니다.");
             navigate("/member/mypage");
         } catch (error) {

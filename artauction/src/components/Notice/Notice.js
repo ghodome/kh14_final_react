@@ -34,7 +34,7 @@ const Notice = () => {
     //callback
     const loadNoticeList = useCallback(async () => {
         try {
-            const resp = await axios.get("http://localhost:8080/notice/list");
+            const resp = await axios.get("/notice/list");
             // 날짜 기준으로 내림차순 정렬
             const sortedNotices = resp.data.sort((a, b) => new Date(b.noticeWtime) - new Date(a.noticeWtime));
             setAllNotices(sortedNotices);
@@ -50,8 +50,8 @@ const Notice = () => {
             loadNoticeList();
         } else {
             try {
-                const respTitle = await axios.get(`http://localhost:8080/notice/column/notice_title/keyword/${keyword}`);
-                const respType = await axios.get(`http://localhost:8080/notice/column/notice_type/keyword/${keyword}`);
+                const respTitle = await axios.get(`/notice/column/notice_title/keyword/${keyword}`);
+                const respType = await axios.get(`/notice/column/notice_type/keyword/${keyword}`);
                 const combinedResults = [...respTitle.data, ...respType.data];
 
                 const uniqueResults = Array.from(new Set(combinedResults.map(notice => notice.noticeNo)))
@@ -69,7 +69,7 @@ const Notice = () => {
 
     const handleAddNotice = async () => {
         try {
-            await axios.post("http://localhost:8080/notice/plus", {
+            await axios.post("/notice/plus", {
                 noticeType: newNotice.type,
                 noticeTitle: newNotice.title,
                 noticeContent: newNotice.content,

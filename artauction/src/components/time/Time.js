@@ -10,7 +10,7 @@ const Time = ({endDate})=>{
 
     const getTime = useCallback(async () => {
         try {
-            const resp = await axios.get("http://localhost:8080/time/");
+            const resp = await axios.get("/time/");
             const currentDateTime = new Date(resp.data);
 
             const delay = 1000 - currentDateTime.getMilliseconds();

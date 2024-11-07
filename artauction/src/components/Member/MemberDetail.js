@@ -20,7 +20,7 @@ const MemberDetail = () => {
 
     const loadMember = useCallback(async () => {
         try {
-            const resp = await axios.get(`http://localhost:8080/member/${memberId}`);
+            const resp = await axios.get(`/member/${memberId}`);
             setMember(resp.data);
             setBlocked(resp.data.blocked);
             if (resp.data.blocked) {
@@ -38,7 +38,7 @@ const MemberDetail = () => {
         const confirmDelete = window.confirm("정말 삭제하시겠습니까?");
         if (!confirmDelete) return;
         try {
-            await axios.delete(`http://localhost:8080/member/delete/${memberId}`);
+            await axios.delete(`/member/delete/${memberId}`);
             navigate("/admin/member/list");
         } catch (error) {
             console.error("Failed to delete member:", error);
@@ -56,7 +56,7 @@ const MemberDetail = () => {
         if (!confirmBlock) return;
 
         try {
-            await axios.post(`http://localhost:8080/member/block`, {
+            await axios.post(`/member/block`, {
                 blockMemberId: memberId,
                 blockReason: blockReasonInput,
                 blockType: "차단",
@@ -77,7 +77,7 @@ const MemberDetail = () => {
         if (!confirmUnblock) return;
 
         try {
-            await axios.delete(`http://localhost:8080/member/unblock/${memberId}`);
+            await axios.delete(`/member/unblock/${memberId}`);
             setBlocked(false);
             setBlockReason(null);
             localStorage.removeItem(`blockReason_${memberId}`);

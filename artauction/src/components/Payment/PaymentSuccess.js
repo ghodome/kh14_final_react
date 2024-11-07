@@ -33,7 +33,7 @@ const PaymentSuccess = () =>{
     const pgToken = query.get("pg_token");
       try{
        const resp = await axios.post(
-           "http://localhost:8080/payment/approve",
+           "/payment/approve",
            {
                partnerOrderId : partnerOrderId,
                pgToken : pgToken,

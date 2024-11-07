@@ -28,7 +28,7 @@ const Faq = () => {
 
     //callback
     const loadFaqList = useCallback(async () => {
-        const resp = await axios.get("http://localhost:8080/faq/list");
+        const resp = await axios.get("/faq/list");
         setFaqList(resp.data);
         setFilteredFaqs(resp.data.filter(faq => faq.faqType === selectedType));
     }, [selectedType]);
@@ -87,9 +87,9 @@ const Faq = () => {
                 const faqToSubmit = { ...currentFaq, faqContent: formattedContent };
     
                 if (currentFaq.faqNo) {
-                    await axios.put(`http://localhost:8080/faq/`, faqToSubmit);
+                    await axios.put(`/faq/`, faqToSubmit);
                 } else {
-                    await axios.post(`http://localhost:8080/faq/plus`, faqToSubmit);
+                    await axios.post(`/faq/plus`, faqToSubmit);
                 }
                 closeModal();
                 loadFaqList();
@@ -104,7 +104,7 @@ const Faq = () => {
         const confirmDelete = window.confirm("정말로 삭제하시겠습니까?");
         if (confirmDelete) {
             try {
-                await axios.delete(`http://localhost:8080/faq/${faqNo}`);
+                await axios.delete(`/faq/${faqNo}`);
                 loadFaqList();
             } catch (error) {
                 console.error("삭제 실패:", error);

@@ -47,7 +47,7 @@ const AuctionSchedule = () => {
     // 경매 일정 목록 불러오기
     const loadAuctionScheduleList = useCallback(async () => {
         try {
-            const resp = await axios.post("http://localhost:8080/auctionSchedule/", {
+            const resp = await axios.post("/auctionSchedule/", {
                 beginRow: Number(row.beginRow),
                 endRow: Number(row.endRow)
             });
@@ -162,7 +162,7 @@ const AuctionSchedule = () => {
             console.log('FormData entries:', Array.from(formData.entries()));
     
             // 서버로 요청 전송
-            const resp = await axios.post("http://localhost:8080/auctionSchedule/", formData, {
+            const resp = await axios.post("/auctionSchedule/", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
     
@@ -328,7 +328,7 @@ const AuctionSchedule = () => {
                                 </div>
                             ) : (
                                 <div className="col-3 p-4">
-                                    <img src={`http://localhost:8080/attach/download/${schedule.attachment}`} 
+                                    <img src={`${process.env.REACT_APP_BASE_URL}/attach/download/${schedule.attachment}`} 
                                             className="img-thumbnail rounded-1" alt="이미지 정보 없음"/>
                                 </div>
                             )}

@@ -61,7 +61,7 @@ const WorkList = () => {
     const [ancientList, setAncientList] = useState([]);
 
     const loadArtistList = useCallback(async () => {
-        const resp = await axios.post("http://localhost:8080/artist/", inputKeyword);
+        const resp = await axios.post(`/artist/`, inputKeyword);
         setArtistList(resp.data.artistList);
     }, [artistList, inputKeyword]);
 
@@ -162,7 +162,7 @@ const WorkList = () => {
         formData.append("workSize", input.workSize);
         formData.append("workCategory", input.workCategory);
 
-        await axios.post("http://localhost:8080/work/", formData, {
+        await axios.post("/work/", formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -198,6 +198,7 @@ const WorkList = () => {
     }, []);
 
     useEffect(() => {
+        clearCollapse();
         setCollapse({
             work: true,
             modern: false,
@@ -208,10 +209,10 @@ const WorkList = () => {
             artButton: "btn",
             ancientButton: "btn"
         });
-    }, []);
+    }, [page]);
 
     const loadWorkList = useCallback(async () => {
-        const resp = await axios.post("http://localhost:8080/work/", inputKeyword);
+        const resp = await axios.post(`/work/`, inputKeyword);
         setWorkList(resp.data.workList);
 
         setModernList(
@@ -243,7 +244,7 @@ const WorkList = () => {
 
     //삭제
     const deleteWork = useCallback(async (workNo) => {
-        await axios.delete(`http://localhost:8080/work/${workNo}`);
+        await axios.delete(`/work/${workNo}`);
         window.alert("삭제가 완료되었습니다.");
         loadWorkList();
         closeEditModal();
@@ -350,36 +351,6 @@ const WorkList = () => {
     const [workFileClass, setWorkFileClass] = useState("");
     const [workFileValid, setWorkFileValid] = useState(true);
 
-    // const saveTarget = useCallback(async () => {
-    //     const formData = new FormData();
-    //     const fileList = inputFileRef.current.files;
-
-    //     for (let i = 0; i < fileList.length; i++) {
-    //         formData.append("attachList", fileList[i]);
-    //     }
-
-    //     formData.append("workTitle", target.workTitle);
-    //     formData.append("artistNo", target.artistNo);
-    //     formData.append("workDescription", target.workDescription);
-    //     formData.append("workMaterials", target.workMaterials);
-    //     formData.append("workSize", target.workSize);
-    //     formData.append("workCategory", target.workCategory);
-    //     formData.append("workNo", target.workNo);
-
-    //     formData.append("originList", target.attachment); // 삭제 하지 않을 그림들의 첨부파일번호(attachmentNo) - target.attachment / loadImages
-
-    //     await axios.post("http://localhost:8080/work/edit", formData, {
-    //         headers: {
-    //             'Content-Type': 'multipart/form-data',
-    //         },
-    //     });
-
-    //     setImage(loadImages);
-
-    //     closeEditModal();
-    //     loadWorkList();
-    // }, [target, loadImages]);
-
     const saveTarget = useCallback(async () => {
         const formData = new FormData();
         const fileList = inputFileRef.current.files;
@@ -403,7 +374,7 @@ const WorkList = () => {
             formData.append("originList", target.attachment); // 첨부된 파일이 없는 경우 기존 목록 유지
         }
 
-        await axios.post("http://localhost:8080/work/edit", formData, {
+        await axios.post("/work/edit", formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -438,10 +409,34 @@ const WorkList = () => {
         }
         setIsEditing(!isEditing);
     };
+    //카테고리
+    const clearCollapse = useCallback(() => {
+        setCollapse({
+            work: false,
+            modern: false,
+            art: false,
+            ancient: false,
+            workButton: "btn",
+            modernButton: "btn",
+            artButton: "btn",
+            ancientButton: "btn"
+        });
+    }, [collapse]);
 
     const pageClick = useCallback((pageNumber) => {
         setPage(pageNumber);
-    }, []);
+        clearCollapse(); // 페이지 이동 시 collapse 초기화
+        setCollapse({
+            work: true,
+            modern: false,
+            art: false,
+            ancient: false,
+            workButton: "btn border-warning text-warning",
+            modernButton: "btn",
+            artButton: "btn",
+            ancientButton: "btn"
+        });
+    }, [clearCollapse]);
 
     const sortedWorkList = [...workList].sort();
     const sortedModernList = [...modernList].sort();
@@ -484,20 +479,6 @@ const WorkList = () => {
 
         return sortedAncientList.slice(startIndex, endIndex);
     }, [sortedAncientList, collapse]);
-
-    //카테고리
-    const clearCollapse = useCallback(() => {
-        setCollapse({
-            work: false,
-            modern: false,
-            art: false,
-            ancient: false,
-            workButton: "btn",
-            modernButton: "btn",
-            artButton: "btn",
-            ancientButton: "btn"
-        });
-    }, [collapse]);
 
     const changeCollapse = useCallback((e) => {
         clearCollapse();
@@ -679,7 +660,7 @@ const WorkList = () => {
                             <div className="col mb-3" key={work.workNo}>
                                 <div className="card h-100 d-flex flex-column">
                                     <h3 className="card-header" style={{ height: '200px', overflow: 'hidden' }}>
-                                        <img src={`http://localhost:8080/attach/download/${work.attachment}`}
+                                        <img src={`${process.env.REACT_APP_BASE_URL}/attach/download/${work.attachment}`}
                                             className="card-img-top"
                                             style={{ height: '100%', width: '100%', objectFit: 'cover' }} />
                                     </h3>
@@ -740,7 +721,7 @@ const WorkList = () => {
                             <div className="col mb-3" key={work.workNo}>
                                 <div className="card h-100 d-flex flex-column">
                                     <h3 className="card-header" style={{ height: '200px', overflow: 'hidden' }}>
-                                        <img src={`http://localhost:8080/attach/download/${work.attachment}`}
+                                        <img src={`${process.env.REACT_APP_BASE_URL}/attach/download/${work.attachment}`}
                                             className="card-img-top"
                                             style={{ height: '100%', width: '100%', objectFit: 'cover' }} />
                                     </h3>
@@ -801,7 +782,7 @@ const WorkList = () => {
                             <div className="col mb-3" key={work.workNo}>
                                 <div className="card h-100 d-flex flex-column">
                                     <h3 className="card-header" style={{ height: '200px', overflow: 'hidden' }}>
-                                        <img src={`http://localhost:8080/attach/download/${work.attachment}`}
+                                        <img src={`${process.env.REACT_APP_BASE_URL}/attach/download/${work.attachment}`}
                                             className="card-img-top"
                                             style={{ height: '100%', width: '100%', objectFit: 'cover' }} />
                                     </h3>
@@ -862,7 +843,7 @@ const WorkList = () => {
                             <div className="col mb-3" key={work.workNo}>
                                 <div className="card h-100 d-flex flex-column">
                                     <h3 className="card-header" style={{ height: '200px', overflow: 'hidden' }}>
-                                        <img src={`http://localhost:8080/attach/download/${work.attachment}`}
+                                        <img src={`${process.env.REACT_APP_BASE_URL}/attach/download/${work.attachment}`}
                                             className="card-img-top"
                                             style={{ height: '100%', width: '100%', objectFit: 'cover' }} />
                                     </h3>
@@ -942,7 +923,7 @@ const WorkList = () => {
                         <div className="row mt-2">
                             <div className="col d-flex justify-content-center">
                                 {target.attachment ? (<>
-                                    <img src={`http://localhost:8080/attach/download/${target.attachment}`} style={{ width: 200 }} />
+                                    <img src={`${process.env.REACT_APP_BASE_URL}/attach/download/${target.attachment}`} style={{ width: 200 }} />
                                 </>) : (
                                     <img src="https://placeholder.com/200" style={{ width: 200 }} />
                                 )}
@@ -951,7 +932,7 @@ const WorkList = () => {
 
                         {/* 새로운 첨부 이미지 미리보기 */}
                         {attachImages.map((image, index) => (
-                            <div key={index} style={{ position: "relative", display: "inline-block" }}>
+                            <div key={index} style={{ position: "relative", display: "inline-b  k" }}>
                                 <img src={image} alt={`미리보기 ${index + 1}`} style={{ maxWidth: '100px', margin: '5px', display: "block" }} />
                                 <MdCancel
                                     style={{ position: "absolute", top: "10px", right: "10px", color: "red" }}

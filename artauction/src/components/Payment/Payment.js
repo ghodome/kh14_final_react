@@ -21,7 +21,7 @@ const Payment = () => {
 
     // callback
     const loadDealList = useCallback(async () => {
-        const resp = await axios.get("http://localhost:8080/deal/");
+        const resp = await axios.get("/deal/");
         setDealList(resp.data.map(deal => ({
             ...deal,
             select: false, // 체크박스용 상태값 추가
@@ -52,7 +52,7 @@ const Payment = () => {
     const sendPurchaseRequest = useCallback(async (dealList) => {
         if (dealList.length === 0) return;
 
-        const resp = await axios.post("http://localhost:8080/payment/purchase", {
+        const resp = await axios.post("/payment/purchase", {
             dealList: dealList,
             approvalUrl: getCurrentUrl() + "/success",
             cancelUrl: getCurrentUrl() + "/cancel",
@@ -67,7 +67,7 @@ const Payment = () => {
     //취소
     const sendGiveUp = useCallback(async(dealNo)=>{
         try{
-            const resp = await axios.post("http://localhost:8080/deal/giveup/"+dealNo);
+            const resp = await axios.post("/deal/giveup/"+dealNo);
         }
         catch{
             console.log("오류남");

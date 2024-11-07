@@ -55,7 +55,7 @@ const AuctionScheduleDetail = ()=>{
 
     //callback
     const loadAuctionSchedule = useCallback(async ()=>{
-        const resp = await axios.get("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
+        const resp = await axios.get("/auctionSchedule/"+auctionScheduleNo);
         // console.log(resp.data);
         setAuctionSchedule({
             ...resp.data,
@@ -138,7 +138,7 @@ const AuctionScheduleDetail = ()=>{
 
     //     formData.append("originList", target.attachment);
 
-    //     await axios.post("http://localhost:8080/auctionSchedule/edit", formData,
+    //     await axios.post("/auctionSchedule/edit", formData,
     //     { 
     //         headers:  { 
     //             "Content-Type": "multipart/form-data",
@@ -175,7 +175,7 @@ const AuctionScheduleDetail = ()=>{
         const originList = fileList.length > 0 ? loadImages : (target.attachment ? [target.attachment] : []);
         formData.append("originList", originList);
     
-        await axios.post("http://localhost:8080/auctionSchedule/edit", formData, {
+        await axios.post("/auctionSchedule/edit", formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
             },
@@ -197,7 +197,7 @@ const AuctionScheduleDetail = ()=>{
         const choice = window.confirm("정말 삭제하시겠습니까?");
         if(choice === false) return;
         
-        await axios.delete("http://localhost:8080/auctionSchedule/"+auctionScheduleNo);
+        await axios.delete("/auctionSchedule/"+auctionScheduleNo);
         navigate("/auctionschedule");
     }, [auctionSchedule]);
         
@@ -218,7 +218,7 @@ const AuctionScheduleDetail = ()=>{
         });
         // 기존 첨부파일 이미지 URL 설정
         setImages([
-            `http://localhost:8080/attach/download/${auctionSchedule.attachment}`
+            `${process.env.REACT_APP_BASE_URL}/attach/download/${auctionSchedule.attachment}`
         ]);
     }, [editModal]);
         
@@ -230,7 +230,7 @@ const AuctionScheduleDetail = ()=>{
     
     //출품작 목록
     const loadAuctionList=useCallback(async ()=>{   //출품작 불러오기
-        const resp=await axios.get(`http://localhost:8080/auction/${auctionScheduleNo}`);
+        const resp=await axios.get(`/auction/${auctionScheduleNo}`);
         // console.log(resp.data.auctionList);
         setAuctionList([
             ...resp.data
@@ -285,7 +285,7 @@ const AuctionScheduleDetail = ()=>{
                 window.alert("시작가격은 100원 단위여야 합니다.");
                 return;
             }
-            const resp=await axios.post(`http://localhost:8080/auction/`, presentInput);
+            const resp=await axios.post(`/auction/`, presentInput);
             console.log(presentInput.auctionLot===null)
             if(resp.status===200) 
                 window.alert("출품작 등록 완료");
@@ -300,7 +300,7 @@ const AuctionScheduleDetail = ()=>{
     //출품작 삭제
     const deleteLot=useCallback(async (auction)=>{
         if(window.confirm("출품 작품을 삭제하시겠습니까?")){
-            const resp=await axios.delete("http://localhost:8080/auction/"+auction.auctionNo)
+            const resp=await axios.delete("/auction/"+auction.auctionNo)
             if(resp.status===200)
             window.alert(`LOT : ${auction.auctionLot}, ${auction.workTitle}이(가) 삭제되었습니다`);
             loadAuctionList();
@@ -310,7 +310,7 @@ const AuctionScheduleDetail = ()=>{
     //출품 취소
     const cancelLot=useCallback(async (auction)=>{
         if(window.confirm("출품을 취소하시겠습니까?")){
-            const resp=await axios.get("http://localhost:8080/auction/cancelPresent/"+auction.auctionNo);
+            const resp=await axios.get("/auction/cancelPresent/"+auction.auctionNo);
             if(resp.status===200)
                 window.alert(`LOT : ${auction.auctionLot}, ${auction.workTitle}의 출품이 취소되었습니다`);
             clearPresentInput();
@@ -321,7 +321,7 @@ const AuctionScheduleDetail = ()=>{
     //출품 재등록
     const uncancelLot=useCallback(async (auction)=>{
         if(window.confirm("출품 하시겠습니까?")){
-            const resp=await axios.get("http://localhost:8080/auction/uncancelPresent/"+auction.auctionNo);
+            const resp=await axios.get("/auction/uncancelPresent/"+auction.auctionNo);
             if(resp.status===200)
                 window.alert(`LOT : ${auction.auctionLot}, ${auction.workTitle}의 출품이 등록되었습니다`);
             loadAuctionList();
@@ -420,7 +420,7 @@ const AuctionScheduleDetail = ()=>{
             {/* 경매일정 이미지 */}
             <div className="row mt-4 text-center">
                 <div className="col my-4">
-                        <img src={`http://localhost:8080/attach/download/${auctionSchedule.attachment}`} 
+                        <img src={`${process.env.REACT_APP_BASE_URL}/attach/download/${auctionSchedule.attachment}`} 
                                 className="img-thumbnail rounded-1" alt="" height='300px' width='500px' />
                 </div>
             </div>
